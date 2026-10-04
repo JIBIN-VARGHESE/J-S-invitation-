@@ -108,16 +108,34 @@ window.WEDDING = {
   },
 
   /* ---------------------------------------------------------- SCENE ARTWORK */
-  // Painted scenes. Portrait versions are used on phones, landscape on wider
-  // screens. Replace with your own artwork at the same proportions if you like.
+  // Painted artwork. The header uses three layers that scroll at different
+  // speeds: sky (back), church (middle), floral arch (front).
+  // church & arch need a TRANSPARENT background (WebP or PNG).
   scenes: {
-    churchPortrait:  "assets/images/scenes/church-portrait.webp",   // 1170×2080, church door at 50% / 84.8% (camera zooms into it)
-    churchLandscape: "assets/images/scenes/church-landscape.webp",  // 2400×1350, church door at 50% / 81.65%
-    navePortrait:    "assets/images/scenes/nave-portrait.webp",     // inside the church (invitation)
-    naveLandscape:   "assets/images/scenes/nave-landscape.webp",
-    duskPortrait:    "assets/images/scenes/dusk-portrait.webp",     // closing
-    duskLandscape:   "assets/images/scenes/dusk-landscape.webp",
-    window:          "assets/images/scenes/window.webp",            // stained glass (verse + engagement)
+    skyPortrait:   "assets/images/scenes/sky-p.webp",            // phones
+    skyLandscape:  "assets/images/scenes/sky-l.webp",            // tablets / desktop
+    church:        "assets/images/scenes/church.webp",
+    archPortrait:  "assets/images/scenes/arch-portrait.webp",
+    archLandscape: "assets/images/scenes/arch-landscape.webp",
+    duskPortrait:  "assets/images/scenes/dusk-portrait.webp",    // closing scene
+    duskLandscape: "assets/images/scenes/dusk-landscape.webp",
+    window:        "assets/images/scenes/window.webp",           // stained glass
+  },
+
+  /* ---------------------------------------------------------------- MOMENTS */
+  // The polaroid stack ("Touch here for magic"). 5–6 photos work best.
+  // These are PLACEHOLDERS — replace the files, or set enabled: false to hide
+  // the whole section.
+  moments: {
+    enabled: true,
+    photos: [
+      { src: "assets/images/moments/01.jpg", caption: "" },
+      { src: "assets/images/moments/02.jpg", caption: "" },
+      { src: "assets/images/moments/03.jpg", caption: "" },
+      { src: "assets/images/moments/04.jpg", caption: "" },
+      { src: "assets/images/moments/05.jpg", caption: "" },
+      { src: "assets/images/moments/06.jpg", caption: "" },
+    ],
   },
 
   /* ------------------------------------------------------------------ MUSIC */

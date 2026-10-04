@@ -2,7 +2,7 @@
    Jibin & Sofi — main script
    1. Content binding from config.js
    2. Scroll engine  (sets --p on [data-scrub] elements, one rAF per frame)
-   3. Reveal-on-enter (IntersectionObserver)
+   3. Fade-in on enter (IntersectionObserver) + polaroid "magic" scatter
    4. Countdown (Asia/Kolkata, IST = UTC+05:30)
    5. Music control
    No wedding details live here — edit config.js instead.
@@ -165,14 +165,14 @@
     p = Math.min(1, Math.max(0, p));
     if (node._p !== p) { node._p = p; node.style.setProperty("--p", p.toFixed(4)); }
   }
-  var hero, heroInside = false;
+  var hero, heroVisible = true, lastY = -1;
   function frame() {
     ticking = false;
     active.forEach(measure);
-    // Swap stages inside the hero so only one painted scene is ever drawn
-    if (hero && (hero._p > .4) !== heroInside) {
-      heroInside = !heroInside;
-      hero.classList.toggle("is-inside", heroInside);
+    // Feature 1 · three-layer parallax: one number drives every layer's speed (see CSS)
+    if (hero && heroVisible) {
+      var y = Math.round(Math.min(window.scrollY, window.innerHeight * 1.2));
+      if (y !== lastY) { lastY = y; hero.style.setProperty("--y", y); }
     }
     if (progressBar) {
       var max = root.scrollHeight - window.innerHeight;
@@ -186,6 +186,9 @@
     hero = doc.querySelector(".hero");
     scrubs = Array.prototype.slice.call(doc.querySelectorAll("[data-scrub]"));
     if (reduceMotion.matches) return; // CSS supplies calm static states
+    new IntersectionObserver(function (entries) {
+      heroVisible = entries[0].isIntersecting;
+    }).observe(hero);
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         if (e.isIntersecting) active.add(e.target);
@@ -198,37 +201,84 @@
     window.addEventListener("resize", requestFrame, { passive: true });
   }
 
-  /* ------------------------------------------------ 3. reveal on enter */
-  function initReveals() {
-    var items = doc.querySelectorAll(".reveal");
-    // Stagger siblings that share a parent
-    var counts = new Map();
-    items.forEach(function (n) {
-      var parent = n.parentElement;
-      var c = counts.get(parent) || 0;
-      counts.set(parent, c + 1);
-      if (c) n.style.setProperty("--d", (Math.min(c, 6) * 0.12).toFixed(2) + "s");
-    });
-    if (reduceMotion.matches || !("IntersectionObserver" in window)) {
-      items.forEach(function (n) { n.classList.add("is-in"); });
-      return;
-    }
-    // A fully clip-pathed element never reports as intersecting, so clip/draw
-    // reveals are triggered by their parent instead.
-    var targets = new Map();
-    items.forEach(function (n) {
-      var t = n.hasAttribute("data-reveal") ? n.parentElement : n;
-      if (!targets.has(t)) targets.set(t, []);
-      targets.get(t).push(n);
-    });
+  /* ----------------------- 3. Feature 2 · fade + float up on enter */
+  // Every <section> and <article> floats up 40px and fades in as it enters.
+  // Pinned scenes (data-nofade) animate with the scroll engine instead.
+  function initFades() {
+    var items = doc.querySelectorAll("main section:not([data-nofade]), main article");
+    if (reduceMotion.matches || !("IntersectionObserver" in window)) return;
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         if (!e.isIntersecting) return;
-        targets.get(e.target).forEach(function (n) { n.classList.add("is-in"); });
+        e.target.classList.add("is-in");
         io.unobserve(e.target);
+        // drop the transform afterwards so the element stops being its own layer
+        e.target.addEventListener("transitionend", function done(ev) {
+          if (ev.target !== e.target || ev.propertyName !== "transform") return;
+          e.target.classList.remove("fade", "is-in");
+          e.target.removeEventListener("transitionend", done);
+        });
       });
-    }, { rootMargin: "0px 0px -12% 0px", threshold: 0 });
-    targets.forEach(function (_, t) { io.observe(t); });
+    }, { rootMargin: "0px 0px -10% 0px", threshold: 0 });
+    items.forEach(function (n) { n.classList.add("fade"); io.observe(n); });
+  }
+
+  /* ------------------------------ Feature 3 · "Touch here for magic" */
+  function initMoments() {
+    var M = C.moments || {};
+    var section = doc.getElementById("moments");
+    var stage = doc.querySelector(".polaroids");
+    var btn = doc.querySelector(".btn--magic");
+    if (!section || !stage || !btn) return;
+    if (!M.enabled || !M.photos || !M.photos.length) { section.hidden = true; return; }
+
+    var cards = [], scattered = false, topZ = 10;
+    M.photos.slice(0, 8).forEach(function (ph, i) {
+      var fig = el("figure", "polaroid");
+      var img = el("img");
+      img.src = ph.src; img.alt = ph.caption || "Photograph " + (i + 1); img.loading = "lazy"; img.decoding = "async";
+      fig.appendChild(img);
+      fig.appendChild(el("figcaption", null, ph.caption || ""));
+      fig.style.zIndex = i + 1;
+      fig.addEventListener("click", function () { if (scattered) fig.style.zIndex = ++topZ; });
+      stage.appendChild(fig);
+      cards.push(fig);
+    });
+
+    function rand(a, b) { return a + Math.random() * (b - a); }
+    function set(card, x, y, r, delay) {
+      card.style.setProperty("--sx", x.toFixed(1) + "px");
+      card.style.setProperty("--sy", y.toFixed(1) + "px");
+      card.style.setProperty("--r", r.toFixed(1) + "deg");
+      card.style.setProperty("--delay", delay + "s");
+    }
+    function stack() {   // a neat, slightly untidy pile in the centre
+      cards.forEach(function (c, i) { set(c, rand(-8, 8), rand(-6, 6), rand(-9, 9), i * .04); });
+    }
+    function scatter() { // fly apart to random spots inside the stage
+      var W = stage.clientWidth, H = stage.clientHeight;
+      var cw = cards[0].offsetWidth, ch = cards[0].offsetHeight;
+      // leave room for the tilt so rotated corners stay on screen
+      var maxX = Math.max(0, (W - cw) / 2 - cw * .2), maxY = Math.max(0, (H - ch) / 2 - ch * .1);
+      var cols = W > 700 ? 3 : 2, rows = Math.ceil(cards.length / cols);
+      // jittered grid keeps photos spread out instead of piling up by chance
+      var order = cards.map(function (_, i) { return i; }).sort(function () { return Math.random() - .5; });
+      cards.forEach(function (c, i) {
+        var slot = order[i], cx = slot % cols, cy = Math.floor(slot / cols);
+        var x = (cols === 1 ? 0 : (cx / (cols - 1)) * 2 - 1) * maxX + rand(-18, 18);
+        var y = (rows === 1 ? 0 : (cy / (rows - 1)) * 2 - 1) * maxY + rand(-14, 14);
+        set(c, Math.max(-maxX, Math.min(maxX, x)), Math.max(-maxY, Math.min(maxY, y)), rand(-18, 18), i * .07);
+      });
+    }
+    stack();
+    btn.addEventListener("click", function () {
+      scattered = !scattered;
+      stage.classList.toggle("is-scattered", scattered);
+      btn.setAttribute("aria-pressed", String(scattered));
+      btn.querySelector(".btn--magic__label").textContent = scattered ? "Gather them back" : "Touch here for magic";
+      if (scattered) scatter(); else stack();
+    });
+    window.addEventListener("resize", function () { if (scattered) scatter(); });
   }
 
   /* -------------------------------------------------- 4. countdown (IST) */
@@ -312,7 +362,8 @@
   bindContent();
   renderLists();
   initScroll();
-  initReveals();
+  initFades();
+  initMoments();
   initCountdown();
   initMusic();
   if (window.RSVP) window.RSVP.init(doc.querySelector(".rsvp__form"), C.rsvp || {});

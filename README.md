@@ -10,7 +10,8 @@ assets/
   js/main.js            content binding, scroll engine, countdown, lightbox, music
   js/rsvp.js            RSVP validation + swappable delivery providers (isolated)
   images/
-    scenes/             painted scenes (WebP): church, nave, dusk, stained glass, textures
+    scenes/             painted artwork (WebP): header layers, dusk closing, stained glass
+    moments/01–06.jpg   polaroid photos (placeholders)
     og-image.jpg        WhatsApp / social preview (1200×630)
   icons/favicon.svg
   music/                put wedding.mp3 here
@@ -31,18 +32,16 @@ Open **`config.js`**. It holds the names, dates, times, venues, addresses, map l
 
 **The one exception is the link preview.** WhatsApp and iMessage read the `<meta property="og:…">` tags at the top of `index.html` without running JavaScript, so edit those by hand. After deploying, change `og:image` to the full URL, for example `https://YOUR-USERNAME.github.io/YOUR-REPO/assets/images/og-image.jpg`. Otherwise many apps won't show the image.
 
-## 2. The painted scenes
+## 2. Artwork and photos
 
-The scenes are oil-painting-style images in `assets/images/scenes/`:
-- the church at dawn, which the camera flies into
-- the nave where the invitation appears
-- the church at dusk for the closing
-- a stained-glass window
-- two canvas textures
+**Header (three-layer parallax).** The header is three painted layers that scroll at different speeds:
+- `sky-p` / `sky-l`: the sunset sky. It moves slowest.
+- `church.webp`: the church on its lawn, with a transparent background. It moves slowly.
+- `arch-portrait` / `arch-landscape`: the floral arch in front, with a transparent background. It moves up fastest.
 
-Phones get the portrait versions; tablets in landscape and desktops get the landscape ones.
+All of these are in `assets/images/scenes/`, and their paths are set in `config.js → scenes`. To use your own artwork, keep the same proportions and keep transparency on the church and arch layers. The layer speeds are the `calc(var(--y) * …)` values under "HEADER (parallax)" in `styles.css`.
 
-To use your own artwork (for example AI-generated paintings), set the paths in `config.js → scenes` and keep the same proportions. In the church paintings, the camera zooms into the **church door**. The door must sit horizontally centred, at **84.8 %** from the top in the portrait version and **81.65 %** in the landscape version. Otherwise, change `--door` in `styles.css`.
+**Moments (polaroids).** `config.js → moments` lists 5–6 photos for the polaroid stack and the "Touch here for magic" scatter. The files in `assets/images/moments/` are **placeholders**. Replace them with your photos (portrait, about 800 × 900 px, under 200 KB each), or set `moments.enabled: false` to hide the section.
 
 ## 3. Music
 
@@ -106,11 +105,11 @@ The empty `.nojekyll` file tells Pages to serve files as they are. All paths are
 - **Information sections.** Events sit in framed cards with a photograph, title, details and a location button. The countdown uses small tiles on a textured ivory paper. Then comes "Will you join us?" with an RSVP call to action.
 - **Closing.** A wide landscape scene is the final, still image.
 
-**The original visual system made for Jibin & Sofi:**
-- **Palette.** Ivory with a muted gold, borrowed from the *kasavu* saree (off-white with a gold border), and deep forest green. Gold is only for hairlines and large type. Small gold text uses a darker shade so it stays readable.
-- **Type.** Cormorant Garamond for display and body, with italic instead of a script font for an editorial rather than template feel. Jost in small spaced capitals for labels.
-- **Motifs.** A line-drawn Kerala church façade, coconut palms, jasmine (*mulla*) sprigs, a rose window, and rounded church-window arches on every photo frame. The cross is a small *budded* cross, a quiet nod to the St Thomas Christian tradition. It appears only a handful of times, always small.
-- **Story arc.** You walk toward a church at dawn, step through its lit doorway into the nave where the invitation waits, and leave at dusk by the backwaters with the church glowing.
+**Visual system:**
+- **Colour.** Sunset gradient (`#DDA7A5` → `#4A6274`), Alabaster `#FAF9F6` cards with gold `#C5A059` borders, and Midnight Indigo `#1A2421` text.
+- **Type.** Cormorant Garamond for large headings. Jost for subheadings, in uppercase with 0.15em letter-spacing.
+- **Motifs.** A Kerala church, rose and jasmine garlands, stained glass, and a small budded cross.
+**Story arc.** The site opens on a church at sunset seen through a floral arch, moves through alabaster cards set against a sunset gradient, and closes at dusk by the backwaters with the church glowing.
 
 **Performance and accessibility.**
 - All scroll motion is `transform` and `opacity`, driven by one `requestAnimationFrame` loop. That loop only measures sections currently near the viewport.
