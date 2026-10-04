@@ -107,35 +107,21 @@ window.WEDDING = {
     googleFormFields: { name: "entry.000000", guests: "entry.000001", attending: "entry.000002", message: "entry.000003" },
   },
 
-  /* ---------------------------------------------------------- SCENE ARTWORK */
-  // Painted artwork. The header uses three layers that scroll at different
-  // speeds: sky (back), church (middle), floral arch (front).
-  // church & arch need a TRANSPARENT background (WebP or PNG).
-  scenes: {
-    skyPortrait:   "assets/images/scenes/sky-p.webp",            // phones
-    skyLandscape:  "assets/images/scenes/sky-l.webp",            // tablets / desktop
-    church:        "assets/images/scenes/church.webp",
-    archPortrait:  "assets/images/scenes/arch-portrait.webp",
-    archLandscape: "assets/images/scenes/arch-landscape.webp",
-    duskPortrait:  "assets/images/scenes/dusk-portrait.webp",    // closing scene
-    duskLandscape: "assets/images/scenes/dusk-landscape.webp",
-    window:        "assets/images/scenes/window.webp",           // stained glass
-  },
-
-  /* ---------------------------------------------------------------- MOMENTS */
-  // The polaroid stack ("Touch here for magic"). 5–6 photos work best.
-  // These are PLACEHOLDERS — replace the files, or set enabled: false to hide
-  // the whole section.
-  moments: {
-    enabled: true,
-    photos: [
-      { src: "assets/images/moments/01.jpg", caption: "" },
-      { src: "assets/images/moments/02.jpg", caption: "" },
-      { src: "assets/images/moments/03.jpg", caption: "" },
-      { src: "assets/images/moments/04.jpg", caption: "" },
-      { src: "assets/images/moments/05.jpg", caption: "" },
-      { src: "assets/images/moments/06.jpg", caption: "" },
-    ],
+  /* ---------------------------------------------------------------- PHOTOS */
+  // Full-bleed photographs. Use high-resolution originals for the best result
+  // (at least 2000 px on the long side), saved as WebP or JPG under ~400 KB.
+  //   hero    – opening screen. Landscape works; the tower/cross is kept in view.
+  //   verse   – behind the Bible verse. Portrait suits phones best.
+  //   closing – the final scene (church interior / aisle).
+  photos: {
+    hero:    "assets/images/photos/kerala-tower.webp",
+    verse:   "assets/images/photos/gold-tower.webp",
+    closing: "assets/images/photos/nave.webp",
+    // Where the subject sits in each photo (CSS object-position), so phones crop well.
+    focus: { hero: "48% 30%", verse: "50% 35%", closing: "52% 60%" },
+    // Shown in small type at the very bottom. Fill in if your photo licence asks for credit,
+    // e.g. "Photographs: Name / Unsplash". Leave "" to show nothing.
+    credits: "",
   },
 
   /* ------------------------------------------------------------------ MUSIC */

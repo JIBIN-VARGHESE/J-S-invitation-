@@ -2,7 +2,7 @@
    Jibin & Sofi — main script
    1. Content binding from config.js
    2. Scroll engine  (sets --p on [data-scrub] elements, one rAF per frame)
-   3. Fade-in on enter (IntersectionObserver) + polaroid "magic" scatter
+   3. Fade-in on enter (IntersectionObserver)
    4. Countdown (Asia/Kolkata, IST = UTC+05:30)
    5. Music control
    No wedding details live here — edit config.js instead.
@@ -68,6 +68,7 @@
     receptionMapsUrl: W.receptionMapsUrl || W.churchMapsUrl,
     weddingVenueFull: [W.churchName, W.churchAddress].filter(Boolean).join(", ") || tba("Venue details to follow"),
     rsvpDeadline: R.deadline ? "Kindly reply by " + (function (d) { return d.d + " " + d.month + " " + d.y; })(parseDate(R.deadline)) + "." : "We would be grateful for your reply.",
+    photoCredits: (C.photos && C.photos.credits) || "",
     countdownNote: wd.weekday + ", " + wd.d + " " + wd.month + " " + wd.y + " · " + (W.town || ""),
   };
 
@@ -93,6 +94,13 @@
       if (v) img.src = v;
       var alt = img.getAttribute("data-alt-bind");
       if (alt) img.alt = valueFor(alt) || "";
+    });
+    var photos = C.photos || {}, focus = photos.focus || {};
+    doc.querySelectorAll("[data-photo]").forEach(function (img) {
+      var key = img.getAttribute("data-photo");
+      if (photos[key]) img.src = photos[key];
+      if (focus[key]) img.style.objectPosition = focus[key];
+      img.decoding = "async";
     });
     var scenes = C.scenes || {};
     doc.querySelectorAll("[data-scene]").forEach(function (img) {
@@ -223,64 +231,6 @@
     items.forEach(function (n) { n.classList.add("fade"); io.observe(n); });
   }
 
-  /* ------------------------------ Feature 3 · "Touch here for magic" */
-  function initMoments() {
-    var M = C.moments || {};
-    var section = doc.getElementById("moments");
-    var stage = doc.querySelector(".polaroids");
-    var btn = doc.querySelector(".btn--magic");
-    if (!section || !stage || !btn) return;
-    if (!M.enabled || !M.photos || !M.photos.length) { section.hidden = true; return; }
-
-    var cards = [], scattered = false, topZ = 10;
-    M.photos.slice(0, 8).forEach(function (ph, i) {
-      var fig = el("figure", "polaroid");
-      var img = el("img");
-      img.src = ph.src; img.alt = ph.caption || "Photograph " + (i + 1); img.loading = "lazy"; img.decoding = "async";
-      fig.appendChild(img);
-      fig.appendChild(el("figcaption", null, ph.caption || ""));
-      fig.style.zIndex = i + 1;
-      fig.addEventListener("click", function () { if (scattered) fig.style.zIndex = ++topZ; });
-      stage.appendChild(fig);
-      cards.push(fig);
-    });
-
-    function rand(a, b) { return a + Math.random() * (b - a); }
-    function set(card, x, y, r, delay) {
-      card.style.setProperty("--sx", x.toFixed(1) + "px");
-      card.style.setProperty("--sy", y.toFixed(1) + "px");
-      card.style.setProperty("--r", r.toFixed(1) + "deg");
-      card.style.setProperty("--delay", delay + "s");
-    }
-    function stack() {   // a neat, slightly untidy pile in the centre
-      cards.forEach(function (c, i) { set(c, rand(-8, 8), rand(-6, 6), rand(-9, 9), i * .04); });
-    }
-    function scatter() { // fly apart to random spots inside the stage
-      var W = stage.clientWidth, H = stage.clientHeight;
-      var cw = cards[0].offsetWidth, ch = cards[0].offsetHeight;
-      // leave room for the tilt so rotated corners stay on screen
-      var maxX = Math.max(0, (W - cw) / 2 - cw * .2), maxY = Math.max(0, (H - ch) / 2 - ch * .1);
-      var cols = W > 700 ? 3 : 2, rows = Math.ceil(cards.length / cols);
-      // jittered grid keeps photos spread out instead of piling up by chance
-      var order = cards.map(function (_, i) { return i; }).sort(function () { return Math.random() - .5; });
-      cards.forEach(function (c, i) {
-        var slot = order[i], cx = slot % cols, cy = Math.floor(slot / cols);
-        var x = (cols === 1 ? 0 : (cx / (cols - 1)) * 2 - 1) * maxX + rand(-18, 18);
-        var y = (rows === 1 ? 0 : (cy / (rows - 1)) * 2 - 1) * maxY + rand(-14, 14);
-        set(c, Math.max(-maxX, Math.min(maxX, x)), Math.max(-maxY, Math.min(maxY, y)), rand(-18, 18), i * .07);
-      });
-    }
-    stack();
-    btn.addEventListener("click", function () {
-      scattered = !scattered;
-      stage.classList.toggle("is-scattered", scattered);
-      btn.setAttribute("aria-pressed", String(scattered));
-      btn.querySelector(".btn--magic__label").textContent = scattered ? "Gather them back" : "Touch here for magic";
-      if (scattered) scatter(); else stack();
-    });
-    window.addEventListener("resize", function () { if (scattered) scatter(); });
-  }
-
   /* -------------------------------------------------- 4. countdown (IST) */
   function initCountdown() {
     var nodes = {};
@@ -363,7 +313,6 @@
   renderLists();
   initScroll();
   initFades();
-  initMoments();
   initCountdown();
   initMusic();
   if (window.RSVP) window.RSVP.init(doc.querySelector(".rsvp__form"), C.rsvp || {});

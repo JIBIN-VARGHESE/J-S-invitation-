@@ -10,8 +10,7 @@ assets/
   js/main.js            content binding, scroll engine, countdown, lightbox, music
   js/rsvp.js            RSVP validation + swappable delivery providers (isolated)
   images/
-    scenes/             painted artwork (WebP): header layers, dusk closing, stained glass
-    moments/01–06.jpg   polaroid photos (placeholders)
+    photos/             church photographs (hero, verse, closing)
     og-image.jpg        WhatsApp / social preview (1200×630)
   icons/favicon.svg
   music/                put wedding.mp3 here
@@ -32,16 +31,21 @@ Open **`config.js`**. It holds the names, dates, times, venues, addresses, map l
 
 **The one exception is the link preview.** WhatsApp and iMessage read the `<meta property="og:…">` tags at the top of `index.html` without running JavaScript, so edit those by hand. After deploying, change `og:image` to the full URL, for example `https://YOUR-USERNAME.github.io/YOUR-REPO/assets/images/og-image.jpg`. Otherwise many apps won't show the image.
 
-## 2. Artwork and photos
+## 2. Photographs
 
-**Header (three-layer parallax).** The header is three painted layers that scroll at different speeds:
-- `sky-p` / `sky-l`: the sunset sky. It moves slowest.
-- `church.webp`: the church on its lawn, with a transparent background. It moves slowly.
-- `arch-portrait` / `arch-landscape`: the floral arch in front, with a transparent background. It moves up fastest.
+The site uses three full-screen church photographs, set in `config.js → photos`:
 
-All of these are in `assets/images/scenes/`, and their paths are set in `config.js → scenes`. To use your own artwork, keep the same proportions and keep transparency on the church and arch layers. The layer speeds are the `calc(var(--y) * …)` values under "HEADER (parallax)" in `styles.css`.
+| Slot | Where | Current file |
+|---|---|---|
+| `hero` | opening screen (parallax) | `assets/images/photos/kerala-tower.webp` |
+| `verse` | behind the Bible verse | `assets/images/photos/gold-tower.webp` |
+| `closing` | final scene (slow push down the aisle) | `assets/images/photos/nave.webp` |
 
-**Moments (polaroids).** `config.js → moments` lists 5–6 photos for the polaroid stack and the "Touch here for magic" scatter. The files in `assets/images/moments/` are **placeholders**. Replace them with your photos (portrait, about 800 × 900 px, under 200 KB each), or set `moments.enabled: false` to hide the section.
+**These are the reference images you supplied.** They have been cropped, cleaned, upscaled and colour-graded. Two things to check before going live:
+1. **Rights.** Use only photos you took yourself, or ones under a free licence such as Unsplash or Pexels. Put any credit line the licence requires in `photos.credits`.
+2. **Resolution.** The sources were screenshots of about 1000 px, so they look soft on large desktop screens. Original files of 2000 px or more will look much sharper. Put them in the same folder and update the paths.
+
+`photos.focus` sets which part of each photo stays in view when a phone crops it.
 
 ## 3. Music
 
@@ -106,10 +110,10 @@ The empty `.nojekyll` file tells Pages to serve files as they are. All paths are
 - **Closing.** A wide landscape scene is the final, still image.
 
 **Visual system:**
-- **Colour.** Sunset gradient (`#DDA7A5` → `#4A6274`), Alabaster `#FAF9F6` cards with gold `#C5A059` borders, and Midnight Indigo `#1A2421` text.
+- **Photography first.** Real church architecture fills the screen. A Kerala tower with a tiled roof and white cross opens the site, an ornate white-and-gold tower sits behind the verse, and a church nave closes it.
+- **Colour.** Ivory and stone paper tones, a deep warm black for the photographic sections, and muted gold line-work.
 - **Type.** Cormorant Garamond for large headings. Jost for subheadings, in uppercase with 0.15em letter-spacing.
-- **Motifs.** A Kerala church, rose and jasmine garlands, stained glass, and a small budded cross.
-**Story arc.** The site opens on a church at sunset seen through a floral arch, moves through alabaster cards set against a sunset gradient, and closes at dusk by the backwaters with the church glowing.
+- **Cross.** An original ornate cross (trefoil ends, centre medallion, scrollwork), used sparingly.
 
 **Performance and accessibility.**
 - All scroll motion is `transform` and `opacity`, driven by one `requestAnimationFrame` loop. That loop only measures sections currently near the viewport.

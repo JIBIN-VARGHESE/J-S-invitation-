@@ -18,10 +18,11 @@
   <meta property="og:description" content="With the grace of God, we invite you to celebrate our wedding in Kozhikode, Kerala.">
   <meta property="og:image" content="assets/images/og-image.jpg">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="theme-color" content="#DDA7A5">
+  <meta name="theme-color" content="#141312">
 
   <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="assets/fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/images/photos/kerala-tower.webp" as="image">
   <link rel="preload" href="assets/fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/css/styles.css">
 
@@ -50,6 +51,29 @@
 
 
 
+
+    <!-- Ornate cross (original): trefoil terminals, inner line, centre medallion, scrollwork -->
+    <symbol id="ornate-cross" viewBox="0 0 120 184">
+      <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke-width="1.4" d="M54 30H66V54H90V66H66V154H54V66H30V54H54Z"/>
+        <path stroke-width=".7" d="M57.5 33.5H62.5V57.5H86.5V62.5H62.5V150.5H57.5V62.5H33.5V57.5H57.5Z"/>
+        <g stroke-width="1.2">
+          <circle cx="60" cy="21" r="6.5"/><circle cx="51.5" cy="27" r="4.2"/><circle cx="68.5" cy="27" r="4.2"/>
+          <circle cx="60" cy="163" r="6.5"/><circle cx="51.5" cy="157" r="4.2"/><circle cx="68.5" cy="157" r="4.2"/>
+          <circle cx="21" cy="60" r="6.5"/><circle cx="27" cy="51.5" r="4.2"/><circle cx="27" cy="68.5" r="4.2"/>
+          <circle cx="99" cy="60" r="6.5"/><circle cx="93" cy="51.5" r="4.2"/><circle cx="93" cy="68.5" r="4.2"/>
+        </g>
+        <path stroke-width="1" d="M60 11V6M60 173v5M11 60H6M109 60h5"/>
+        <circle stroke-width="1.2" cx="60" cy="60" r="10"/>
+        <path stroke-width="1" d="M60 50.5c3 3 3 6 0 9.5c-3-3.5-3-6.5 0-9.5zM60 69.5c3-3 3-6 0-9.5c-3 3.5-3 6.5 0 9.5zM50.5 60c3-3 6-3 9.5 0c-3.5 3-6.5 3-9.5 0zM69.5 60c-3-3-6-3-9.5 0c3.5 3 6.5 3 9.5 0z"/>
+        <g stroke-width=".9">
+          <path d="M52 52c-7 0-11-5-8-9c2-3 7-1 5 2"/>
+          <path d="M68 52c7 0 11-5 8-9c-2-3-7-1-5 2"/>
+          <path d="M52 68c-7 0-11 5-8 9c2 3 7 1 5-2"/>
+          <path d="M68 68c7 0 11 5 8 9c-2 3-7 1-5-2"/>
+        </g>
+      </g>
+    </symbol>
   </defs>
 </svg>
 
@@ -76,37 +100,21 @@
 </div>
 
 <!-- ================================================================ HEADER
-     Three painted layers that scroll at different speeds (parallax).
-     Artwork paths: config.js → scenes. -->
+     Photograph + gradient + type, each moving at its own speed (parallax).
+     Photo path: config.js → photos.hero -->
 <header class="hero" id="top">
-  <div class="layer layer-sky" aria-hidden="true">
-    <picture>
-      <source media="(min-aspect-ratio: 1/1)" data-scene-srcset="skyLandscape">
-      <img data-scene="skyPortrait" alt="" fetchpriority="high">
-    </picture>
-  </div>
-
-  <div class="layer layer-names">
+  <div class="hero__photo layer" aria-hidden="true"><img data-photo="hero" alt="" fetchpriority="high"></div>
+  <div class="hero__shade layer" aria-hidden="true"></div>
+  <div class="hero__content layer">
+    <svg class="hero__cross" aria-hidden="true"><use href="#ornate-cross"/></svg>
     <p class="hero__eyebrow">The wedding of</p>
     <h1 class="hero__title">
       <span class="hero__name" data-bind="couple.groom">Jibin</span>
       <span class="hero__amp">&amp;</span>
       <span class="hero__name" data-bind="couple.bride">Sofi</span>
     </h1>
-    <p class="hero__date" data-bind="weddingDateShort">25 April 2027</p>
+    <p class="hero__date"><span data-bind="weddingDateShort">25 April 2027</span><i aria-hidden="true"></i><span data-bind="wedding.town">Kozhikode</span></p>
   </div>
-
-  <div class="layer layer-church" aria-hidden="true">
-    <img data-scene="church" alt="" fetchpriority="high">
-  </div>
-
-  <div class="layer layer-foreground" aria-hidden="true">
-    <picture>
-      <source media="(min-aspect-ratio: 1/1)" data-scene-srcset="archLandscape">
-      <img data-scene="archPortrait" alt="" fetchpriority="high">
-    </picture>
-  </div>
-
   <p class="scroll-cue" aria-hidden="true"><span>Scroll</span><i></i></p>
 </header>
 
@@ -114,24 +122,22 @@
 
   <!-- ===================================================== INVITATION -->
   <section class="invite" id="invitation" aria-labelledby="invite-title">
-    <article class="card card--arch invite__card">
-      <svg class="card__cross"><use href="#cross"/></svg>
-      <p class="eyebrow" data-bind="invitation.eyebrow">Together with our families</p>
-      <div class="invite__lines" data-list="invitation.lines"></div>
-      <h2 class="invite__names" id="invite-title">
-        <span data-bind="couple.groomFull">Jibin Varghese</span>
-        <em>&amp;</em>
-        <span data-bind="couple.brideFull">Sofia John</span>
-      </h2>
-      <p class="invite__when" data-bind="weddingDateLong"></p>
-    </article>
+    <svg class="orn orn--lg" aria-hidden="true"><use href="#ornate-cross"/></svg>
+    <p class="eyebrow" data-bind="invitation.eyebrow">Together with our families</p>
+    <div class="invite__lines" data-list="invitation.lines"></div>
+    <h2 class="invite__names" id="invite-title">
+      <span data-bind="couple.groomFull">Jibin Varghese</span>
+      <em>&amp;</em>
+      <span data-bind="couple.brideFull">Sofia John</span>
+    </h2>
+    <p class="invite__when" data-bind="weddingDateLong"></p>
   </section>
 
   <!-- ========================================================== VERSE -->
   <section class="verse" id="verse" data-scrub="pin" data-nofade aria-labelledby="verse-ref">
     <div class="pin">
-      <div class="verse__window" aria-hidden="true"><img data-scene="window" alt=""></div>
-      <figure class="card verse__body">
+      <div class="verse__photo"><img data-photo="verse" alt="" loading="lazy"></div>
+      <figure class="verse__body">
         <blockquote class="verse__text" data-words="verse.text"></blockquote>
         <figcaption class="verse__ref" id="verse-ref">
           <span class="rule" aria-hidden="true"></span>
@@ -143,36 +149,34 @@
   </section>
 
   <!-- ===================================================== ENGAGEMENT -->
-  <section class="engagement" id="engagement" aria-labelledby="eng-title">
-    <article class="card engagement__card">
-      <header class="card__head">
-        <p class="eyebrow" data-bind="engagementWeekday">Saturday</p>
-        <h2 class="card__title" id="eng-title">Engagement</h2>
+  <section class="event event--engagement" id="engagement" aria-labelledby="eng-title">
+    <div class="event__inner">
+      <header class="event__head">
+        <p class="eyebrow"><span data-bind="engagementWeekday">Saturday</span> · The Betrothal</p>
+        <h2 class="event__title" id="eng-title">Engagement</h2>
       </header>
-      <div class="engagement__date" aria-label="17 April 2027">
-        <span class="engagement__day" data-bind="engagementDay">17</span>
-        <span class="engagement__month"><span data-bind="engagementMonth">April</span><span data-bind="engagementYear">2027</span></span>
+      <div class="event__date" aria-label="17 April 2027">
+        <span class="event__day" data-bind="engagementDay">17</span>
+        <span class="event__month"><span data-bind="engagementMonth">April</span><span data-bind="engagementYear">2027</span></span>
       </div>
-      <p class="engagement__place" data-bind="engagement.town">Pandalam</p>
-      <figure class="eng-art">
-        <img data-scene="window" width="600" height="1240" loading="lazy" decoding="async" alt="A painted stained-glass window">
-      </figure>
-      <p class="engagement__desc" data-bind="engagement.description"></p>
+      <p class="event__place" data-bind="engagement.town">Pandalam</p>
+      <p class="event__desc" data-bind="engagement.description"></p>
       <dl class="details">
         <div><dt>Time</dt><dd data-bind="engagementTime"></dd></div>
         <div><dt>Venue</dt><dd data-bind="engagementVenue"></dd></div>
         <div><dt>Address</dt><dd data-bind="engagementAddress"></dd></div>
       </dl>
       <a class="btn" data-href-bind="engagement.mapsUrl" target="_blank" rel="noopener">View Location</a>
-    </article>
+    </div>
   </section>
 
   <!-- ======================================================== WEDDING -->
-  <section class="wedding" id="wedding" aria-labelledby="wed-title">
-    <div class="card wedding__card">
-      <header class="card__head">
+  <section class="event event--wedding" id="wedding" aria-labelledby="wed-title">
+    <div class="event__inner">
+      <header class="event__head">
+        <svg class="orn" aria-hidden="true"><use href="#ornate-cross"/></svg>
         <p class="eyebrow">Holy Matrimony</p>
-        <h2 class="card__title card__title--xl" id="wed-title"><em>The</em> Wedding</h2>
+        <h2 class="event__title event__title--xl" id="wed-title"><em>The</em> Wedding</h2>
         <p class="wedding__date">
           <span data-bind="weddingD">25</span><i aria-hidden="true"></i><span data-bind="weddingM">04</span><i aria-hidden="true"></i><span data-bind="weddingY">2027</span>
         </p>
@@ -184,14 +188,14 @@
           <h3 class="wcard__title" data-bind="churchName"></h3>
           <p class="wcard__time" data-bind="ceremonyTime"></p>
           <p class="wcard__addr" data-bind="churchAddress"></p>
-          <a class="btn" data-href-bind="wedding.churchMapsUrl" target="_blank" rel="noopener">View Location</a>
+          <a class="btn btn--light" data-href-bind="wedding.churchMapsUrl" target="_blank" rel="noopener">View Location</a>
         </article>
         <article class="wcard">
           <p class="wcard__label">The Reception</p>
           <h3 class="wcard__title" data-bind="receptionVenue"></h3>
           <p class="wcard__time" data-bind="receptionTime"></p>
           <p class="wcard__addr" data-bind="receptionAddress"></p>
-          <a class="btn" data-href-bind="receptionMapsUrl" target="_blank" rel="noopener">View Location</a>
+          <a class="btn btn--light" data-href-bind="receptionMapsUrl" target="_blank" rel="noopener">View Location</a>
         </article>
       </div>
     </div>
@@ -199,112 +203,92 @@
 
   <!-- ======================================================= TIMELINE -->
   <section class="timeline" id="timeline" aria-labelledby="tl-title">
-    <div class="card">
-      <header class="card__head">
-        <p class="eyebrow" data-bind="weddingDateShort">25 April 2027</p>
-        <h2 class="card__title" id="tl-title"><em>The</em> Order of the Day</h2>
-      </header>
-      <div class="timeline__track" data-scrub="view">
-        <span class="timeline__line" aria-hidden="true"><span></span></span>
-        <ol class="timeline__list" data-list="timeline"></ol>
-      </div>
-    </div>
-  </section>
-
-  <!-- ======================================================== MOMENTS
-       Polaroid stack + "Touch here for magic". Hide with config.js → moments.enabled -->
-  <section class="moments" id="moments" aria-labelledby="mom-title">
-    <header class="moments__head">
-      <p class="eyebrow">Portraits</p>
-      <h2 class="moments__title" id="mom-title"><em>Moments</em> kept</h2>
+    <header class="section-head">
+      <p class="eyebrow" data-bind="weddingDateShort">25 April 2027</p>
+      <h2 class="section-title" id="tl-title"><em>The</em> Order of the Day</h2>
     </header>
-    <div class="polaroids" data-list="moments"></div>
-    <button class="btn btn--magic" type="button" aria-pressed="false">
-      <span class="btn--magic__spark" aria-hidden="true">✦</span>
-      <span class="btn--magic__label">Touch here for magic</span>
-    </button>
+    <div class="timeline__track" data-scrub="view">
+      <span class="timeline__line" aria-hidden="true"><span></span></span>
+      <ol class="timeline__list" data-list="timeline"></ol>
+    </div>
   </section>
 
   <!-- ====================================================== COUNTDOWN -->
   <section class="countdown" id="countdown" aria-labelledby="cd-title">
-    <div class="card">
-      <h2 class="card__title" id="cd-title"><em>Counting</em> the days</h2>
-      <div class="countdown__grid" role="timer" aria-live="off">
-        <div><span class="countdown__num" data-cd="days">000</span><span class="countdown__lbl">Days</span></div>
-        <div><span class="countdown__num" data-cd="hours">00</span><span class="countdown__lbl">Hours</span></div>
-        <div><span class="countdown__num" data-cd="minutes">00</span><span class="countdown__lbl">Minutes</span></div>
-        <div><span class="countdown__num" data-cd="seconds">00</span><span class="countdown__lbl">Seconds</span></div>
-      </div>
-      <p class="countdown__note" data-bind="countdownNote"></p>
+    <h2 class="section-title" id="cd-title"><em>Counting</em> the days</h2>
+    <div class="countdown__grid" role="timer" aria-live="off">
+      <div><span class="countdown__num" data-cd="days">000</span><span class="countdown__lbl">Days</span></div>
+      <div><span class="countdown__num" data-cd="hours">00</span><span class="countdown__lbl">Hours</span></div>
+      <div><span class="countdown__num" data-cd="minutes">00</span><span class="countdown__lbl">Minutes</span></div>
+      <div><span class="countdown__num" data-cd="seconds">00</span><span class="countdown__lbl">Seconds</span></div>
     </div>
+    <p class="countdown__note" data-bind="countdownNote"></p>
   </section>
 
   <!-- =========================================================== RSVP -->
   <section class="rsvp" id="rsvp" aria-labelledby="rsvp-title">
-    <div class="card">
-      <header class="card__head">
-        <p class="eyebrow">Kindly Reply</p>
-        <h2 class="card__title" id="rsvp-title"><em>Will</em> you join us?</h2>
-        <p class="card__lede" data-bind="rsvpDeadline"></p>
-      </header>
+    <header class="section-head">
+      <p class="eyebrow">Kindly Reply</p>
+      <h2 class="section-title" id="rsvp-title"><em>Will</em> you join us?</h2>
+      <p class="section-lede" data-bind="rsvpDeadline"></p>
+    </header>
 
-      <form class="rsvp__form" novalidate>
-        <div class="field">
-          <label for="rsvp-name">Your name</label>
-          <input id="rsvp-name" name="name" type="text" autocomplete="name" required maxlength="80">
-          <p class="field__error" id="err-name" aria-live="polite"></p>
+    <form class="rsvp__form" novalidate>
+      <div class="field">
+        <label for="rsvp-name">Your name</label>
+        <input id="rsvp-name" name="name" type="text" autocomplete="name" required maxlength="80">
+        <p class="field__error" id="err-name" aria-live="polite"></p>
+      </div>
+
+      <fieldset class="field field--choice">
+        <legend>Will you attend?</legend>
+        <div class="choice">
+          <input type="radio" id="att-yes" name="attending" value="yes" required>
+          <label for="att-yes">Joyfully accepts</label>
+          <input type="radio" id="att-no" name="attending" value="no">
+          <label for="att-no">Regretfully declines</label>
         </div>
+        <p class="field__error" id="err-attending" aria-live="polite"></p>
+      </fieldset>
 
-        <fieldset class="field field--choice">
-          <legend>Will you attend?</legend>
-          <div class="choice">
-            <input type="radio" id="att-yes" name="attending" value="yes" required>
-            <label for="att-yes">Joyfully accepts</label>
-            <input type="radio" id="att-no" name="attending" value="no">
-            <label for="att-no">Regretfully declines</label>
-          </div>
-          <p class="field__error" id="err-attending" aria-live="polite"></p>
-        </fieldset>
-
-        <div class="field field--guests">
-          <label for="rsvp-guests">Number of guests</label>
-          <div class="stepper">
-            <button type="button" data-step="-1" aria-label="Fewer guests">−</button>
-            <input id="rsvp-guests" name="guests" type="number" inputmode="numeric" min="1" value="1" required>
-            <button type="button" data-step="1" aria-label="More guests">+</button>
-          </div>
-          <p class="field__error" id="err-guests" aria-live="polite"></p>
+      <div class="field field--guests">
+        <label for="rsvp-guests">Number of guests</label>
+        <div class="stepper">
+          <button type="button" data-step="-1" aria-label="Fewer guests">−</button>
+          <input id="rsvp-guests" name="guests" type="number" inputmode="numeric" min="1" value="1" required>
+          <button type="button" data-step="1" aria-label="More guests">+</button>
         </div>
+        <p class="field__error" id="err-guests" aria-live="polite"></p>
+      </div>
 
-        <div class="field">
-          <label for="rsvp-msg">A message for the couple <span>(optional)</span></label>
-          <textarea id="rsvp-msg" name="message" rows="3" maxlength="600"></textarea>
-        </div>
+      <div class="field">
+        <label for="rsvp-msg">A message for the couple <span>(optional)</span></label>
+        <textarea id="rsvp-msg" name="message" rows="3" maxlength="600"></textarea>
+      </div>
 
-        <!-- Honeypot: humans never see or fill this; bots often do. -->
-        <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <!-- Honeypot: humans never see or fill this; bots often do. -->
+      <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
 
-        <button class="btn btn--solid" type="submit"><span>Send reply</span></button>
-        <p class="rsvp__status" role="status" aria-live="polite"></p>
-      </form>
-    </div>
+      <button class="btn btn--solid" type="submit"><span>Send reply</span></button>
+      <p class="rsvp__status" role="status" aria-live="polite"></p>
+    </form>
   </section>
 
   <!-- ====================================================== LOCATIONS -->
   <section class="locations" id="locations" aria-labelledby="loc-title">
-    <header class="moments__head">
+    <header class="section-head">
       <p class="eyebrow">Finding Your Way</p>
-      <h2 class="moments__title" id="loc-title"><em>Where</em> we gather</h2>
+      <h2 class="section-title" id="loc-title"><em>Where</em> we gather</h2>
     </header>
     <div class="locations__cards">
-      <article class="card card--arch lcard">
+      <article class="lcard">
         <p class="eyebrow">Engagement</p>
         <h3 class="lcard__town"><span data-bind="engagement.town">Pandalam</span>, <span data-bind="engagement.region">Kerala</span></h3>
         <p class="lcard__date" data-bind="engagementDateLong"></p>
         <p class="lcard__venue" data-bind="engagementVenueFull"></p>
         <a class="btn" data-href-bind="engagement.mapsUrl" target="_blank" rel="noopener">View on Google Maps</a>
       </article>
-      <article class="card card--arch lcard">
+      <article class="lcard">
         <p class="eyebrow">Wedding</p>
         <h3 class="lcard__town"><span data-bind="wedding.town">Kozhikode</span>, <span data-bind="wedding.region">Kerala</span></h3>
         <p class="lcard__date" data-bind="weddingDateLong"></p>
@@ -317,16 +301,12 @@
   <!-- ======================================================== CLOSING -->
   <section class="closing" id="closing" data-scrub="pin" data-nofade aria-labelledby="close-names">
     <div class="pin">
-      <div class="closing__scene" aria-hidden="true">
-        <picture>
-          <source media="(min-aspect-ratio: 1/1)" data-scene-srcset="duskLandscape">
-          <img data-scene="duskPortrait" loading="lazy" alt="">
-        </picture>
-      </div>
+      <div class="closing__photo" aria-hidden="true"><img data-photo="closing" alt="" loading="lazy"></div>
+      <div class="closing__shade" aria-hidden="true"></div>
       <div class="closing__text">
         <p class="closing__line" data-bind="closing.line"></p>
         <div class="closing__sign">
-          <svg class="closing__cross"><use href="#cross"/></svg>
+          <svg class="closing__cross"><use href="#ornate-cross"/></svg>
           <h2 class="closing__names" id="close-names">
             <span data-bind="couple.groom">Jibin</span> <em>&amp;</em> <span data-bind="couple.bride">Sofi</span>
           </h2>
@@ -339,6 +319,8 @@
   </section>
 
 </main>
+
+<footer class="credits"><p data-bind="photoCredits"></p></footer>
 
 <noscript><style>.curtain{display:none}</style></noscript>
 </body>
