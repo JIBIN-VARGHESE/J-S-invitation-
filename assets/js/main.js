@@ -95,6 +95,16 @@
       var alt = img.getAttribute("data-alt-bind");
       if (alt) img.alt = valueFor(alt) || "";
     });
+    var scenes = C.scenes || {};
+    doc.querySelectorAll("[data-scene]").forEach(function (img) {
+      var src = scenes[img.getAttribute("data-scene")];
+      if (src) img.src = src;
+      img.decoding = "async";
+    });
+    doc.querySelectorAll("[data-scene-srcset]").forEach(function (src) {
+      var v = scenes[src.getAttribute("data-scene-srcset")];
+      if (v) src.srcset = v; else src.remove();
+    });
     var names = (C.couple ? C.couple.groom + " & " + C.couple.bride : "") + " · " + derived.weddingDateShort;
     if (C.couple) doc.title = names;
   }
@@ -104,7 +114,7 @@
     // Invitation lines
     var lines = doc.querySelector('[data-list="invitation.lines"]');
     if (lines && C.invitation) {
-      C.invitation.lines.forEach(function (t) { lines.appendChild(el("p", "reveal", t)); });
+      C.invitation.lines.forEach(function (t) { lines.appendChild(el("p", null, t)); });
     }
 
     // Verse: one span per word so they can light up as you scroll

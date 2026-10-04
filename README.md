@@ -46,6 +46,25 @@ The simplest way is to **overwrite the placeholder file with your photo under th
 
 Keep each JPEG **under ~350 KB** (quality 70–80 in Squoosh, Photoshop "Export for Web", or Lightroom). This matters for guests on mobile data. You can add or remove gallery photos freely in `config.js`. The asymmetric layout repeats every four images. Write a meaningful `alt` text for each photo.
 
+## 2b. Upgrading the scene artwork
+
+The scenes (church, palms/flowers, sky, church interior, stained-glass window) are vector illustrations in `assets/images/scenes/`. To get a fully painted look like the reference video, generate images and point `config.js → scenes` at them. No code changes are needed.
+
+| Slot | Format | Size | Notes |
+|---|---|---|---|
+| `church` | **transparent** PNG/WebP | 1200 × 1600 | façade only, centred, **open door glowing at bottom-centre** (the camera zooms into it) |
+| `flora` | **transparent** PNG/WebP | 1040 × 1800 | palms + flowers for the left edge (mirrored on the right) |
+| `sky` | JPG/WebP | 1200 × 1600 | soft dawn sky, empty in the upper third for the names |
+| `interior` / `interiorWide` | JPG/WebP | 1000 × 1600 / 2000 × 1250 | central aisle to the altar; keep the centre calm, the invitation card sits there |
+| `window` | transparent PNG/WebP | 600 × 1240 | single arched stained-glass window |
+
+Prompt starter (ChatGPT image, Gemini, Midjourney, etc.):
+> *Elegant painterly illustration of a white Kerala Syro-Malabar church facade with twin bell towers, terracotta domes, gold cross, jewel-toned stained-glass rose window, arched teak door open with warm golden light inside, coconut palms and magenta bougainvillea, soft dawn light, pastel sky, high detail, wedding invitation art, symmetrical, front view, transparent background*
+
+Swap "facade" for "interior nave with stone arches, stained-glass windows, red carpet aisle, brass lamps, golden altar light" for the interior. Use the same style words for every slot so the scenes match.
+
+A stock photo also works for `interior`, for example the Magnific/Freepik church interior you found. Free stock licences usually require an attribution line, so add one in the page footer if so.
+
 ## 3. Music
 
 Put an MP3 at `assets/music/wedding.mp3`. The music button appears only once that file exists. Music never autoplays: mobile browsers block it, and it's impolite. Guests tap **Music** to start it. Set `music.enabled: false` to remove the button. Only use music you have the right to share.

@@ -153,6 +153,20 @@ window.WEDDING = {
     googleFormFields: { name: "entry.000000", guests: "entry.000001", attending: "entry.000002", message: "entry.000003" },
   },
 
+  /* ---------------------------------------------------------- SCENE ARTWORK */
+  // The painted scenes. Replace any of these with your own artwork or photos
+  // (AI-generated illustrations work well — see README → "Upgrading the artwork").
+  //   church, flora → need a TRANSPARENT background (PNG or WebP)
+  //   sky, interior, window → full images (JPG/WebP fine)
+  scenes: {
+    sky:      "assets/images/scenes/sky.svg",       // dawn sky behind the church
+    church:   "assets/images/scenes/church.svg",    // church façade, door centred at the bottom
+    flora:    "assets/images/scenes/flora.svg",     // palms + flowers (left edge; mirrored for right)
+    interior: "assets/images/scenes/interior.svg",  // inside the church, aisle towards the altar
+    interiorWide: "assets/images/scenes/interior-wide.svg", // same, landscape version for desktop
+    window:   "assets/images/scenes/window.svg",    // stained-glass window for the Bible verse
+  },
+
   /* ------------------------------------------------------------------ MUSIC */
   music: {
     enabled: true,                 // set false to hide the music button entirely
