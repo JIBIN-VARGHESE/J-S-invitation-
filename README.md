@@ -1,4 +1,4 @@
-# Jibin & Sofi — Wedding Microsite
+# Jibin Varghese & Sofia John — Wedding Microsite
 
 A cinematic, scroll-told wedding invitation. Static HTML, CSS and vanilla JavaScript, with no build step, no framework, no backend. It runs on GitHub Pages for free.
 
@@ -10,9 +10,7 @@ assets/
   js/main.js            content binding, scroll engine, countdown, lightbox, music
   js/rsvp.js            RSVP validation + swappable delivery providers (isolated)
   images/
-    story/01–03.jpg     Our Story photographs   (4:5 portrait)
-    events/             engagement.jpg, wedding.jpg (4:5 portrait)
-    gallery/01–08.jpg   gallery photographs
+    scenes/             painted scenes (WebP): church, nave, dusk, stained glass, textures
     og-image.jpg        WhatsApp / social preview (1200×630)
   icons/favicon.svg
   music/                put wedding.mp3 here
@@ -29,41 +27,22 @@ Open **`config.js`**. It holds the names, dates, times, venues, addresses, map l
 - Times use 24-hour Kerala time: `"11:00"`, `"16:30"`.
 - `wedding.ceremonyTime` also sets the countdown target. Until you set it, the countdown runs to 00:00 IST on 25 April 2027.
 
-**Values still to fill in:** engagement time, venue and address. Wedding church name, address and time. Reception venue, address and time. All Google Maps URLs (they currently search for the town name). Story text. Timeline times. RSVP provider and deadline.
+**Values still to fill in:** engagement time, venue and address. Wedding church name, address and time. Reception venue, address and time. All Google Maps URLs (they currently search for the town name). Timeline times. RSVP provider and deadline.
 
 **The one exception is the link preview.** WhatsApp and iMessage read the `<meta property="og:…">` tags at the top of `index.html` without running JavaScript, so edit those by hand. After deploying, change `og:image` to the full URL, for example `https://YOUR-USERNAME.github.io/YOUR-REPO/assets/images/og-image.jpg`. Otherwise many apps won't show the image.
 
-## 2. Replacing photographs
+## 2. The painted scenes
 
-The simplest way is to **overwrite the placeholder file with your photo under the same name**, for example save your portrait as `assets/images/story/01.jpg`. Or point the path in `config.js` somewhere else.
+The scenes are oil-painting-style images in `assets/images/scenes/`:
+- the church at dawn, which the camera flies into
+- the nave where the invitation appears
+- the church at dusk for the closing
+- a stained-glass window
+- two canvas textures
 
-| Slot | Shape | Export size |
-|---|---|---|
-| story/01–03, events/* | portrait 4:5 | 1200 × 1500 px |
-| gallery `"tall"` | portrait 4:5 | 1600 px long edge |
-| gallery `"wide"` | landscape 3:2 | 1600 px long edge |
-| gallery `"square"` | 1:1 | 1400 × 1400 px |
+Phones get the portrait versions; tablets in landscape and desktops get the landscape ones.
 
-Keep each JPEG **under ~350 KB** (quality 70–80 in Squoosh, Photoshop "Export for Web", or Lightroom). This matters for guests on mobile data. You can add or remove gallery photos freely in `config.js`. The asymmetric layout repeats every four images. Write a meaningful `alt` text for each photo.
-
-## 2b. Upgrading the scene artwork
-
-The scenes (church, palms/flowers, sky, church interior, stained-glass window) are vector illustrations in `assets/images/scenes/`. To get a fully painted look like the reference video, generate images and point `config.js → scenes` at them. No code changes are needed.
-
-| Slot | Format | Size | Notes |
-|---|---|---|---|
-| `church` | **transparent** PNG/WebP | 1200 × 1600 | façade only, centred, **open door glowing at bottom-centre** (the camera zooms into it) |
-| `flora` | **transparent** PNG/WebP | 1040 × 1800 | palms + flowers for the left edge (mirrored on the right) |
-| `sky` | JPG/WebP | 1200 × 1600 | soft dawn sky, empty in the upper third for the names |
-| `interior` / `interiorWide` | JPG/WebP | 1000 × 1600 / 2000 × 1250 | central aisle to the altar; keep the centre calm, the invitation card sits there |
-| `window` | transparent PNG/WebP | 600 × 1240 | single arched stained-glass window |
-
-Prompt starter (ChatGPT image, Gemini, Midjourney, etc.):
-> *Elegant painterly illustration of a white Kerala Syro-Malabar church facade with twin bell towers, terracotta domes, gold cross, jewel-toned stained-glass rose window, arched teak door open with warm golden light inside, coconut palms and magenta bougainvillea, soft dawn light, pastel sky, high detail, wedding invitation art, symmetrical, front view, transparent background*
-
-Swap "facade" for "interior nave with stone arches, stained-glass windows, red carpet aisle, brass lamps, golden altar light" for the interior. Use the same style words for every slot so the scenes match.
-
-A stock photo also works for `interior`, for example the Magnific/Freepik church interior you found. Free stock licences usually require an attribution line, so add one in the page footer if so.
+To use your own artwork (for example AI-generated paintings), set the paths in `config.js → scenes` and keep the same proportions. In the church paintings, the camera zooms into the **church door**. The door must sit horizontally centred, at **84.8 %** from the top in the portrait version and **81.65 %** in the landscape version. Otherwise, change `--door` in `styles.css`.
 
 ## 3. Music
 
@@ -112,7 +91,6 @@ The empty `.nojekyll` file tells Pages to serve files as they are. All paths are
 
 **Before sending the link,** make sure you have:
 - filled in `config.js`
-- replaced all placeholder photos and story text
 - connected RSVP
 - set the absolute `og:image` URL
 - tested the site on one Android phone and one iPhone
@@ -132,7 +110,7 @@ The empty `.nojekyll` file tells Pages to serve files as they are. All paths are
 - **Palette.** Ivory with a muted gold, borrowed from the *kasavu* saree (off-white with a gold border), and deep forest green. Gold is only for hairlines and large type. Small gold text uses a darker shade so it stays readable.
 - **Type.** Cormorant Garamond for display and body, with italic instead of a script font for an editorial rather than template feel. Jost in small spaced capitals for labels.
 - **Motifs.** A line-drawn Kerala church façade, coconut palms, jasmine (*mulla*) sprigs, a rose window, and rounded church-window arches on every photo frame. The cross is a small *budded* cross, a quiet nod to the St Thomas Christian tradition. It appears only a handful of times, always small.
-- **Story arc.** You walk toward a church at dawn, step through its lit doorway into the invitation, and leave at dusk by the backwaters with the church door still glowing.
+- **Story arc.** You walk toward a church at dawn, step through its lit doorway into the nave where the invitation waits, and leave at dusk by the backwaters with the church glowing.
 
 **Performance and accessibility.**
 - All scroll motion is `transform` and `opacity`, driven by one `requestAnimationFrame` loop. That loop only measures sections currently near the viewport.

@@ -4,8 +4,7 @@
    2. Scroll engine  (sets --p on [data-scrub] elements, one rAF per frame)
    3. Reveal-on-enter (IntersectionObserver)
    4. Countdown (Asia/Kolkata, IST = UTC+05:30)
-   5. Gallery lightbox
-   6. Music control
+   5. Music control
    No wedding details live here — edit config.js instead.
    ========================================================================== */
 (function () {
@@ -105,7 +104,7 @@
       var v = scenes[src.getAttribute("data-scene-srcset")];
       if (v) src.srcset = v; else src.remove();
     });
-    var names = (C.couple ? C.couple.groom + " & " + C.couple.bride : "") + " · " + derived.weddingDateShort;
+    var names = (C.couple ? (C.couple.groomFull || C.couple.groom) + " & " + (C.couple.brideFull || C.couple.bride) : "") + " · " + derived.weddingDateShort;
     if (C.couple) doc.title = names;
   }
 
@@ -130,28 +129,6 @@
       });
     }
 
-    // Story chapters
-    var story = doc.querySelector('[data-list="story.chapters"]');
-    if (story && C.story) {
-      C.story.chapters.forEach(function (ch) {
-        var li = el("li", "chapter");
-        var fig = el("figure", "chapter__fig reveal");
-        fig.setAttribute("data-reveal", "clip");
-        var img = el("img");
-        img.src = ch.image; img.alt = ch.alt || ""; img.loading = "lazy"; img.decoding = "async";
-        img.width = 960; img.height = 1200;
-        fig.appendChild(img);
-        var txt = el("div", "chapter__text");
-        txt.appendChild(el("p", "chapter__num reveal", ch.numeral));
-        txt.appendChild(el("h3", "chapter__title reveal", ch.title));
-        var body = el("p", "chapter__body reveal", ch.text);
-        if (/^\s*\[/.test(ch.text)) body.classList.add("is-placeholder");
-        txt.appendChild(body);
-        li.appendChild(fig); li.appendChild(txt);
-        story.appendChild(li);
-      });
-    }
-
     // Timeline
     var tl = doc.querySelector('[data-list="timeline"]');
     if (tl && C.timeline) {
@@ -168,29 +145,6 @@
       });
     }
 
-    // Gallery
-    var grid = doc.querySelector('[data-list="gallery"]');
-    if (grid && C.gallery) {
-      var total = pad(C.gallery.length);
-      C.gallery.forEach(function (g, i) {
-        var fig = el("figure", "g-item g-item--" + (g.shape || "tall"));
-        var btn = el("button", "g-btn reveal");
-        btn.type = "button";
-        btn.setAttribute("data-reveal", "clip");
-        btn.setAttribute("data-index", i);
-        btn.setAttribute("aria-label", "Open photograph " + (i + 1) + " of " + C.gallery.length);
-        var par = el("div", "parallax");
-        par.setAttribute("data-scrub", "view");
-        var img = el("img");
-        img.src = g.src; img.alt = g.alt || ""; img.loading = "lazy"; img.decoding = "async";
-        par.appendChild(img); btn.appendChild(par); fig.appendChild(btn);
-        var cap = el("figcaption", "g-cap reveal");
-        cap.appendChild(el("span", null, pad(i + 1)));
-        cap.appendChild(el("span", null, "/ " + total));
-        fig.appendChild(cap);
-        grid.appendChild(fig);
-      });
-    }
   }
 
   /* --------------------------------------------- 2. scroll engine (--p) */
@@ -211,9 +165,15 @@
     p = Math.min(1, Math.max(0, p));
     if (node._p !== p) { node._p = p; node.style.setProperty("--p", p.toFixed(4)); }
   }
+  var hero, heroInside = false;
   function frame() {
     ticking = false;
     active.forEach(measure);
+    // Swap stages inside the hero so only one painted scene is ever drawn
+    if (hero && (hero._p > .4) !== heroInside) {
+      heroInside = !heroInside;
+      hero.classList.toggle("is-inside", heroInside);
+    }
     if (progressBar) {
       var max = root.scrollHeight - window.innerHeight;
       progressBar.style.setProperty("--progress", max > 0 ? (window.scrollY / max).toFixed(4) : 0);
@@ -223,6 +183,7 @@
 
   function initScroll() {
     progressBar = doc.querySelector(".progress span");
+    hero = doc.querySelector(".hero");
     scrubs = Array.prototype.slice.call(doc.querySelectorAll("[data-scrub]"));
     if (reduceMotion.matches) return; // CSS supplies calm static states
     var io = new IntersectionObserver(function (entries) {
@@ -305,70 +266,6 @@
     }).observe(section);
   }
 
-  /* ----------------------------------------------------- 5. lightbox */
-  function initLightbox() {
-    var box = doc.querySelector(".lightbox");
-    var grid = doc.querySelector(".gallery__grid");
-    if (!box || !grid || !C.gallery || !C.gallery.length) return;
-    var img = box.querySelector("img"), count = box.querySelector(".lightbox__count");
-    var index = 0, lastFocus = null, startX = null;
-
-    function show(i) {
-      index = (i + C.gallery.length) % C.gallery.length;
-      var g = C.gallery[index];
-      img.classList.add("is-swapping");
-      var next = new Image();
-      next.onload = next.onerror = function () {
-        img.src = g.src; img.alt = g.alt || "";
-        requestAnimationFrame(function () { img.classList.remove("is-swapping"); });
-      };
-      next.src = g.src;
-      count.textContent = pad(index + 1) + " / " + pad(C.gallery.length);
-    }
-    function open(i) {
-      lastFocus = doc.activeElement;
-      box.hidden = false;
-      doc.body.classList.add("no-scroll");
-      show(i);
-      requestAnimationFrame(function () { box.classList.add("is-open"); });
-      box.querySelector(".lightbox__close").focus();
-    }
-    function close() {
-      box.classList.remove("is-open");
-      doc.body.classList.remove("no-scroll");
-      setTimeout(function () { box.hidden = true; }, reduceMotion.matches ? 0 : 600);
-      if (lastFocus) lastFocus.focus();
-    }
-
-    grid.addEventListener("click", function (e) {
-      var b = e.target.closest(".g-btn");
-      if (b) open(Number(b.getAttribute("data-index")));
-    });
-    box.querySelector(".lightbox__close").addEventListener("click", close);
-    box.querySelector(".lightbox__prev").addEventListener("click", function () { show(index - 1); });
-    box.querySelector(".lightbox__next").addEventListener("click", function () { show(index + 1); });
-    box.addEventListener("click", function (e) { if (e.target === box || e.target.classList.contains("lightbox__stage")) close(); });
-    doc.addEventListener("keydown", function (e) {
-      if (box.hidden) return;
-      if (e.key === "Escape") close();
-      else if (e.key === "ArrowRight") show(index + 1);
-      else if (e.key === "ArrowLeft") show(index - 1);
-      else if (e.key === "Tab") { // keep focus inside the dialog
-        var f = box.querySelectorAll("button"), first = f[0], last = f[f.length - 1];
-        if (e.shiftKey && doc.activeElement === first) { e.preventDefault(); last.focus(); }
-        else if (!e.shiftKey && doc.activeElement === last) { e.preventDefault(); first.focus(); }
-      }
-    });
-    // Swipe
-    box.addEventListener("touchstart", function (e) { startX = e.touches[0].clientX; }, { passive: true });
-    box.addEventListener("touchend", function (e) {
-      if (startX == null) return;
-      var dx = e.changedTouches[0].clientX - startX;
-      if (Math.abs(dx) > 50) show(index + (dx < 0 ? 1 : -1));
-      startX = null;
-    });
-  }
-
   /* -------------------------------------------------------- 6. music */
   function initMusic() {
     var M = C.music || {};
@@ -417,7 +314,6 @@
   initScroll();
   initReveals();
   initCountdown();
-  initLightbox();
   initMusic();
   if (window.RSVP) window.RSVP.init(doc.querySelector(".rsvp__form"), C.rsvp || {});
 

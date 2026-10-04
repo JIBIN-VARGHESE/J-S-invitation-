@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Jibin &amp; Sofi · 25 April 2027</title>
+  <title>Jibin Varghese &amp; Sofia John · 25 April 2027</title>
 
   <!-- ===================================================================
        LINK PREVIEW (WhatsApp, iMessage, Facebook)
@@ -12,9 +12,9 @@
        After deploying, replace the og:image value with the absolute URL,
        e.g. https://YOUR-USERNAME.github.io/REPO/assets/images/og-image.jpg
        =================================================================== -->
-  <meta name="description" content="Jibin &amp; Sofi request the joy of your presence at their wedding — Sunday, 25 April 2027, Kozhikode, Kerala.">
+  <meta name="description" content="Jibin Varghese &amp; Sofia John request the joy of your presence at their wedding — Sunday, 25 April 2027, Kozhikode, Kerala.">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Jibin &amp; Sofi · 25 April 2027">
+  <meta property="og:title" content="Jibin Varghese &amp; Sofia John · 25 April 2027">
   <meta property="og:description" content="With the grace of God, we invite you to celebrate our wedding in Kozhikode, Kerala.">
   <meta property="og:image" content="assets/images/og-image.jpg">
   <meta name="twitter:card" content="summary_large_image">
@@ -103,7 +103,12 @@
     <div class="pin">
 
       <div class="stage stage--outside">
-        <img class="hero__sky" data-scene="sky" alt="" aria-hidden="true">
+        <div class="hero__scene">
+          <picture>
+            <source media="(min-aspect-ratio: 1/1)" data-scene-srcset="churchLandscape">
+            <img data-scene="churchPortrait" fetchpriority="high" alt="A painted Kerala church with twin bell towers at dawn">
+          </picture>
+        </div>
 
         <div class="hero__names">
           <p class="eyebrow hero__eyebrow">The wedding of</p>
@@ -115,25 +120,22 @@
           <p class="hero__date" data-bind="weddingDateShort">25 April 2027</p>
         </div>
 
-        <div class="hero__church"><img data-scene="church" alt="A Kerala church with twin bell towers and a stained-glass rose window"></div>
-        <div class="hero__flora hero__flora--l" aria-hidden="true"><img data-scene="flora" alt=""></div>
-        <div class="hero__flora hero__flora--r" aria-hidden="true"><img data-scene="flora" alt=""></div>
         <p class="scroll-cue" aria-hidden="true"><span>Scroll</span><i></i></p>
       </div>
 
       <div class="stage stage--nave" id="invitation">
         <picture>
-          <source media="(min-aspect-ratio: 1/1)" data-scene-srcset="interiorWide">
-          <img class="nave__img" data-scene="interior" alt="" aria-hidden="true">
+          <source media="(min-aspect-ratio: 1/1)" data-scene-srcset="naveLandscape">
+          <img class="nave__img" data-scene="navePortrait" alt="" aria-hidden="true">
         </picture>
         <div class="arch-frame" aria-labelledby="invite-title">
           <svg class="arch-frame__cross"><use href="#cross"/></svg>
           <p class="eyebrow" data-bind="invitation.eyebrow">Together with our families</p>
           <div class="invite__lines" data-list="invitation.lines"></div>
           <h2 class="invite__names" id="invite-title">
-            <span data-bind="couple.groom">Jibin</span>
+            <span data-bind="couple.groomFull">Jibin Varghese</span>
             <em>&amp;</em>
-            <span data-bind="couple.bride">Sofi</span>
+            <span data-bind="couple.brideFull">Sofia John</span>
           </h2>
           <p class="invite__when" data-bind="weddingDateLong"></p>
         </div>
@@ -161,16 +163,6 @@
     </div>
   </section>
 
-  <!-- ====================================================== 4 · OUR STORY -->
-  <section class="story" id="story" aria-labelledby="story-title">
-    <header class="section-head">
-      <p class="eyebrow reveal">Our Story</p>
-      <h2 class="section-title reveal" id="story-title"><em>Written</em> by grace</h2>
-      <p class="section-lede reveal" data-bind="story.intro"></p>
-    </header>
-    <ol class="story__chapters" data-list="story.chapters"></ol>
-  </section>
-
   <!-- ===================================================== 5 · ENGAGEMENT -->
   <section class="engagement" id="engagement" aria-labelledby="eng-title">
     <div class="portal" data-scrub="view" aria-hidden="true">
@@ -187,8 +179,8 @@
       </div>
       <p class="engagement__place reveal" data-bind="engagement.town">Pandalam</p>
 
-      <figure class="arch-photo reveal" data-reveal="clip">
-        <img data-src-bind="engagement.image" data-alt-bind="engagement.imageAlt" width="1000" height="1250" loading="lazy" decoding="async" alt="">
+      <figure class="eng-art reveal">
+        <img data-scene="window" width="600" height="1240" loading="lazy" decoding="async" alt="A painted stained-glass window">
       </figure>
 
       <div class="engagement__copy">
@@ -228,12 +220,6 @@
       <p class="wedding__place reveal"><span data-bind="weddingWeekday">Sunday</span> · <span data-bind="wedding.town">Kozhikode</span>, <span data-bind="wedding.region">Kerala</span></p>
     </header>
 
-    <figure class="wedding__photo reveal" data-reveal="clip">
-      <div class="parallax" data-scrub="view">
-        <img data-src-bind="wedding.image" data-alt-bind="wedding.imageAlt" width="1000" height="1250" loading="lazy" decoding="async" alt="">
-      </div>
-    </figure>
-
     <div class="wedding__cards">
       <article class="wcard reveal">
         <p class="wcard__label">The Ceremony</p>
@@ -262,15 +248,6 @@
       <span class="timeline__line" aria-hidden="true"><span></span></span>
       <ol class="timeline__list" data-list="timeline"></ol>
     </div>
-  </section>
-
-  <!-- ======================================================== 8 · GALLERY -->
-  <section class="gallery" id="gallery" aria-labelledby="gal-title">
-    <header class="section-head section-head--left">
-      <p class="eyebrow reveal">Portraits</p>
-      <h2 class="section-title reveal" id="gal-title"><em>Moments</em> kept</h2>
-    </header>
-    <div class="gallery__grid" data-list="gallery"></div>
   </section>
 
   <!-- ====================================================== 9 · COUNTDOWN -->
@@ -363,15 +340,14 @@
   <!-- ======================================================== 12 · CLOSING -->
   <section class="closing" id="closing" data-scrub="pin" aria-labelledby="close-names">
     <div class="pin">
-      <div class="closing__dusk" aria-hidden="true"></div>
-      <div class="portal" aria-hidden="true">
+            <div class="portal" aria-hidden="true">
         <svg viewBox="0 0 400 300" preserveAspectRatio="none"><path d="M0 0H400V300H364V196C364 96 290 26 200 26S36 96 36 196V300H0Z"/><path class="portal__edge" d="M352 300V196C352 104 284 40 200 40S48 104 48 196V300"/></svg>
       </div>
-      <div class="closing__land" aria-hidden="true">
-        <img class="closing__church" data-scene="church" alt="">
-        <img class="closing__flora closing__flora--l" data-scene="flora" alt="">
-        <img class="closing__flora closing__flora--r" data-scene="flora" alt="">
-        <div class="closing__water"><i></i><i></i><i></i></div>
+      <div class="closing__scene" aria-hidden="true">
+        <picture>
+          <source media="(min-aspect-ratio: 1/1)" data-scene-srcset="duskLandscape">
+          <img data-scene="duskPortrait" loading="lazy" alt="">
+        </picture>
       </div>
 
       <div class="closing__text">
@@ -381,6 +357,7 @@
           <h2 class="closing__names" id="close-names">
             <span data-bind="couple.groom">Jibin</span> <em>&amp;</em> <span data-bind="couple.bride">Sofi</span>
           </h2>
+          <p class="closing__full"><span data-bind="couple.groomFull">Jibin Varghese</span> &amp; <span data-bind="couple.brideFull">Sofia John</span></p>
           <p class="closing__date" data-bind="weddingDateDots">25.04.2027</p>
           <p class="closing__signoff" data-bind="closing.signoff"></p>
         </div>
@@ -389,17 +366,6 @@
   </section>
 
 </main>
-
-<!-- Lightbox -->
-<div class="lightbox" role="dialog" aria-modal="true" aria-label="Photograph viewer" hidden>
-  <button class="lightbox__close" type="button" aria-label="Close">Close</button>
-  <figure class="lightbox__stage"><img alt=""></figure>
-  <div class="lightbox__nav">
-    <button class="lightbox__prev" type="button" aria-label="Previous photograph">Prev</button>
-    <span class="lightbox__count" aria-live="polite"></span>
-    <button class="lightbox__next" type="button" aria-label="Next photograph">Next</button>
-  </div>
-</div>
 
 <noscript><style>.curtain{display:none}</style></noscript>
 </body>

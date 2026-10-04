@@ -16,8 +16,10 @@ window.WEDDING = {
 
   /* ---------------------------------------------------------------- COUPLE */
   couple: {
-    groom: "Jibin",
+    groom: "Jibin",                 // short names: opening screen & closing
     bride: "Sofi",
+    groomFull: "Jibin Varghese",    // full names: invitation card
+    brideFull: "Sofia John",
     // Small monogram letters shown in the corner and on the closing screen.
     monogram: ["J", "S"],
   },
@@ -43,36 +45,6 @@ window.WEDDING = {
     reference: "Song of Solomon 8:7",
   },
 
-  /* -------------------------------------------------------------- OUR STORY */
-  // Replace the placeholder text with your own words (2–3 sentences each
-  // reads best). Add or remove chapters freely.
-  story: {
-    intro: "A few pages from the story God has been writing for us.",
-    chapters: [
-      {
-        numeral: "I",
-        title: "The Beginning",
-        text: "[Placeholder — a few lines about how you first met.]",
-        image: "assets/images/story/01.jpg",
-        alt: "Jibin and Sofi — the beginning",
-      },
-      {
-        numeral: "II",
-        title: "The Promise",
-        text: "[Placeholder — a few lines about the moment you knew.]",
-        image: "assets/images/story/02.jpg",
-        alt: "Jibin and Sofi — the promise",
-      },
-      {
-        numeral: "III",
-        title: "Two Families, One Home",
-        text: "[Placeholder — a few lines about your families and the road ahead.]",
-        image: "assets/images/story/03.jpg",
-        alt: "Jibin and Sofi with family",
-      },
-    ],
-  },
-
   /* ------------------------------------------------------------- ENGAGEMENT */
   engagement: {
     date: "2027-04-17",            // Saturday
@@ -85,8 +57,6 @@ window.WEDDING = {
     description:
       "A gathering of prayer and blessing, and the exchanging of rings, " +
       "shared with the families and friends who have shaped us.",
-    image: "assets/images/events/engagement.jpg",
-    imageAlt: "Engagement photograph of Jibin and Sofi",
   },
 
   /* ---------------------------------------------------------------- WEDDING */
@@ -107,8 +77,6 @@ window.WEDDING = {
     receptionAddress: "",
     receptionMapsUrl: "",          // leave "" to reuse churchMapsUrl
 
-    image: "assets/images/events/wedding.jpg",
-    imageAlt: "Jibin and Sofi",
   },
 
   /* ---------------------------------------------------- WEDDING DAY TIMELINE */
@@ -118,20 +86,6 @@ window.WEDDING = {
     { time: "", title: "Photographs",     note: "With family and friends" },
     { time: "", title: "Reception",       note: "Lunch and fellowship" },
     { time: "", title: "Celebration",     note: "Toasts, music and blessings" },
-  ],
-
-  /* ---------------------------------------------------------------- GALLERY */
-  // Any number of photos. "shape" controls the editorial layout:
-  //   "tall" (portrait), "wide" (landscape) or "square".
-  gallery: [
-    { src: "assets/images/gallery/01.jpg", alt: "Gallery photograph 1", shape: "tall"   },
-    { src: "assets/images/gallery/02.jpg", alt: "Gallery photograph 2", shape: "wide"   },
-    { src: "assets/images/gallery/03.jpg", alt: "Gallery photograph 3", shape: "tall"   },
-    { src: "assets/images/gallery/04.jpg", alt: "Gallery photograph 4", shape: "square" },
-    { src: "assets/images/gallery/05.jpg", alt: "Gallery photograph 5", shape: "tall"   },
-    { src: "assets/images/gallery/06.jpg", alt: "Gallery photograph 6", shape: "wide"   },
-    { src: "assets/images/gallery/07.jpg", alt: "Gallery photograph 7", shape: "tall"   },
-    { src: "assets/images/gallery/08.jpg", alt: "Gallery photograph 8", shape: "wide"   },
   ],
 
   /* ------------------------------------------------------------------- RSVP */
@@ -154,17 +108,16 @@ window.WEDDING = {
   },
 
   /* ---------------------------------------------------------- SCENE ARTWORK */
-  // The painted scenes. Replace any of these with your own artwork or photos
-  // (AI-generated illustrations work well — see README → "Upgrading the artwork").
-  //   church, flora → need a TRANSPARENT background (PNG or WebP)
-  //   sky, interior, window → full images (JPG/WebP fine)
+  // Painted scenes. Portrait versions are used on phones, landscape on wider
+  // screens. Replace with your own artwork at the same proportions if you like.
   scenes: {
-    sky:      "assets/images/scenes/sky.svg",       // dawn sky behind the church
-    church:   "assets/images/scenes/church.svg",    // church façade, door centred at the bottom
-    flora:    "assets/images/scenes/flora.svg",     // palms + flowers (left edge; mirrored for right)
-    interior: "assets/images/scenes/interior.svg",  // inside the church, aisle towards the altar
-    interiorWide: "assets/images/scenes/interior-wide.svg", // same, landscape version for desktop
-    window:   "assets/images/scenes/window.svg",    // stained-glass window for the Bible verse
+    churchPortrait:  "assets/images/scenes/church-portrait.webp",   // 1170×2080, church door at 50% / 84.8% (camera zooms into it)
+    churchLandscape: "assets/images/scenes/church-landscape.webp",  // 2400×1350, church door at 50% / 81.65%
+    navePortrait:    "assets/images/scenes/nave-portrait.webp",     // inside the church (invitation)
+    naveLandscape:   "assets/images/scenes/nave-landscape.webp",
+    duskPortrait:    "assets/images/scenes/dusk-portrait.webp",     // closing
+    duskLandscape:   "assets/images/scenes/dusk-landscape.webp",
+    window:          "assets/images/scenes/window.webp",            // stained glass (verse + engagement)
   },
 
   /* ------------------------------------------------------------------ MUSIC */
