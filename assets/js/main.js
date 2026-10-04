@@ -68,7 +68,8 @@
     receptionMapsUrl: W.receptionMapsUrl || W.churchMapsUrl,
     weddingVenueFull: [W.churchName, W.churchAddress].filter(Boolean).join(", ") || tba("Venue details to follow"),
     rsvpDeadline: R.deadline ? "Kindly reply by " + (function (d) { return d.d + " " + d.month + " " + d.y; })(parseDate(R.deadline)) + "." : "We would be grateful for your reply.",
-    photoCredits: (C.photos && C.photos.credits) || "",
+    artCredits: (C.art && C.art.credits) || "",
+    weddingWeekdayShort: wd.weekday.slice(0, 3), weddingMonthShort: wd.month.slice(0, 3),
     countdownNote: wd.weekday + ", " + wd.d + " " + wd.month + " " + wd.y + " · " + (W.town || ""),
   };
 
@@ -95,12 +96,15 @@
       var alt = img.getAttribute("data-alt-bind");
       if (alt) img.alt = valueFor(alt) || "";
     });
-    var photos = C.photos || {}, focus = photos.focus || {};
-    doc.querySelectorAll("[data-photo]").forEach(function (img) {
-      var key = img.getAttribute("data-photo");
-      if (photos[key]) img.src = photos[key];
-      if (focus[key]) img.style.objectPosition = focus[key];
+    var art = C.art || {};
+    doc.querySelectorAll("[data-art]").forEach(function (img) {
+      var v = art[img.getAttribute("data-art")];
+      if (v) img.src = v;
       img.decoding = "async";
+    });
+    doc.querySelectorAll("[data-art-srcset]").forEach(function (src) {
+      var v = art[src.getAttribute("data-art-srcset")];
+      if (v) src.srcset = v; else src.remove();
     });
     var scenes = C.scenes || {};
     doc.querySelectorAll("[data-scene]").forEach(function (img) {

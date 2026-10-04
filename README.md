@@ -10,7 +10,7 @@ assets/
   js/main.js            content binding, scroll engine, countdown, lightbox, music
   js/rsvp.js            RSVP validation + swappable delivery providers (isolated)
   images/
-    photos/             church photographs (hero, verse, closing)
+    illustrations/      watercolour sky, church, wedding car
     og-image.jpg        WhatsApp / social preview (1200×630)
   icons/favicon.svg
   music/                put wedding.mp3 here
@@ -31,21 +31,19 @@ Open **`config.js`**. It holds the names, dates, times, venues, addresses, map l
 
 **The one exception is the link preview.** WhatsApp and iMessage read the `<meta property="og:…">` tags at the top of `index.html` without running JavaScript, so edit those by hand. After deploying, change `og:image` to the full URL, for example `https://YOUR-USERNAME.github.io/YOUR-REPO/assets/images/og-image.jpg`. Otherwise many apps won't show the image.
 
-## 2. Photographs
+## 2. Illustrations
 
-The site uses three full-screen church photographs, set in `config.js → photos`:
+The opening, "Save the Date" and closing scenes use the files in `assets/images/illustrations/`. Their paths are set in `config.js → art`:
 
-| Slot | Where | Current file |
+| File | What | Notes |
 |---|---|---|
-| `hero` | opening screen (parallax) | `assets/images/photos/kerala-tower.webp` |
-| `verse` | behind the Bible verse | `assets/images/photos/gold-tower.webp` |
-| `closing` | final scene (slow push down the aisle) | `assets/images/photos/nave.webp` |
+| `wash-portrait.webp` / `wash-landscape.webp` | watercolour sky | generated for this site |
+| `church.webp` | white church, anchored to the right edge | cut out of the reference card you supplied |
+| `wedding-car.webp` | couple in the convertible | cut out of the reference card you supplied |
 
-**These are the reference images you supplied.** They have been cropped, cleaned, upscaled and colour-graded. Two things to check before going live:
-1. **Rights.** Use only photos you took yourself, or ones under a free licence such as Unsplash or Pexels. Put any credit line the licence requires in `photos.credits`.
-2. **Resolution.** The sources were screenshots of about 1000 px, so they look soft on large desktop screens. Original files of 2000 px or more will look much sharper. Put them in the same folder and update the paths.
-
-`photos.focus` sets which part of each photo stays in view when a phone crops it.
+**The church and car come from a stock invitation template** (it has the "Florence & Bradon" placeholder text). Before going live:
+1. **Licence.** Find the original on the stock site (it looks like Freepik / Magnific). Check its licence: free licences usually require a credit line, which goes in `art.credits`. If you buy the premium licence, no credit is needed.
+2. **Quality.** The cut-outs were taken from a 1472 px screenshot and upscaled 2.5×, so the flowers and fine edges are soft. If you download the original vector (EPS/AI/SVG) from the stock site, export the church and car as transparent PNGs at about 3× this size and replace the files.
 
 ## 3. Music
 
@@ -110,10 +108,9 @@ The empty `.nojekyll` file tells Pages to serve files as they are. All paths are
 - **Closing.** A wide landscape scene is the final, still image.
 
 **Visual system:**
-- **Photography first.** Real church architecture fills the screen. A Kerala tower with a tiled roof and white cross opens the site, an ornate white-and-gold tower sits behind the verse, and a church nave closes it.
-- **Colour.** Ivory and stone paper tones, a deep warm black for the photographic sections, and muted gold line-work.
-- **Type.** Cormorant Garamond for large headings. Jost for subheadings, in uppercase with 0.15em letter-spacing.
-- **Cross.** An original ornate cross (trefoil ends, centre medallion, scrollwork), used sparingly.
+- **Illustrated scenes.** A watercolour sky over pale paper, a white church on the right edge, and a wedding car that drives across "Save the Date" and stops at the church in the closing scene.
+- **Colour.** Watercolour blue and navy for the scenes. Ivory, stone and deep navy sections with muted gold line-work in between.
+- **Type.** Great Vibes script for the names. Cormorant Garamond for headings and body. Jost in uppercase for labels.
 
 **Performance and accessibility.**
 - All scroll motion is `transform` and `opacity`, driven by one `requestAnimationFrame` loop. That loop only measures sections currently near the viewport.

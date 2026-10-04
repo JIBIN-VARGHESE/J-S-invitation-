@@ -6,7 +6,7 @@
    • Leave a value as "" (empty) when you don't know it yet. The site will
      show a graceful "to be announced" line instead — nothing is invented.
    • Dates use ISO format: "YYYY-MM-DD".  Times use 24h "HH:MM" (Kerala time).
-   • Photo paths are relative to the site root. To replace a photo, either
+   • Image paths are relative to the site root. To replace an image, either
      overwrite the file with the same name, or change the path here.
    • The only things NOT controlled from here are the link-preview tags
      (WhatsApp / iMessage preview) at the top of index.html — see README.
@@ -107,20 +107,18 @@ window.WEDDING = {
     googleFormFields: { name: "entry.000000", guests: "entry.000001", attending: "entry.000002", message: "entry.000003" },
   },
 
-  /* ---------------------------------------------------------------- PHOTOS */
-  // Full-bleed photographs. Use high-resolution originals for the best result
-  // (at least 2000 px on the long side), saved as WebP or JPG under ~400 KB.
-  //   hero    – opening screen. Landscape works; the tower/cross is kept in view.
-  //   verse   – behind the Bible verse. Portrait suits phones best.
-  //   closing – the final scene (church interior / aisle).
-  photos: {
-    hero:    "assets/images/photos/kerala-tower.webp",
-    verse:   "assets/images/photos/gold-tower.webp",
-    closing: "assets/images/photos/nave.webp",
-    // Where the subject sits in each photo (CSS object-position), so phones crop well.
-    focus: { hero: "48% 30%", verse: "50% 35%", closing: "52% 60%" },
-    // Shown in small type at the very bottom. Fill in if your photo licence asks for credit,
-    // e.g. "Photographs: Name / Unsplash". Leave "" to show nothing.
+  /* --------------------------------------------------------------- ARTWORK */
+  // Illustrations used on the opening, "Save the Date" and closing scenes.
+  //   church, car → transparent background (WebP or PNG)
+  //   wash        → watercolour sky (portrait for phones, landscape for wider screens)
+  art: {
+    washPortrait:  "assets/images/illustrations/wash-portrait.webp",
+    washLandscape: "assets/images/illustrations/wash-landscape.webp",
+    church:        "assets/images/illustrations/church.webp",
+    car:           "assets/images/illustrations/wedding-car.webp",
+    // Credit line shown at the very bottom of the page. If the church / car
+    // illustrations come from a stock site (e.g. Freepik), its licence usually
+    // requires attribution — put it here, e.g. "Illustrations: Freepik".
     credits: "",
   },
 

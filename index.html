@@ -18,11 +18,11 @@
   <meta property="og:description" content="With the grace of God, we invite you to celebrate our wedding in Kozhikode, Kerala.">
   <meta property="og:image" content="assets/images/og-image.jpg">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="theme-color" content="#141312">
+  <meta name="theme-color" content="#7FB2E0">
 
   <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="assets/fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="assets/images/photos/kerala-tower.webp" as="image">
+  <link rel="preload" href="assets/fonts/great-vibes-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/jost-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/css/styles.css">
 
@@ -100,25 +100,49 @@
 </div>
 
 <!-- ================================================================ HEADER
-     Photograph + gradient + type, each moving at its own speed (parallax).
-     Photo path: config.js → photos.hero -->
+     Watercolour sky + church (right edge) + names. Layers scroll at different speeds.
+     Artwork paths: config.js → art -->
 <header class="hero" id="top">
-  <div class="hero__photo layer" aria-hidden="true"><img data-photo="hero" alt="" fetchpriority="high"></div>
-  <div class="hero__shade layer" aria-hidden="true"></div>
+  <div class="hero__wash layer" aria-hidden="true">
+    <picture>
+      <source media="(min-aspect-ratio: 1/1)" data-art-srcset="washLandscape">
+      <img data-art="washPortrait" alt="" fetchpriority="high">
+    </picture>
+  </div>
+  <div class="hero__church layer" aria-hidden="true"><img data-art="church" alt="" fetchpriority="high"></div>
   <div class="hero__content layer">
-    <svg class="hero__cross" aria-hidden="true"><use href="#ornate-cross"/></svg>
-    <p class="hero__eyebrow">The wedding of</p>
+    <p class="hero__eyebrow">Together with their families</p>
     <h1 class="hero__title">
-      <span class="hero__name" data-bind="couple.groom">Jibin</span>
+      <span class="hero__person"><span class="hero__name" data-bind="couple.groom">Jibin</span><span class="hero__role">Groom</span></span>
       <span class="hero__amp">&amp;</span>
-      <span class="hero__name" data-bind="couple.bride">Sofi</span>
+      <span class="hero__person"><span class="hero__name" data-bind="couple.bride">Sofi</span><span class="hero__role">Bride</span></span>
     </h1>
-    <p class="hero__date"><span data-bind="weddingDateShort">25 April 2027</span><i aria-hidden="true"></i><span data-bind="wedding.town">Kozhikode</span></p>
+    <p class="hero__date"><span data-bind="weddingWeekdayShort">Sun</span><i aria-hidden="true"></i><b data-bind="weddingD">25</b><i aria-hidden="true"></i><span data-bind="weddingMonthShort">Apr</span></p>
+    <p class="hero__place"><span data-bind="wedding.town">Kozhikode</span>, <span data-bind="wedding.region">Kerala</span> · <span data-bind="weddingY">2027</span></p>
   </div>
   <p class="scroll-cue" aria-hidden="true"><span>Scroll</span><i></i></p>
 </header>
 
 <main>
+
+  <!-- ================================================== SAVE THE DATE
+       Pinned scene: the wedding car drives across as you scroll. -->
+  <section class="savedate" id="save-the-date" data-scrub="pin" data-nofade aria-labelledby="sd-title">
+    <div class="pin">
+      <div class="savedate__wash" aria-hidden="true">
+        <picture>
+          <source media="(min-aspect-ratio: 1/1)" data-art-srcset="washLandscape">
+          <img data-art="washPortrait" alt="" loading="lazy">
+        </picture>
+      </div>
+      <div class="savedate__text">
+        <h2 class="savedate__title" id="sd-title">Save <small>the</small> Date</h2>
+        <p class="savedate__date" data-bind="weddingDateDots">25.04.2027</p>
+      </div>
+      <div class="savedate__road" aria-hidden="true"></div>
+      <div class="car" aria-hidden="true"><img data-art="car" alt="" loading="lazy"></div>
+    </div>
+  </section>
 
   <!-- ===================================================== INVITATION -->
   <section class="invite" id="invitation" aria-labelledby="invite-title">
@@ -136,7 +160,7 @@
   <!-- ========================================================== VERSE -->
   <section class="verse" id="verse" data-scrub="pin" data-nofade aria-labelledby="verse-ref">
     <div class="pin">
-      <div class="verse__photo"><img data-photo="verse" alt="" loading="lazy"></div>
+      <svg class="verse__cross" aria-hidden="true"><use href="#ornate-cross"/></svg>
       <figure class="verse__body">
         <blockquote class="verse__text" data-words="verse.text"></blockquote>
         <figcaption class="verse__ref" id="verse-ref">
@@ -301,8 +325,15 @@
   <!-- ======================================================== CLOSING -->
   <section class="closing" id="closing" data-scrub="pin" data-nofade aria-labelledby="close-names">
     <div class="pin">
-      <div class="closing__photo" aria-hidden="true"><img data-photo="closing" alt="" loading="lazy"></div>
-      <div class="closing__shade" aria-hidden="true"></div>
+      <div class="closing__wash" aria-hidden="true">
+        <picture>
+          <source media="(min-aspect-ratio: 1/1)" data-art-srcset="washLandscape">
+          <img data-art="washPortrait" alt="" loading="lazy">
+        </picture>
+      </div>
+      <div class="closing__church" aria-hidden="true"><img data-art="church" alt="" loading="lazy"></div>
+      <div class="closing__road" aria-hidden="true"></div>
+      <div class="car car--closing" aria-hidden="true"><img data-art="car" alt="" loading="lazy"></div>
       <div class="closing__text">
         <p class="closing__line" data-bind="closing.line"></p>
         <div class="closing__sign">
@@ -320,7 +351,7 @@
 
 </main>
 
-<footer class="credits"><p data-bind="photoCredits"></p></footer>
+<footer class="credits"><p data-bind="artCredits"></p></footer>
 
 <noscript><style>.curtain{display:none}</style></noscript>
 </body>
