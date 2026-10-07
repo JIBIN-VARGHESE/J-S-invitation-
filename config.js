@@ -125,11 +125,12 @@ window.WEDDING = {
     apse:   "assets/images/nave/apse.webp",     // far end: rose window, altar, candles
     pillar: "assets/images/nave/pillar.webp",   // stone column (transparent), repeated down the aisle
     shafts: "assets/images/nave/shafts.webp",   // light beams from the high windows (screen-blended)
-    groom:  "assets/images/nave/groom.svg",     // silhouettes at the altar — they move together as you scroll
+    groom:  "assets/images/nave/groom.svg",     // silhouettes at the altar (same frame) — they slide together as you scroll
     bride:  "assets/images/nave/bride.svg",
-    // Credit line shown at the very bottom of the page. The opening film is from
-    // Vecteezy; its free licence requires attribution, e.g. "Video: Vecteezy".
-    credits: "",
+    // Credit line shown at the very bottom of the page. Free licences of the
+    // opening film (Vecteezy) and the couple silhouette (Freepik) require
+    // attribution. Remove a credit only if you hold a premium licence for it.
+    credits: "Opening film: Vecteezy · Couple silhouette: Freepik",
   },
 
   /* ------------------------------------------------------------- ANIMATIONS */

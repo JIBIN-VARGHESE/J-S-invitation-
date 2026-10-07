@@ -89,7 +89,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 [hidden] { display: none !important; }
 em { font-style: italic; }
 
-main { position: relative; z-index: 1; padding-bottom: 20svh; }
+main { position: relative; z-index: 1; }
 section { position: relative; color: var(--fg); }
 /* every information block is a dark glass panel floating in the nave, with
    a full screen of church between panels so the walk is always visible */
@@ -194,8 +194,7 @@ section { position: relative; color: var(--fg); }
 .nave__couple img { position: absolute; filter: drop-shadow(0 0 18px rgba(255, 200, 130, .2)); }
 .nave__pillars { inset: 0; z-index: 2; }
 .pillar { position: absolute; }
-.pillar--l { scale: -1 1; }
-.nave__shafts { inset: -10% -20%; width: 140%; height: 120%; z-index: 3; object-fit: cover; mix-blend-mode: screen; opacity: .5; }
+.nave__shafts { left: -50%; top: -10%; width: 200%; max-width: none; height: 120%; z-index: 3; object-fit: cover; mix-blend-mode: screen; opacity: .5; }
 .nave__motes { z-index: 4; }
 .nave__vignette { inset: 0; z-index: 5; background: radial-gradient(120% 90% at 50% 40%, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, .7) 100%); }
 
@@ -393,7 +392,7 @@ section { position: relative; color: var(--fg); }
   --line-out: clamp(0, (var(--p) - .5) / .08, 1);
   --sign: clamp(0, (var(--p) - .58) / .16, 1);
 }
-.closing__text { position: absolute; left: 0; right: 0; top: 4svh; height: 40svh; text-shadow: 0 2px 20px rgba(0, 0, 0, .8); padding: 0 var(--gutter) 3svh; display: grid; place-items: center; text-align: center; z-index: 3; }
+.closing__text { position: absolute; left: 0; right: 0; bottom: 3svh; height: 38svh; text-shadow: 0 2px 20px rgba(0, 0, 0, .8); padding: 0 var(--gutter) 3svh; display: grid; place-items: center; text-align: center; z-index: 3; }
 .closing__line {
   grid-area: 1 / 1; max-width: 24rem;
   font-weight: 300; font-style: italic; font-size: clamp(1.8rem, 1.2rem + 3.6vw, 3.2rem); line-height: 1.22; text-shadow: var(--glow);
@@ -441,6 +440,7 @@ section { position: relative; color: var(--fg); }
   .wedding__cards { grid-template-columns: 1fr 1fr; column-gap: 1.6rem; }
   .locations__cards { grid-template-columns: 1fr 1fr; }
   .closing__line { max-width: 36rem; }
+  .closing__text { height: 30svh; bottom: 2svh; }
 }
 
 /* ================================================ Reduced motion */

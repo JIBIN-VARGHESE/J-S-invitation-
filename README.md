@@ -10,8 +10,8 @@ assets/
   js/main.js            content binding, scroll engine, countdown, lightbox, music
   js/rsvp.js            RSVP validation + swappable delivery providers (isolated)
   images/
-    glass/              rendered stained glass + rose backgrounds
-    illustrations/      wedding car
+    nave/               church interior layers + couple silhouettes
+    glass/              stained-glass source renders (not loaded by the page)
   video/                opening film (MP4 + WebM, portrait and landscape)
     og-image.jpg        WhatsApp / social preview (1200×630)
   icons/favicon.svg
@@ -33,24 +33,30 @@ Open **`config.js`**. It holds the names, dates, times, venues, addresses, map l
 
 **The one exception is the link preview.** WhatsApp and iMessage read the `<meta property="og:…">` tags at the top of `index.html` without running JavaScript, so edit those by hand. After deploying, change `og:image` to the full URL, for example `https://YOUR-USERNAME.github.io/YOUR-REPO/assets/images/og-image.jpg`. Otherwise many apps won't show the image.
 
-## 2. Film, stained glass and artwork
+## 2. The walk down the aisle
 
-| What | Files | Notes |
+After the opening film, a church interior sits **fixed behind the whole page**. As guests scroll, a perspective camera walks down the aisle. Stone pillars pass on both sides and light falls through high windows. At the far end, under the rose window, the bride and groom silhouettes start apart and slide together until they stand hand in hand. Every section floats over the church on a dark glass panel, with a screen of church between panels.
+
+| Layer | File | Notes |
 |---|---|---|
-| Opening film (statue against the sky) | `assets/video/hero-*.mp4` and `.webm`, plus posters | made from the Vecteezy clip you supplied: trimmed, colour-graded, with portrait and landscape cuts, about 0.5 MB each |
-| Rose window behind the Bible verse | `assets/images/glass/rose-window.webp` | rendered for this site |
-| Gothic windows for the invitation and closing | `assets/images/glass/windows-*.webp` | rendered for this site |
-| Blurred roses for "Save the Date" | `assets/images/glass/roses-*.webp` | rendered for this site |
-| Wedding car | `assets/images/illustrations/wedding-car.webp` | cut out of the stock card you supplied |
+| Opening film | `assets/video/hero-*.mp4` / `.webm` + posters | from the Vecteezy clip you supplied |
+| Far wall (rose window, lancets, altar, candles) | `assets/images/nave/apse.webp` | rendered for this site |
+| Stone pillar (repeated, mirrored on the left) | `assets/images/nave/pillar.webp` | rendered for this site |
+| Light shafts | `assets/images/nave/shafts.webp` | rendered for this site; screen-blended |
+| Bride / groom silhouettes | `assets/images/nave/bride.svg`, `groom.svg` | from the Freepik file you supplied, recoloured and split into two layers that share one frame |
+| Dust in the light | `assets/lottie/light-motes.json` | original Lottie |
 
-All the paths are set in `config.js → video` and `config.js → art`.
+**Tuning the walk.** In `assets/js/main.js`, the `NAVE` settings control the scene:
+- number of pillar pairs and their spacing;
+- aisle width and eye height;
+- where the couple stand (`coupleZ`);
+- how far the camera walks (`walkTo`).
 
-**Licences to check before going live:**
-- **Vecteezy clip.** The free licence requires a credit line, e.g. "Video by Vecteezy". Put it in `art.credits`, or buy the Pro licence.
-- **Car.** It comes from a stock template (likely Freepik), which also needs credit or a paid licence.
-- **Everything else.** The stained glass and roses were generated for this site, so they need no credit.
+The couple meet at about 85 % of the page.
 
-To use a different opening film, export H.264 MP4 (and optionally VP9 WebM) with no audio, about 10–15 seconds long and under 1 MB. Then update `config.js → video`. The video is muted and plays inline, which phones allow without a tap.
+**Credits.** The free Vecteezy and Freepik licences require attribution. The page footer shows "Opening film: Vecteezy · Couple silhouette: Freepik" (`config.js → art.credits`). Clear it only if you hold premium licences.
+
+`assets/images/glass/` holds the stained-glass renders used to build the far wall. The page doesn't load them.
 
 ## 2b. Animations (Lottie)
 
@@ -134,11 +140,11 @@ The empty `.nojekyll` file tells Pages to serve files as they are. All paths are
 - **Information sections.** Events sit in framed cards with a photograph, title, details and a location button. The countdown uses small tiles on a textured ivory paper. Then comes "Will you join us?" with an RSVP call to action.
 - **Closing.** A wide landscape scene is the final, still image.
 
-**Visual system ("sanctuary light"):**
-- **Darkness and light.** Deep candle-lit sections, with stained glass glowing out of the dark: a rose window behind the verse and gothic windows over a reflective floor.
-- **Opening.** A slow film of the statue of Christ against the sky, with soft light rays.
-- **Type.** Cinzel engraved capitals for names and titles, with a Great Vibes script word as a flourish. Cormorant Garamond for reading text, Jost for labels.
-- **Colour.** Near-black sanctuary brown, candle gold and cream. Parchment sections (engagement, timeline, RSVP) for rhythm, and a sky-blue "Save the Date".
+**Visual system ("walking down the aisle"):**
+- **One continuous space.** Every section after the opening film takes place inside the same candle-lit church. Darkness, with light from the windows, candles and stained glass.
+- **Story.** The guest walks toward the altar while the couple come together, and the final screen is the two of them hand in hand under the rose window.
+- **Type.** Cinzel engraved capitals with Great Vibes script flourishes. Cormorant Garamond for reading, Jost for labels.
+- **Colour.** Candle-lit dark, candle gold and cream throughout. No light sections, so the theme never breaks.
 
 **Performance and accessibility.**
 - All scroll motion is `transform` and `opacity`, driven by one `requestAnimationFrame` loop. That loop only measures sections currently near the viewport.

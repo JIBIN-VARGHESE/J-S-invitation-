@@ -243,7 +243,7 @@
   //   couple   : stand in front of the altar, start apart, meet near the end
   //   apse     : the far wall (rose window + altar), a flat backdrop
   var nave = null;
-  var NAVE = { pairs: 7, spacing: 3.2, aisle: 2.1, eye: 1.6, pillarW: .62, coupleZ: 25.5, apseZ: 28, apseW: 13, walkTo: 20.5, coupleH: 1.72 };
+  var NAVE = { pairs: 7, spacing: 3.2, aisle: 2.1, eye: 1.6, pillarW: .62, coupleZ: 25.5, apseZ: 28, apseW: 13, walkTo: 20.5, coupleH: 1.78 };
   function initNave() {
     var el = doc.querySelector(".nave");
     if (!el) return;
@@ -255,6 +255,7 @@
         var img = el.ownerDocument.createElement("img");
         img.src = pillarSrc; img.alt = ""; img.decoding = "async";
         img.className = "pillar" + (side < 0 ? " pillar--l" : "");
+        img.setAttribute("data-base", "160");
         wrap.appendChild(img);
         pillars.push({ el: img, z: NAVE.spacing * (i + 1), x: side * NAVE.aisle });
       });
@@ -284,41 +285,47 @@
     var cx = vw / 2, hz = vh * .42;                         // vanishing point
     var ease = t * t * (3 - 2 * t);
     var camZ = NAVE.walkTo * (t * .7 + ease * .3);
-    function place(node, x, z, wM, hM, anchor) {           // anchor: fraction of height that sits on the floor
+    function place(node, x, z, wM, hM, anchor, mirror) {   // anchor: fraction of height that sits on the floor
       var dz = z - camZ;
       if (dz < .45) { node.style.visibility = "hidden"; return; }
       var s = k / dz;
       var w = wM * s, h = hM * s;
       var sx = cx + x * s - w / 2, sy = hz + NAVE.eye * s - h * anchor;
       node.style.visibility = "visible";
-      node.style.width = w.toFixed(1) + "px";
-      node.style.transform = "translate3d(" + sx.toFixed(1) + "px," + sy.toFixed(1) + "px,0)";
+      // size is set once (BASE px wide); per frame only a GPU transform changes
+      var base = node._base || (node._base = parseFloat(node.getAttribute("data-base")) || 200);
+      if (!node._sized) { node.style.width = base + "px"; node._sized = true; }
+      var sc = w / base;
+      node.style.transform = mirror
+        ? "translate3d(" + (sx + w).toFixed(1) + "px," + sy.toFixed(1) + "px,0) scale(" + (-sc).toFixed(4) + "," + sc.toFixed(4) + ")"
+        : "translate3d(" + sx.toFixed(1) + "px," + sy.toFixed(1) + "px,0) scale(" + sc.toFixed(4) + ")";
       node.style.opacity = Math.min(1, (dz - .45) / 1.2).toFixed(3);
       return dz;
     }
     nave.pillars.forEach(function (p) {
-      var dz = place(p.el, p.x, p.z, NAVE.pillarW, NAVE.pillarW * 6.19, 1);
+      var dz = place(p.el, p.x, p.z, NAVE.pillarW, NAVE.pillarW * 6.19, 1, p.x < 0);
       if (dz) p.el.style.zIndex = String(1000 - Math.round(dz * 10));
     });
     // far wall: the image's floor line sits at 64 % of its height
     place(nave.apse, 0, NAVE.apseZ, NAVE.apseW, NAVE.apseW * .85, .64);
     nave.apse.style.opacity = "1";
-    // couple: apart → together (meet at ~85 % of the page)
+    // couple: both images share one frame (the original hand-in-hand pose);
+    // they start apart and slide together, meeting at ~85 % of the page
     var m = Math.min(1, t / .85), meet = m * m * (3 - 2 * m);
-    var gap = 1.5 * (1 - meet);
-    var H = NAVE.coupleH;
-    place(nave.groom, -(.27 + gap / 2), NAVE.coupleZ, H * 220 / 560, H, 1);
-    place(nave.bride, (.36 + gap / 2), NAVE.coupleZ, H * 300 / 560, H, 1);
+    var gap = 1.3 * (1 - meet);
+    var H = NAVE.coupleH, Wc = H * 396 / 442;
+    place(nave.bride, -gap / 2, NAVE.coupleZ, Wc, H, 1);
+    place(nave.groom, gap / 2, NAVE.coupleZ, Wc, H, 1);
     nave.groom.style.opacity = nave.bride.style.opacity = "1";
     // carpet: from the camera to the altar steps
     nave.el.style.setProperty("--carpet-top", (hz + NAVE.eye * k / (NAVE.coupleZ + .8 - camZ)).toFixed(1) + "px");
     nave.el.style.setProperty("--hz", hz.toFixed(1) + "px");
     // light shafts breathe as you pass each window bay
-    nave.shafts.style.opacity = (.45 + .25 * Math.sin(camZ / NAVE.spacing * Math.PI)).toFixed(3);
+    nave.shafts.style.opacity = (.26 + .12 * Math.sin(camZ / NAVE.spacing * Math.PI)).toFixed(3);
     nave.shafts.style.transform = "translate3d(" + (-camZ * 6).toFixed(1) + "px,0,0) scale(1.15)";
     // entering from the bright film: fade the nave in over the first screen
     var heroH = nave.hero ? nave.hero.offsetHeight : vh;
-    nave.el.style.opacity = Math.min(1, Math.max(0, window.scrollY / (heroH * .7))).toFixed(3);
+    nave.el.style.opacity = reduceMotion.matches ? "1" : Math.min(1, Math.max(0, window.scrollY / (heroH * .7))).toFixed(3);
   }
 
   /* --------------------------------------------------- hero video */
