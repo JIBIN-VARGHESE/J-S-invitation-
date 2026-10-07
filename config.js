@@ -81,6 +81,7 @@ window.WEDDING = {
 
   /* ---------------------------------------------------- WEDDING DAY TIMELINE */
   // Times are optional — empty entries show "Time to follow".
+  // (not shown on the page at present: the Wedding card lists both events)
   timeline: [
     { time: "14:30", title: "Holy Matrimony", note: "St. George Orthodox Cathedral" },
     { time: "18:30", title: "Reception",      note: "Opulent Convention Centre" },
@@ -92,29 +93,20 @@ window.WEDDING = {
     maxGuests: 6,                  // upper limit in the "number of guests" field
 
     // Where responses are sent. See assets/js/rsvp.js for details.
+    //   "formsubmit"  – endpoint: an email address; each reply is emailed there
     //   "demo"        – no backend; the response is only kept in this browser
     //   "formspree"   – endpoint: "https://formspree.io/f/XXXXXXX"
     //   "googleForm"  – endpoint: the form's ".../formResponse" URL + fields map
     //   "appsScript"  – endpoint: Google Apps Script web-app URL (writes to Sheets)
     //   "supabase"    – endpoint: "https://PROJECT.supabase.co/rest/v1/rsvps", key: anon key
     //   "firebase"    – endpoint: "https://PROJECT.firebaseio.com/rsvps.json"
-    provider: "demo",
-    endpoint: "",
+    provider: "formsubmit",
+    endpoint: "jibinv471@gmail.com",
+    // After the site is live, send one test reply: FormSubmit emails an
+    // "Activate form" link to this address. Click it once; replies then arrive.
     key: "",
     // Only for provider "googleForm": map our fields to your form's entry IDs.
     googleFormFields: { name: "entry.000000", guests: "entry.000001", attending: "entry.000002", message: "entry.000003" },
-  },
-
-  /* ------------------------------------------------------------ HERO VIDEO */
-  // Background film behind the names. Phones get the portrait cut.
-  // Keep each file under ~1 MB (H.264 MP4, no audio). Leave src "" to use the poster only.
-  video: {
-    portrait:        "assets/video/hero-portrait.mp4",
-    portraitWebm:    "assets/video/hero-portrait.webm",   // smaller; used where supported (Chrome, Android, Firefox)
-    portraitPoster:  "assets/video/hero-portrait-poster.webp",
-    landscape:       "assets/video/hero-landscape.mp4",
-    landscapeWebm:   "assets/video/hero-landscape.webm",
-    landscapePoster: "assets/video/hero-landscape-poster.webp",
   },
 
   /* --------------------------------------------------------------- ARTWORK */
@@ -122,6 +114,8 @@ window.WEDDING = {
   // assets/js/nave.js from these textures (all in assets/images/nave/).
   // Replace a file to change a surface; keep the pixel size (powers of two).
   art: {
+    heroPortrait:  "assets/images/hero/hero-portrait.webp",   // opening picture on phones
+    heroLandscape: "assets/images/hero/hero-landscape.webp",  // opening picture on wide screens
     floor:  "assets/images/nave/floor.webp",    // polished stone tiles (repeats)
     carpet: "assets/images/nave/carpet.webp",   // aisle runner (repeats)
     wall:   "assets/images/nave/wall.webp",     // nave wall: arcade, triforium, clerestory (one bay, repeats)
@@ -132,10 +126,9 @@ window.WEDDING = {
     pewend: "assets/images/nave/pewend.webp",   // carved pew end
     altar:  "assets/images/nave/altar.webp",    // far wall: rose window, altar, candles
     couple: "assets/images/nave/couple.webp",   // the couple, cut into parts so they can walk
-    // Credit line shown at the very bottom of the page. Free licences of the
-    // opening film (Vecteezy) and the couple silhouette (Freepik) require
-    // attribution. Remove a credit only if you hold a premium licence for it.
-    credits: "Opening film: Vecteezy · Couple silhouette: Freepik",
+    // The footer credit was removed at the couple's request. The free Vecteezy
+    // (opening picture) and Freepik (couple) licences require attribution, so
+    // hold premium licences for both, or put a credit line back in index.html.
   },
 
   /* ------------------------------------------------------------- ANIMATIONS */
@@ -160,6 +153,7 @@ window.WEDDING = {
   /* ---------------------------------------------------------------- CLOSING */
   closing: {
     line: "Your presence would make our celebration complete.",
-    signoff: "With love and prayers",
+    signoff: "\u201CWhat God has joined together, let no one separate.\u201D",
+    signoffRef: "Mark 10:9",
   },
 };

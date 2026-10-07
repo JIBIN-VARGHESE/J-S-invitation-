@@ -105,9 +105,12 @@
      Watercolour sky + church (right edge) + names. Layers scroll at different speeds.
      Artwork paths: config.js → art -->
 <header class="hero" id="top">
-  <!-- Background film: the source is chosen by orientation in main.js (config.js → video) -->
+  <!-- Background picture: portrait crop on phones, landscape on wide screens (config.js → art.hero*) -->
   <div class="hero__film layer" aria-hidden="true">
-    <video class="hero__video" muted playsinline loop preload="auto" data-video="hero"></video>
+    <picture>
+      <source media="(min-aspect-ratio: 1/1)" srcset="assets/images/hero/hero-landscape.webp" data-art-srcset="heroLandscape">
+      <img class="hero__photo" src="assets/images/hero/hero-portrait.webp" data-art="heroPortrait" alt="" fetchpriority="high">
+    </picture>
   </div>
   <div class="hero__shade layer" aria-hidden="true"></div>
   <div class="hero__rays layer" aria-hidden="true"></div>
@@ -226,18 +229,6 @@
     </div>
   </section>
 
-  <!-- ======================================================= TIMELINE -->
-  <section class="timeline panel" id="timeline" aria-labelledby="tl-title">
-    <header class="section-head">
-      <p class="eyebrow" data-bind="weddingDateShort">25 April 2027</p>
-      <h2 class="section-title" id="tl-title"><em>The</em> Order of the Day</h2>
-    </header>
-    <div class="timeline__track" data-scrub="view">
-      <span class="timeline__line" aria-hidden="true"><span></span></span>
-      <ol class="timeline__list" data-list="timeline"></ol>
-    </div>
-  </section>
-
   <!-- ====================================================== COUNTDOWN -->
   <section class="countdown panel" id="countdown" aria-labelledby="cd-title">
     <div class="lottie lottie--countdown" data-lottie="countdown" aria-hidden="true"></div>
@@ -347,6 +338,7 @@
           <p class="closing__full"><span data-bind="couple.groomFull">Jibin Varghese</span> &amp; <span data-bind="couple.brideFull">Sofia John</span></p>
           <p class="closing__date" data-bind="weddingDateDots">25.04.2027</p>
           <p class="closing__signoff" data-bind="closing.signoff"></p>
+          <p class="closing__ref" data-bind="closing.signoffRef"></p>
         </div>
       </div>
     </div>
@@ -354,7 +346,6 @@
 
 </main>
 
-<footer class="credits"><p data-bind="artCredits"></p></footer>
 
 <noscript><style>.curtain{display:none}</style></noscript>
 </body>

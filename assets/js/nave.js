@@ -378,7 +378,7 @@
   }
   function resize() {
     var cw = host.clientWidth, ch = host.clientHeight;
-    var want = Math.min(window.devicePixelRatio || 1, opts.maxDpr || 1.75);
+    var want = Math.min(window.devicePixelRatio || 1, opts.maxDpr || 1.5);
     if (slowFrames > 2) want = Math.min(want, 1.25); else if (slowFrames > 0) want = Math.min(want, 1.5);
     dpr = want;
     W = Math.round(cw * dpr); H = Math.round(ch * dpr);
@@ -426,6 +426,12 @@
     var op = update(dt);
     if (op <= 0 || !ready) return;
     if (reduce && !dirty) return;          // reduced motion: a still picture, redrawn only when needed
+    // at rest only the candles and dust move: redraw ~24 times a second to
+    // leave the phone's GPU free for the moment scrolling starts
+    var moving = Math.abs(window.scrollY - state.sy) > .5 || state.hug > 0 && state.hug < 1;
+    if (moving) state.still = 0; else state.still = (state.still || 0) + dt;
+    if (state.still > .3 && !dirty && now - (state.lastDraw || 0) < 40) return;
+    state.lastDraw = now;
     dirty = false;
     render(now);
     state.ms = state.ms ? state.ms * .95 + (performance.now() - t0) * .05 : performance.now() - t0;

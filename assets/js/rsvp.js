@@ -10,6 +10,9 @@
    and returns a Promise that resolves on success / rejects on failure.
 
    Free options, from simplest:
+   • formsubmit  – emails each reply to the address in endpoint (no sign-up).
+                   The FIRST reply sends an "Activate form" email to that
+                   address; click it once, then every reply arrives by email.
    • formspree   – create a form at formspree.io, paste its URL into endpoint.
    • appsScript  – Google Sheet → Extensions → Apps Script, deploy a web app
                    with a doPost(e) that appends a row (see README). Paste the
@@ -34,6 +37,26 @@
           localStorage.setItem("rsvp-demo", JSON.stringify(all));
         } catch (e) { /* storage unavailable — still show success in demo mode */ }
         setTimeout(resolve, 700);
+      });
+    },
+
+    formsubmit: function (data, cfg) {
+      var yes = data.attending === "yes";
+      return fetch("https://formsubmit.co/ajax/" + encodeURIComponent(cfg.endpoint), {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          _subject: "Wedding RSVP: " + data.name + (yes ? " is coming (" + data.guests + ")" : " can't come"),
+          _template: "table",
+          _captcha: "false",
+          Name: data.name,
+          Attending: yes ? "Yes" : "No",
+          Guests: yes ? data.guests : 0,
+          Message: data.message || "-",
+          Sent: data.submittedAt,
+        }),
+      }).then(ok).then(function (r) { return r.json(); }).then(function (j) {
+        if (String(j.success) !== "true") throw new Error(j.message || "FormSubmit refused the reply");
       });
     },
 

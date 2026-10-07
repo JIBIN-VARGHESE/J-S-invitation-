@@ -12,7 +12,6 @@ assets/
   images/
     nave/               church interior layers + couple silhouettes
     glass/              stained-glass source renders (not loaded by the page)
-  video/                opening film (MP4 + WebM, portrait and landscape)
     og-image.jpg        WhatsApp / social preview (1200×630)
   icons/favicon.svg
   music/                put wedding.mp3 here
@@ -29,7 +28,7 @@ Open **`config.js`**. It holds the names, dates, times, venues, addresses, map l
 - Times use 24-hour Kerala time: `"11:00"`, `"16:30"`.
 - `wedding.ceremonyTime` also sets the countdown target. Until you set it, the countdown runs to 00:00 IST on 25 April 2027.
 
-**Values still to fill in:** engagement time, venue, address and Maps link (it currently searches for the town). Street addresses for the church and reception (optional; the town is shown instead). RSVP provider and deadline.
+**Values still to fill in:** engagement time, venue, address and Maps link (it currently searches for the town). Street addresses for the church and reception (optional; the town is shown instead). RSVP deadline (optional).
 
 **The one exception is the link preview.** WhatsApp and iMessage read the `<meta property="og:…">` tags at the top of `index.html` without running JavaScript, so edit those by hand. After deploying, change `og:image` to the full URL, for example `https://YOUR-USERNAME.github.io/YOUR-REPO/assets/images/og-image.jpg`. Otherwise many apps won't show the image.
 
@@ -39,7 +38,7 @@ After the opening film, a church interior sits **fixed behind the whole page**, 
 
 | Layer | File | Notes |
 |---|---|---|
-| Opening film | `assets/video/hero-*.mp4` / `.webm` + posters | from the Vecteezy clip you supplied |
+| Opening picture | `assets/images/hero/hero-portrait.webp`, `hero-landscape.webp` | a still from the Vecteezy clip you supplied |
 | Floor, carpet, walls, side-aisle windows | `floor.webp`, `carpet.webp`, `wall.webp`, `aisle.webp` | rendered for this site; they repeat |
 | Pillars, arches, pews | `pier.webp`, `arch.webp`, `pew.webp`, `pewend.webp` | rendered for this site |
 | Altar wall (rose window, altar, candles) | `altar.webp` | rendered for this site |
@@ -56,7 +55,7 @@ All in `assets/images/nave/`; paths are listed in `config.js → art`. Texture s
 
 **Phones without WebGL** (very rare) see a still picture of the altar instead. Guests with "reduce motion" turned on see a still view of the church with the couple already in the embrace.
 
-**Credits.** The free Vecteezy and Freepik licences require attribution. The page footer shows "Opening film: Vecteezy · Couple silhouette: Freepik" (`config.js → art.credits`). Clear it only if you hold premium licences.
+**Credits.** The footer credit line was removed at your request. The free Vecteezy (opening picture) and Freepik (couple) licences require visible attribution, so either hold premium licences for both or add a credit line back at the end of `index.html`.
 
 `assets/images/glass/` holds the stained-glass renders used to build the windows and altar wall. The page doesn't load them.
 
@@ -84,7 +83,13 @@ Put an MP3 at `assets/music/wedding.mp3`. The music button appears only once tha
 
 ## 4. Connecting RSVP (all free tiers)
 
-Right now `rsvp.provider` is `"demo"`. Replies are validated and acknowledged, but they **are only stored in the guest's own browser, so you will not receive them.** Pick a provider before you send the link:
+Right now replies are **emailed to jibinv471@gmail.com** through FormSubmit (free, no account):
+```js
+provider: "formsubmit", endpoint: "jibinv471@gmail.com",
+```
+**One-time activation:** after the site is live, open it and send one test reply. FormSubmit emails an "Activate Form" link to that address (check spam). Click it; from then on every reply arrives as an email with the name, attending, number of guests and message. Until it is activated, guests see "Something went wrong", so do this before sharing the link. FormSubmit's activation email also offers a random alias you can use instead of the address, so the address isn't visible in the page source.
+
+Other free options, if you'd rather collect replies in a spreadsheet:
 
 **Formspree (easiest).** Sign up at formspree.io, create a form, and copy its endpoint.
 ```js

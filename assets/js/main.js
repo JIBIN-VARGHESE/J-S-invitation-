@@ -69,7 +69,6 @@
     weddingVenueFull: [W.churchName, W.churchAddress].filter(Boolean).join(", ") || tba("Venue details to follow"),
     receptionVenueFull: [W.receptionVenue, W.receptionAddress].filter(Boolean).join(", ") || tba("Venue details to follow"),
     rsvpDeadline: R.deadline ? "Kindly reply by " + (function (d) { return d.d + " " + d.month + " " + d.y; })(parseDate(R.deadline)) + "." : "We would be grateful for your reply.",
-    artCredits: (C.art && C.art.credits) || "",
     weddingWeekdayShort: wd.weekday.slice(0, 3), weddingMonthShort: wd.month.slice(0, 3),
     countdownNote: wd.weekday + ", " + wd.d + " " + wd.month + " " + wd.y + " · " + (W.town || ""),
   };
@@ -167,40 +166,52 @@
   //                    1 when it leaves at the top.
   var scrubs = [], active = new Set(), ticking = false, progressBar;
 
-  function measure(node) {
-    var r = node.getBoundingClientRect(), vh = window.innerHeight, p;
+  // read phase only: no style writes in here, so the browser never has to
+  // recalculate layout in the middle of a frame
+  function progressOf(node, vh) {
+    var r = node.getBoundingClientRect(), p;
     if (node.getAttribute("data-scrub") === "pin") {
       var dist = r.height - vh;
       p = dist > 0 ? -r.top / dist : 0;
     } else {
       p = (vh - r.top) / (vh + r.height);
     }
-    p = Math.min(1, Math.max(0, p));
+    return Math.min(1, Math.max(0, p));
+  }
+  function write(node, p) {
     if (node._p !== p) { node._p = p; node.style.setProperty("--p", p.toFixed(4)); }
   }
-  var hero, heroVisible = true, lastY = -1, topMark;
+  function measure(node) { write(node, progressOf(node, window.innerHeight)); }
+  var hero, heroVisible = true, lastY = -1, topMark, heroH = 0, maxScroll = 1;
+  function sizes() { heroH = hero ? hero.offsetHeight : 0; maxScroll = Math.max(1, root.scrollHeight - window.innerHeight); }
+  var batch = [];
   function frame() {
     ticking = false;
-    active.forEach(measure);
-    // opening film parallax
+    // 1. read
+    var sy = window.scrollY, vh = window.innerHeight;
+    batch.length = 0;
+    active.forEach(function (n) { batch.push(n, progressOf(n, vh)); });
+    // 2. write
+    for (var i = 0; i < batch.length; i += 2) write(batch[i], batch[i + 1]);
     if (topMark) {
-      var past = window.scrollY > (hero ? hero.offsetHeight * .8 : 400);
+      var past = sy > (heroH ? heroH * .8 : 400);
       if (past !== topMark._past) { topMark._past = past; topMark.classList.toggle("is-away", past); }
     }
+    // opening picture parallax
     if (hero && heroVisible) {
-      var y = Math.round(Math.min(window.scrollY, window.innerHeight * 1.2));
+      var y = Math.round(Math.min(sy, vh * 1.2));
       if (y !== lastY) { lastY = y; hero.style.setProperty("--y", y); }
     }
-    if (progressBar) {
-      var max = root.scrollHeight - window.innerHeight;
-      progressBar.style.setProperty("--progress", max > 0 ? (window.scrollY / max).toFixed(4) : 0);
-    }
+    if (progressBar) progressBar.style.setProperty("--progress", (sy / maxScroll).toFixed(4));
   }
   function requestFrame() { if (!ticking) { ticking = true; requestAnimationFrame(frame); } }
 
   function initScroll() {
     progressBar = doc.querySelector(".progress span");
     topMark = doc.querySelector(".topbar__mark");
+    sizes();
+    window.addEventListener("resize", sizes, { passive: true });
+    if (window.ResizeObserver) new ResizeObserver(sizes).observe(doc.body);
     hero = doc.querySelector(".hero");
     scrubs = Array.prototype.slice.call(doc.querySelectorAll("[data-scrub]"));
     if (reduceMotion.matches) return; // CSS supplies calm static states
@@ -253,28 +264,6 @@
       reduce: reduceMotion.matches,
       art: C.art || {},
     });
-  }
-
-  /* --------------------------------------------------- hero video */
-  // Picks the portrait or landscape cut, plays muted inline (allowed on
-  // iOS/Android without a tap), pauses when scrolled away.
-  function initVideo() {
-    var V = C.video || {};
-    var v = doc.querySelector("[data-video]");
-    if (!v) return;
-    var land = window.matchMedia("(min-aspect-ratio: 1/1)").matches;
-    var webm = land ? V.landscapeWebm : V.portraitWebm;
-    var src = land ? V.landscape : V.portrait, poster = land ? V.landscapePoster : V.portraitPoster;
-    if (webm && v.canPlayType('video/webm; codecs="vp9"')) src = webm;
-    if (poster) v.poster = poster;
-    if (!src || reduceMotion.matches || (navigator.connection && navigator.connection.saveData)) return;
-    v.src = src;
-    v.muted = true;
-    var tryPlay = function () { var p = v.play(); if (p && p.catch) p.catch(function () {}); };
-    v.addEventListener("loadeddata", function () { v.classList.add("is-playing"); });
-    new IntersectionObserver(function (entries) {
-      if (entries[0].isIntersecting) tryPlay(); else v.pause();
-    }).observe(v);
   }
 
   /* ------------------------------------------- Lottie animations */
@@ -422,7 +411,6 @@
   initScroll();
   initFades();
   initLottie();
-  initVideo();
   initNave();
   initCountdown();
   initMusic();
