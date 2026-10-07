@@ -65,10 +65,9 @@ The site plays Lottie animations, configured in `config.js → lottie`. The play
 | Slot | Where | Current file |
 |---|---|---|
 | `hero` | above the names, plays once | `assets/lottie/rings.json` (gold rings drawing themselves) |
-| `saveTheDate` | full-screen overlay behind the car | *(empty)* |
 | `countdown` | above "Counting the days" | *(empty)* |
 | `rsvp` | plays when a guest sends a reply | `assets/lottie/heart-burst.json` |
-| `closing` | golden light rising over the final scene | `assets/lottie/light-motes.json` |
+| `nave` | dust drifting in the light, over the whole church | `assets/lottie/light-motes.json` |
 
 The three current animations were made for this site. **To use one from LottieFiles:**
 1. Open the animation on lottiefiles.com and choose **Download → Lottie JSON**. Don't pick `.lottie`, because this player reads only `.json`.
