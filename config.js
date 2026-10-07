@@ -120,13 +120,20 @@ window.WEDDING = {
   },
 
   /* --------------------------------------------------------------- ARTWORK */
-  // The church interior that sits behind the whole page (see main.js → initNave).
+  // The church interior behind the whole page is drawn in 3D by
+  // assets/js/nave.js from these textures (all in assets/images/nave/).
+  // Replace a file to change a surface; keep the pixel size (powers of two).
   art: {
-    apse:   "assets/images/nave/apse.webp",     // far end: rose window, altar, candles
-    pillar: "assets/images/nave/pillar.webp",   // stone column (transparent), repeated down the aisle
-    shafts: "assets/images/nave/shafts.webp",   // light beams from the high windows (screen-blended)
-    groom:  "assets/images/nave/groom.svg",     // silhouettes at the altar (same frame) — they slide together as you scroll
-    bride:  "assets/images/nave/bride.svg",
+    floor:  "assets/images/nave/floor.webp",    // polished stone tiles (repeats)
+    carpet: "assets/images/nave/carpet.webp",   // aisle runner (repeats)
+    wall:   "assets/images/nave/wall.webp",     // nave wall: arcade, triforium, clerestory (one bay, repeats)
+    aisle:  "assets/images/nave/aisle.webp",    // side-aisle wall with a stained-glass window (one bay)
+    pier:   "assets/images/nave/pier.webp",     // clustered stone column
+    arch:   "assets/images/nave/arch.webp",     // pointed arch across the nave
+    pew:    "assets/images/nave/pew.webp",      // pew back
+    pewend: "assets/images/nave/pewend.webp",   // carved pew end
+    altar:  "assets/images/nave/altar.webp",    // far wall: rose window, altar, candles
+    couple: "assets/images/nave/couple.webp",   // the couple, cut into parts so they can walk
     // Credit line shown at the very bottom of the page. Free licences of the
     // opening film (Vecteezy) and the couple silhouette (Freepik) require
     // attribution. Remove a credit only if you hold a premium licence for it.
@@ -143,7 +150,6 @@ window.WEDDING = {
     hero:        { src: "assets/lottie/rings.json",       loop: false }, // above the names
     countdown:   { src: "",                               loop: true  }, // small, above "Counting the days"
     rsvp:        { src: "assets/lottie/heart-burst.json", loop: false }, // plays when a reply is sent
-    nave:        { src: "assets/lottie/light-motes.json", loop: true  }, // dust in the light, over the whole nave
   },
 
   /* ------------------------------------------------------------------ MUSIC */

@@ -35,28 +35,30 @@ Open **`config.js`**. It holds the names, dates, times, venues, addresses, map l
 
 ## 2. The walk down the aisle
 
-After the opening film, a church interior sits **fixed behind the whole page**. As guests scroll, a perspective camera walks down the aisle. Stone pillars pass on both sides and light falls through high windows. At the far end, under the rose window, the bride and groom silhouettes start apart and slide together until they stand hand in hand. Every section floats over the church on a dark glass panel, with a screen of church between panels.
+After the opening film, a church interior sits **fixed behind the whole page**, drawn in real 3D with WebGL by `assets/js/nave.js`. As guests scroll, the camera walks down the aisle between pews and clustered stone pillars, under pointed arches, with light falling from the high windows and candles flickering on the pillars. The camera eases toward the scroll position, so it keeps gliding for a moment after the finger stops. In the last section the bride and groom walk toward each other in front of the altar (his legs step, her gown sways) and take hands. Every section floats over the church on a parchment card, with a screen of church between cards.
 
 | Layer | File | Notes |
 |---|---|---|
 | Opening film | `assets/video/hero-*.mp4` / `.webm` + posters | from the Vecteezy clip you supplied |
-| Far wall (rose window, lancets, altar, candles) | `assets/images/nave/apse.webp` | rendered for this site |
-| Stone pillar (repeated, mirrored on the left) | `assets/images/nave/pillar.webp` | rendered for this site |
-| Light shafts | `assets/images/nave/shafts.webp` | rendered for this site; screen-blended |
-| Bride / groom silhouettes | `assets/images/nave/bride.svg`, `groom.svg` | from the Freepik file you supplied, recoloured and split into two layers that share one frame |
-| Dust in the light | `assets/lottie/light-motes.json` | original Lottie |
+| Floor, carpet, walls, side-aisle windows | `floor.webp`, `carpet.webp`, `wall.webp`, `aisle.webp` | rendered for this site; they repeat |
+| Pillars, arches, pews | `pier.webp`, `arch.webp`, `pew.webp`, `pewend.webp` | rendered for this site |
+| Altar wall (rose window, altar, candles) | `altar.webp` | rendered for this site |
+| The couple | `couple.webp` | from the Freepik file you supplied, recoloured and cut into five parts (his torso and two legs, her bodice and gown) so they can walk; originals in `assets/images/nave/source/` |
 
-**Tuning the walk.** In `assets/js/main.js`, the `NAVE` settings control the scene:
-- number of pillar pairs and their spacing;
-- aisle width and eye height;
-- where the couple stand (`coupleZ`);
-- how far the camera walks (`walkTo`).
+All in `assets/images/nave/`; paths are listed in `config.js → art`. Texture sizes are powers of two (512, 1024, 2048); keep them that way if you replace one.
 
-The couple meet at about 85 % of the page.
+**Tuning the walk.** The `M` settings at the top of `assets/js/nave.js` control the scene:
+- number of pillar pairs and their spacing (`piers`, `bay`);
+- eye height (`eye`) and where the pews start and end;
+- where the couple stand (`coupleZ`), how far apart they start (`apart`), and how close the camera ends up (`endDist`).
+
+The couple walk during the first half of the closing section and meet before the names appear.
+
+**Phones without WebGL** (very rare) see a still picture of the altar instead. Guests with "reduce motion" turned on see a still view of the church with the couple already together.
 
 **Credits.** The free Vecteezy and Freepik licences require attribution. The page footer shows "Opening film: Vecteezy · Couple silhouette: Freepik" (`config.js → art.credits`). Clear it only if you hold premium licences.
 
-`assets/images/glass/` holds the stained-glass renders used to build the far wall. The page doesn't load them.
+`assets/images/glass/` holds the stained-glass renders used to build the windows and altar wall. The page doesn't load them.
 
 ## 2b. Animations (Lottie)
 
@@ -67,9 +69,8 @@ The site plays Lottie animations, configured in `config.js → lottie`. The play
 | `hero` | above the names, plays once | `assets/lottie/rings.json` (gold rings drawing themselves) |
 | `countdown` | above "Counting the days" | *(empty)* |
 | `rsvp` | plays when a guest sends a reply | `assets/lottie/heart-burst.json` |
-| `nave` | dust drifting in the light, over the whole church | `assets/lottie/light-motes.json` |
 
-The three current animations were made for this site. **To use one from LottieFiles:**
+The current animations were made for this site. (The dust in the church light is drawn by `nave.js`, not Lottie.) **To use one from LottieFiles:**
 1. Open the animation on lottiefiles.com and choose **Download → Lottie JSON**. Don't pick `.lottie`, because this player reads only `.json`.
 2. Save the file in `assets/lottie/`, for example `assets/lottie/confetti.json`.
 3. Set the slot's `src` to that path. Use `loop: true` for continuous effects (petals, sparkles) and `loop: false` for one-off moments (rings, a heart).
