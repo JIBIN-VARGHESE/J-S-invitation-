@@ -68,8 +68,6 @@
     receptionMapsUrl: W.receptionMapsUrl || W.churchMapsUrl,
     weddingVenueFull: [W.churchName, W.churchAddress].filter(Boolean).join(", ") || tba("Venue details to follow"),
     receptionVenueFull: [W.receptionVenue, W.receptionAddress].filter(Boolean).join(", ") || tba("Venue details to follow"),
-    weddingWhen: wd.weekday + " · " + wd.d + " " + wd.month + " " + wd.y + (W.ceremonyTime ? " · " + formatTime(W.ceremonyTime) : ""),
-    receptionWhen: wd.weekday + " · " + wd.d + " " + wd.month + " " + wd.y + (W.receptionTime ? " · " + formatTime(W.receptionTime) : ""),
     rsvpDeadline: R.deadline ? "Kindly reply by " + (function (d) { return d.d + " " + d.month + " " + d.y; })(parseDate(R.deadline)) + "." : "We would be grateful for your reply.",
     artCredits: (C.art && C.art.credits) || "",
     weddingWeekdayShort: wd.weekday.slice(0, 3), weddingMonthShort: wd.month.slice(0, 3),
@@ -180,11 +178,15 @@
     p = Math.min(1, Math.max(0, p));
     if (node._p !== p) { node._p = p; node.style.setProperty("--p", p.toFixed(4)); }
   }
-  var hero, heroVisible = true, lastY = -1;
+  var hero, heroVisible = true, lastY = -1, topMark;
   function frame() {
     ticking = false;
     active.forEach(measure);
     // opening film parallax
+    if (topMark) {
+      var past = window.scrollY > (hero ? hero.offsetHeight * .8 : 400);
+      if (past !== topMark._past) { topMark._past = past; topMark.classList.toggle("is-away", past); }
+    }
     if (hero && heroVisible) {
       var y = Math.round(Math.min(window.scrollY, window.innerHeight * 1.2));
       if (y !== lastY) { lastY = y; hero.style.setProperty("--y", y); }
@@ -198,6 +200,7 @@
 
   function initScroll() {
     progressBar = doc.querySelector(".progress span");
+    topMark = doc.querySelector(".topbar__mark");
     hero = doc.querySelector(".hero");
     scrubs = Array.prototype.slice.call(doc.querySelectorAll("[data-scrub]"));
     if (reduceMotion.matches) return; // CSS supplies calm static states

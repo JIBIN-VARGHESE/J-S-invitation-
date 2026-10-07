@@ -21,10 +21,10 @@
   };
   // the couple (assets/images/nave/couple.webp): the embrace from the Freepik
   // pack, gown ivory, boutonniere white, the rest dark. Frame units: 153 = 1 m.
-  var FIG = { unit: 153, cx: 538, floor: 480 };
+  var FIG = { unit: 153, cx: 236, floor: 478 };
   var PIECES = {
-    eVeil: { uv: [.00586, .00781, .25586, .96094], bb: [454, 196, 606.38, 486.48] },
-    eBody: { uv: [.26563, .00781, .51563, .96094], bb: [454, 196, 606.38, 486.48] },
+    eVeil: { uv: [.00586, .00781, .25879, .95313], bb: [158, 194, 312.17, 482.1] },
+    eBody: { uv: [.26855, .00781, .52148, .95313], bb: [158, 194, 312.17, 482.1] },
   };
 
   var VS = [
@@ -385,7 +385,7 @@
     if (canvas.width !== W || canvas.height !== H) { canvas.width = W; canvas.height = H; }
     // focal length: a portrait phone sees the aisle as a tall, narrow view
     k = Math.min(cw * 1.25, ch * .6);
-    hz = ch * (cw < ch ? .40 : .42);
+    hz = ch * (cw < ch ? .375 : .42);
     measure();
     dirty = true;
   }

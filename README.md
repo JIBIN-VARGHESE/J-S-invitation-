@@ -43,7 +43,7 @@ After the opening film, a church interior sits **fixed behind the whole page**, 
 | Floor, carpet, walls, side-aisle windows | `floor.webp`, `carpet.webp`, `wall.webp`, `aisle.webp` | rendered for this site; they repeat |
 | Pillars, arches, pews | `pier.webp`, `arch.webp`, `pew.webp`, `pewend.webp` | rendered for this site |
 | Altar wall (rose window, altar, candles) | `altar.webp` | rendered for this site |
-| The couple | `couple.webp` | the embrace from the Freepik pack you supplied, recoloured: gown ivory, boutonnière white, everything else dark. Source shapes in `assets/images/nave/source/` |
+| The couple | `couple.webp` | the embrace (bottom-left pose) from the Freepik pack you supplied, recoloured: gown ivory, boutonnière white, everything else dark. Source shapes in `assets/images/nave/source/` |
 
 All in `assets/images/nave/`; paths are listed in `config.js → art`. Texture sizes are powers of two (512, 1024, 2048); keep them that way if you replace one.
 
