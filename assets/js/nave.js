@@ -17,17 +17,22 @@
     pierX: 2.4, wallX: 2.65, aisleX: 5.6, // pier centres, nave walls, side-aisle walls
     eye: 1.6,
     pewFrom: 1.8, pewTo: 19.8, pewIn: .82, pewOut: 1.86,
-    coupleZ: 23.6, altarZ: 26.2, endDist: 4.3, apart: 1.7,
+    coupleZ: 23.6, altarZ: 26.2, endDist: 4.3, apartX: 1.75, apartZ: 1.4,
   };
-  // the couple atlas (assets/images/nave/couple.webp): frame units from the
-  // original artwork; 244 units = 1 m, the floor is at 522
-  var FIG = { unit: 244, cx: 262, floor: 522 };
+  // the couple atlas (assets/images/nave/couple.webp), cut from two poses of the
+  // Freepik pack: pose 5 = walking hand in hand (split into bride and groom so
+  // each can walk on their own), pose 8 = the embrace. Frame units: 153 = 1 m.
+  var FIG = { 5: { unit: 153, cx: 402, floor: 300 }, 8: { unit: 153, cx: 538, floor: 480 } };
   var PIECES = {
-    gTorso: { uv: [.00390625, .015625, .12646484375, .98828125], bb: [298, 76, 430.105, 338.105] },
-    gLegF:  { uv: [.13232421875, .015625, .2177734375, .826171875], bb: [300, 308, 392.105, 526.421] },
-    gLegB:  { uv: [.2236328125, .015625, .28857421875, .826171875], bb: [364, 308, 434, 526.421] },
-    bUpper: { uv: [.29443359375, .015625, .5693359375, .966796875], bb: [34, 96, 330.316, 352.316] },
-    bSkirt: { uv: [.5751953125, .015625, .7666015625, .900390625], bb: [70, 288, 276.316, 526.421] },
+    bVeil: { uv: [0.00293,  0.00781,  0.08789,  0.98633], bb: [298,  14,  401.57,  312.21] },
+    bArm: { uv: [0.09277,  0.00781,  0.12158,  0.30664], bb: [366,  97,  401.12,  188.07] },
+    bSkirt: { uv: [0.12646,  0.00781,  0.21143,  0.42188], bb: [298,  186,  401.57,  312.19] },
+    bTop: { uv: [0.21631,  0.00781,  0.28711,  0.6582], bb: [298,  14,  384.31,  212.21] },
+    gLegL: { uv: [0.29199,  0.00781,  0.3291,  0.54102], bb: [392,  150,  437.24,  312.5] },
+    gLegR: { uv: [0.33398,  0.00781,  0.39502,  0.54102], bb: [432,  150,  506.4,  312.5] },
+    gUpper: { uv: [0.3999,  0.00781,  0.4873,  0.56641], bb: [400,  14,  506.55,  184.24] },
+    eVeil: { uv: [0.49219,  0.00781,  0.61719,  0.96094], bb: [454,  196,  606.38,  486.48] },
+    eBody: { uv: [0.62207,  0.00781,  0.74707,  0.96094], bb: [454,  196,  606.38,  486.48] },
   };
 
   var VS = [
@@ -72,7 +77,7 @@
   var gl, canvas, prog, progP, U = {}, UP = {}, quadBuf, moteBuf, tex = {}, ready = false;
   var W = 0, H = 0, dpr = 1, k = 1, hz = 0;
   var solids = [], lights = [], motes, moteData, NM = 70;
-  var state = { sy: 0, t: 0, camZ: 0, walk: 0, phase: 0, w: 0, prevOff: M.apart, time: 0 };
+  var state = { sy: 0, t: 0, camZ: 0, walk: 0, hug: 0, phase: 0, w: 0, prevE: 0, time: 0 };
   var layout = { heroH: 0, closeTop: 0, closeH: 0, vh: 0 };
   var opts = {}, reduce = false, dirty = true, rafId = 0, lastNow = 0, slowFrames = 0, host;
 
@@ -244,30 +249,49 @@
     var c = Math.cos(a), s = Math.sin(a), dx = px - cx, dy = py - cy;
     return [cx + dx * c - dy * s, cy + dx * s + dy * c];
   }
-  // a body part as a world quad: offset (m), bob (m), rotation about a frame-space pivot
-  function piece(name, off, bob, ang, pv) {
-    var p = PIECES[name], b = p.bb;
-    var bl = [b[0], b[3]], br = [b[2], b[3]], tl = [b[0], b[1]];
+  // a body part as a world quad. pos = [x, z] in metres, bob in metres,
+  // dy = shift in frame units, ang = rotation about a frame-space pivot
+  function piece(name, pose, pos, bob, ang, pv, dy, alpha) {
+    var p = PIECES[name], b = p.bb, F = FIG[pose];
+    var bl = [b[0], b[3] + dy], br = [b[2], b[3] + dy], tl = [b[0], b[1] + dy];
     if (ang) { bl = rot(bl[0], bl[1], pv[0], pv[1], ang); br = rot(br[0], br[1], pv[0], pv[1], ang); tl = rot(tl[0], tl[1], pv[0], pv[1], ang); }
-    function w(f) { return [off + (f[0] - FIG.cx) / FIG.unit, (FIG.floor - f[1]) / FIG.unit + bob, M.coupleZ]; }
+    function w(f) { return [pos[0] + (f[0] - F.cx) / F.unit, (F.floor - f[1]) / F.unit + bob, pos[1]]; }
     var O = w(bl), R = w(br), T = w(tl);
-    return { O: O, U: [R[0] - O[0], R[1] - O[1], 0], V: [T[0] - O[0], T[1] - O[1], 0], uv: p.uv };
+    return { O: O, U: [R[0] - O[0], R[1] - O[1], 0], V: [T[0] - O[0], T[1] - O[1], 0], uv: p.uv, a: alpha, z: pos[1] };
   }
-  function coupleQuads() {
-    var e = state.walk, off = M.apart * (1 - e), w = state.w, ph = state.phase;
-    var swing = Math.abs(Math.sin(ph * Math.PI));          // legs apart mid-step
-    var bob = w * .016 * (Math.abs(Math.cos(ph * Math.PI)) - .6);
-    var spread = w * .17 * swing;
-    var hip = [367, 300], waist = [183, 270];
-    return [
-      // groom (walks left, toward her): legs scissor about the hip, slight lean
-      piece("gLegB", off, bob, -spread, hip),
-      piece("gLegF", off, bob, spread, hip),
-      piece("gTorso", off, bob, w * .022, hip),
-      // bride (walks right): the gown swings with each step and trails a little
-      piece("bSkirt", -off, bob * .6, w * (.03 * Math.sin(ph * Math.PI) + .022), waist),
-      piece("bUpper", -off, bob * .6, w * .008 * Math.sin(ph * Math.PI), waist),
-    ];
+  // Walking toward the camera and toward each other: weight shifts from foot
+  // to foot (sway + roll), the body rises over each step (bob), his feet
+  // alternate, her gown swings. They meet hand in hand (the original pose),
+  // then dissolve into the embrace.
+  function coupleQuads(time) {
+    var e = state.walk, hug = state.hug, w = state.w, out = [];
+    var rest = 1 - e, a5 = 1 - hug;
+    if (a5 > .001) {
+      [["b", -1, 0], ["g", 1, .42]].forEach(function (who) {
+        var s = state.phase + who[2], f = Math.sin(s * Math.PI), c = Math.cos(s * Math.PI);
+        var pos = [who[1] * M.apartX * rest + w * .028 * f, M.coupleZ + M.apartZ * rest];
+        var bob = w * .018 * (Math.abs(c) - .6), roll = w * .018 * f;
+        if (who[0] === "b") {
+          var feet = [350, 300], hang = Math.min(1, Math.max(0, (2 * M.apartX * rest - .25) / .7));
+          out.push(piece("bVeil", 5, pos, bob, roll * 1.4, feet, 0, a5));
+          out.push(piece("bArm", 5, pos, bob, roll + .42 * hang, [369, 104], 0, a5));
+          out.push(piece("bSkirt", 5, pos, bob, roll + w * .024 * f, [350, 205], 0, a5));
+          out.push(piece("bTop", 5, pos, bob, roll, feet, 0, a5));
+        } else {
+          var fw = w * f + (1 - w), lift = (1 - fw) / 2 * 9;   // the drawing has his left foot lifted
+          out.push(piece("gLegL", 5, pos, bob, roll, [450, 297], lift, a5));
+          out.push(piece("gLegR", 5, pos, bob, roll, [450, 297], -lift, a5));
+          out.push(piece("gUpper", 5, pos, bob, roll, [450, 297], 0, a5));
+        }
+      });
+      out.sort(function (p, q) { return q.z - p.z; });
+    }
+    if (hug > .001) {
+      var sway = reduce ? 0 : .007 * Math.sin(time * .0008) * hug;    // a slow, gentle sway in the embrace
+      out.push(piece("eVeil", 8, [0, M.coupleZ], 0, sway, [538, 480], 0, hug));
+      out.push(piece("eBody", 8, [0, M.coupleZ], 0, sway, [538, 480], 0, hug));
+    }
+    return out;
   }
 
   /* ------------------------------------------------------------- render */
@@ -308,7 +332,7 @@
     gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     boundTex = null;
 
-    var couple = coupleQuads();
+    var couple = coupleQuads(time);
     // planes: floor, carpet, walls, altar
     for (var i = 0; i < 2; i++) { bind(solids[i].t); setQuad(solids[i], solids[i].tint, solids[i].fog, solids[i].cut); }
     // the couple's reflection in the polished floor
@@ -316,7 +340,7 @@
       gl.disable(gl.DEPTH_TEST);
       bind(tex.couple);
       couple.forEach(function (c) {
-        setQuad({ O: [c.O[0], -c.O[1], c.O[2]], U: [c.U[0], -c.U[1], 0], V: [c.V[0], -c.V[1], 0], uv: c.uv }, [.13, .1, .08, .16], .02, 0);
+        var ra = .16 * c.a; setQuad({ O: [c.O[0], -c.O[1], c.O[2]], U: [c.U[0], -c.U[1], 0], V: [c.V[0], -c.V[1], 0], uv: c.uv }, [.13 * c.a, .1 * c.a, .08 * c.a, ra], .02, 0);
       });
       gl.enable(gl.DEPTH_TEST);
     }
@@ -328,7 +352,7 @@
       if (o.couple) {
         if (!tex.couple.ok) continue;
         bind(tex.couple);
-        for (var c = 0; c < couple.length; c++) setQuad(couple[c], [1, 1, 1, 1], .02, .02);
+        for (var c = 0; c < couple.length; c++) { var ca = couple[c].a; setQuad(couple[c], [ca, ca, ca, ca], .02, .01); }
         continue;
       }
       if (!visible(o, cam)) continue;
@@ -357,6 +381,12 @@
         var sw = l.kind === "flame" ? s * .55 : s;
         setQuad({ O: [p[0] - sw / 2, p[1] - s / 2, p[2]], U: [sw, 0, 0], V: [0, s, 0], uv: [0, 0, 1, 1] }, col, l.fog || .04, 0);
       }
+    }
+    // a warm bloom behind the couple while one pose dissolves into the other
+    var bloom = Math.sin(Math.PI * state.hug) * .3;
+    if (bloom > .005) {
+      bind(tex.glow);
+      setQuad({ O: [-1.9, -.4, M.coupleZ + .15], U: [3.8, 0, 0], V: [0, 3.8, 0], uv: [0, 0, 1, 1] }, [bloom, bloom * .66, bloom * .36, 0], .02, 0);
     }
     // dust in the light
     gl.useProgram(progP);
@@ -421,15 +451,18 @@
     state.t = t;
     state.camZ = reduce ? endZ * .62 : endZ * (.78 * t + .22 * smooth(t));
     var wp = reduce ? 1 : Math.min(1, Math.max(0, (sy - layout.closeTop + vh * .1) / Math.max(1, walkLen + vh * .1)));
-    var e = smooth(wp);
-    var off = M.apart * (1 - e), d = Math.abs(off - state.prevOff);
-    state.prevOff = off;
-    state.phase += d / .3;                        // one step per ~0.6 m between them
+    var e = .85 * wp + .15 * smooth(wp);            // near-constant walking pace
+    var d = Math.abs(e - state.prevE) * Math.sqrt(M.apartX * M.apartX + M.apartZ * M.apartZ);
+    state.prevE = e;
+    state.phase += d / .62;                         // one step every ~0.62 m
     var speed = dt > 0 ? d / dt : 0;
-    var target = Math.min(1, speed / .35);
-    state.w += (target - state.w) * (1 - Math.exp(-dt / .18));
+    var target = e >= 1 ? 0 : Math.min(1, speed / .3);
+    state.w += (target - state.w) * (1 - Math.exp(-dt / .16));
     if (state.w < .002) state.w = 0;
     state.walk = e;
+    // after they meet: dissolve into the embrace over the next stretch of scroll
+    var hugLen = (layout.closeH - vh) * .13;
+    state.hug = reduce ? 1 : smooth(Math.min(1, Math.max(0, (sy - end) / Math.max(1, hugLen))));
     // fade the church in as the opening film scrolls away
     var op = reduce ? 1 : Math.min(1, Math.max(0, y / (layout.heroH * .7)));
     if (op !== state.op) { state.op = op; host.style.opacity = op.toFixed(3); }

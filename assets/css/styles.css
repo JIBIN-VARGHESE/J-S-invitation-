@@ -395,7 +395,7 @@ section { position: relative; color: var(--fg); }
   --lit: clamp(0, var(--p) / .45, 1);
   --line-in: clamp(0, (var(--p) - .22) / .1, 1);
   --line-out: clamp(0, (var(--p) - .5) / .08, 1);
-  --sign: clamp(0, (var(--p) - .58) / .16, 1);
+  --sign: clamp(0, (var(--p) - .65) / .14, 1);
 }
 .closing__text { position: absolute; left: 0; right: 0; bottom: 0; height: 36svh; background: linear-gradient(180deg, rgba(8, 5, 3, 0), rgba(8, 5, 3, .55) 35%, rgba(8, 5, 3, .8)); text-shadow: 0 2px 20px rgba(0, 0, 0, .8); padding: 0 var(--gutter) 3svh; display: grid; place-items: center; text-align: center; z-index: 3; }
 .closing__line {
@@ -412,7 +412,7 @@ section { position: relative; color: var(--fg); }
 .closing__date { font-family: var(--display); font-size: 1rem; letter-spacing: .4em; margin-right: -.4em; color: var(--gold); }
 .closing__signoff { margin-top: .3rem; font-style: italic; color: var(--cream-soft); }
 
-.credits { background: var(--sanctuary); color: var(--cream-soft); text-align: center; font-family: var(--sans); font-size: .62rem; letter-spacing: .08em; }
+.credits { position: relative; z-index: 1; background: var(--sanctuary); color: var(--cream-soft); text-align: center; font-family: var(--sans); font-size: .62rem; letter-spacing: .08em; }
 .credits p:not(:empty) { padding: 1.2rem var(--gutter) 1.6rem; }
 
 /* ============================================================== LOTTIE */
