@@ -414,6 +414,17 @@ section { position: relative; padding: var(--section) var(--gutter); }
 .credits { background: var(--night); color: var(--on-night-soft); text-align: center; font-family: var(--sans); font-size: .62rem; letter-spacing: .08em; }
 .credits p:not(:empty) { padding: 1.2rem var(--gutter) 1.6rem; }
 
+/* ============================================================== LOTTIE */
+.lottie { pointer-events: none; opacity: 0; transition: opacity 1s var(--ease); }
+.lottie.is-loaded { opacity: 1; }
+.lottie svg { display: block; }
+.lottie--hero { width: clamp(96px, 26vw, 150px); aspect-ratio: 220 / 128; margin: 0 auto .8rem; }
+.lottie--countdown { width: clamp(90px, 24vw, 140px); aspect-ratio: 1; margin: 0 auto 1rem; }
+.lottie--overlay { position: absolute; inset: 0; z-index: 2; }
+.lottie--closing { z-index: 2; }
+.lottie--rsvp { width: 160px; height: 160px; margin: 0 auto -1rem; display: none; }
+.rsvp__form.is-sent .lottie--rsvp { display: block; }
+
 /* ======================================================== Larger screens */
 @media (min-aspect-ratio: 1/1) {
   .hero { --ch: 90vh; }

@@ -235,6 +235,68 @@
     items.forEach(function (n) { n.classList.add("fade"); io.observe(n); });
   }
 
+  /* ------------------------------------------- Lottie animations */
+  // Slots: <div data-lottie="name">, configured in config.js → lottie.
+  // The player (assets/js/vendor/lottie_light.min.js) is only downloaded
+  // when the first animation is about to scroll into view.
+  var playerPromise = null;
+  function loadPlayer() {
+    if (window.lottie) return Promise.resolve(window.lottie);
+    if (!playerPromise) {
+      playerPromise = new Promise(function (resolve, reject) {
+        var sc = doc.createElement("script");
+        sc.src = "assets/js/vendor/lottie_light.min.js";
+        sc.onload = function () { resolve(window.lottie); };
+        sc.onerror = reject;
+        doc.head.appendChild(sc);
+      });
+    }
+    return playerPromise;
+  }
+  // wait until the opening curtain has lifted before starting anything
+  function whenReady(fn) {
+    if (root.classList.contains("is-ready")) return setTimeout(fn, 600);
+    setTimeout(function () { whenReady(fn); }, 200);
+  }
+  function initLottie() {
+    var L = C.lottie || {};
+    var slots = Array.prototype.slice.call(doc.querySelectorAll("[data-lottie]"));
+    var still = reduceMotion.matches;
+    slots.forEach(function (slot) {
+      var cfg = L[slot.getAttribute("data-lottie")];
+      if (!cfg || !cfg.src || (still && cfg.loop)) { slot.remove(); return; }
+      var trigger = slot.getAttribute("data-lottie-play");    // custom event name, or play-on-view
+      var anim = null, visible = false;
+      function create() {
+        if (anim) return;
+        loadPlayer().then(function (lottie) {
+          anim = lottie.loadAnimation({
+            container: slot, renderer: "svg", loop: !!cfg.loop, autoplay: false, path: cfg.src,
+            rendererSettings: { preserveAspectRatio: slot.classList.contains("lottie--overlay") ? "xMidYMid slice" : "xMidYMid meet", progressiveLoad: true },
+          });
+          anim.addEventListener("DOMLoaded", function () {
+            slot.classList.add("is-loaded");
+            if (still) anim.goToAndStop(anim.totalFrames - 1, true);   // show the finished frame
+            else if (!trigger && visible) whenReady(function () { anim.play(); });
+          });
+        }).catch(function () { slot.remove(); });
+      }
+      if (trigger) {
+        doc.addEventListener(trigger, function () {
+          create();
+          var go = function () { if (!anim) return setTimeout(go, 50); slot.classList.add("is-playing"); anim.goToAndPlay(0, true); };
+          go();
+        });
+      }
+      new IntersectionObserver(function (entries) {
+        visible = entries[0].isIntersecting;
+        if (visible) create();
+        if (!anim || trigger || still) return;
+        if (visible) whenReady(function () { anim.play(); }); else if (cfg.loop) anim.pause();
+      }, { rootMargin: "300px 0px" }).observe(trigger ? slot.closest("form") || slot : slot);
+    });
+  }
+
   /* -------------------------------------------------- 4. countdown (IST) */
   function initCountdown() {
     var nodes = {};
@@ -317,6 +379,7 @@
   renderLists();
   initScroll();
   initFades();
+  initLottie();
   initCountdown();
   initMusic();
   if (window.RSVP) window.RSVP.init(doc.querySelector(".rsvp__form"), C.rsvp || {});

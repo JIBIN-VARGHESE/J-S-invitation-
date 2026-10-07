@@ -163,6 +163,7 @@
       status.textContent = "Sending…";
 
       send(data, cfg).then(function () {
+        document.dispatchEvent(new CustomEvent("rsvp:sent", { detail: data }));
         form.classList.add("is-sent");
         status.textContent = attending === "yes"
           ? "Thank you, " + data.name.split(" ")[0] + ". We can't wait to celebrate with you."

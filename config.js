@@ -122,6 +122,20 @@ window.WEDDING = {
     credits: "",
   },
 
+  /* ------------------------------------------------------------- ANIMATIONS */
+  // Lottie animations (.json). Each slot is optional — leave src "" to hide it.
+  // To use one from LottieFiles: open the animation → Download → "Lottie JSON",
+  // save it in assets/lottie/ and put its path here.
+  //   loop: true  = plays continuously while on screen
+  //   loop: false = plays once when it first comes into view, then holds
+  lottie: {
+    hero:        { src: "assets/lottie/rings.json",       loop: false }, // above the names
+    saveTheDate: { src: "",                               loop: true  }, // full-screen overlay behind the car
+    countdown:   { src: "",                               loop: true  }, // small, above "Counting the days"
+    rsvp:        { src: "assets/lottie/heart-burst.json", loop: false }, // plays when a reply is sent
+    closing:     { src: "assets/lottie/petals.json",      loop: true  }, // petals falling over the final scene
+  },
+
   /* ------------------------------------------------------------------ MUSIC */
   music: {
     enabled: true,                 // set false to hide the music button entirely

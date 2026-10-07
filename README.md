@@ -45,6 +45,26 @@ The opening, "Save the Date" and closing scenes use the files in `assets/images/
 1. **Licence.** Find the original on the stock site (it looks like Freepik / Magnific). Check its licence: free licences usually require a credit line, which goes in `art.credits`. If you buy the premium licence, no credit is needed.
 2. **Quality.** The cut-outs were taken from a 1472 px screenshot and upscaled 2.5×, so the flowers and fine edges are soft. If you download the original vector (EPS/AI/SVG) from the stock site, export the church and car as transparent PNGs at about 3× this size and replace the files.
 
+## 2b. Animations (Lottie)
+
+The site plays Lottie animations, configured in `config.js → lottie`. The player is `assets/js/vendor/lottie_light.min.js` (lottie-web, MIT licence). It only downloads when the first animation is about to appear on screen.
+
+| Slot | Where | Current file |
+|---|---|---|
+| `hero` | above the names, plays once | `assets/lottie/rings.json` (gold rings drawing themselves) |
+| `saveTheDate` | full-screen overlay behind the car | *(empty)* |
+| `countdown` | above "Counting the days" | *(empty)* |
+| `rsvp` | plays when a guest sends a reply | `assets/lottie/heart-burst.json` |
+| `closing` | petals falling over the final scene | `assets/lottie/petals.json` |
+
+The three current animations were made for this site. **To use one from LottieFiles:**
+1. Open the animation on lottiefiles.com and choose **Download → Lottie JSON**. Don't pick `.lottie`, because this player reads only `.json`.
+2. Save the file in `assets/lottie/`, for example `assets/lottie/confetti.json`.
+3. Set the slot's `src` to that path. Use `loop: true` for continuous effects (petals, sparkles) and `loop: false` for one-off moments (rings, a heart).
+4. Check the animation's licence on its LottieFiles page.
+
+Keep each JSON under about 300 KB, because big animations make phones stutter. Guests who have "reduce motion" turned on see the one-off animations as a still final frame, and the looping ones are hidden.
+
 ## 3. Music
 
 Put an MP3 at `assets/music/wedding.mp3`. The music button appears only once that file exists. Music never autoplays: mobile browsers block it, and it's impolite. Guests tap **Music** to start it. Set `music.enabled: false` to remove the button. Only use music you have the right to share.
