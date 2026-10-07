@@ -10,7 +10,9 @@ assets/
   js/main.js            content binding, scroll engine, countdown, lightbox, music
   js/rsvp.js            RSVP validation + swappable delivery providers (isolated)
   images/
-    illustrations/      watercolour sky, church, wedding car
+    glass/              rendered stained glass + rose backgrounds
+    illustrations/      wedding car
+  video/                opening film (MP4 + WebM, portrait and landscape)
     og-image.jpg        WhatsApp / social preview (1200×630)
   icons/favicon.svg
   music/                put wedding.mp3 here
@@ -31,19 +33,24 @@ Open **`config.js`**. It holds the names, dates, times, venues, addresses, map l
 
 **The one exception is the link preview.** WhatsApp and iMessage read the `<meta property="og:…">` tags at the top of `index.html` without running JavaScript, so edit those by hand. After deploying, change `og:image` to the full URL, for example `https://YOUR-USERNAME.github.io/YOUR-REPO/assets/images/og-image.jpg`. Otherwise many apps won't show the image.
 
-## 2. Illustrations
+## 2. Film, stained glass and artwork
 
-The opening, "Save the Date" and closing scenes use the files in `assets/images/illustrations/`. Their paths are set in `config.js → art`:
-
-| File | What | Notes |
+| What | Files | Notes |
 |---|---|---|
-| `wash-portrait.webp` / `wash-landscape.webp` | watercolour sky | generated for this site |
-| `church.webp` | white church, anchored to the right edge | cut out of the reference card you supplied |
-| `wedding-car.webp` | couple in the convertible | cut out of the reference card you supplied |
+| Opening film (statue against the sky) | `assets/video/hero-*.mp4` and `.webm`, plus posters | made from the Vecteezy clip you supplied: trimmed, colour-graded, with portrait and landscape cuts, about 0.5 MB each |
+| Rose window behind the Bible verse | `assets/images/glass/rose-window.webp` | rendered for this site |
+| Gothic windows for the invitation and closing | `assets/images/glass/windows-*.webp` | rendered for this site |
+| Blurred roses for "Save the Date" | `assets/images/glass/roses-*.webp` | rendered for this site |
+| Wedding car | `assets/images/illustrations/wedding-car.webp` | cut out of the stock card you supplied |
 
-**The church and car come from a stock invitation template** (it has the "Florence & Bradon" placeholder text). Before going live:
-1. **Licence.** Find the original on the stock site (it looks like Freepik / Magnific). Check its licence: free licences usually require a credit line, which goes in `art.credits`. If you buy the premium licence, no credit is needed.
-2. **Quality.** The cut-outs were taken from a 1472 px screenshot and upscaled 2.5×, so the flowers and fine edges are soft. If you download the original vector (EPS/AI/SVG) from the stock site, export the church and car as transparent PNGs at about 3× this size and replace the files.
+All the paths are set in `config.js → video` and `config.js → art`.
+
+**Licences to check before going live:**
+- **Vecteezy clip.** The free licence requires a credit line, e.g. "Video by Vecteezy". Put it in `art.credits`, or buy the Pro licence.
+- **Car.** It comes from a stock template (likely Freepik), which also needs credit or a paid licence.
+- **Everything else.** The stained glass and roses were generated for this site, so they need no credit.
+
+To use a different opening film, export H.264 MP4 (and optionally VP9 WebM) with no audio, about 10–15 seconds long and under 1 MB. Then update `config.js → video`. The video is muted and plays inline, which phones allow without a tap.
 
 ## 2b. Animations (Lottie)
 
@@ -55,7 +62,7 @@ The site plays Lottie animations, configured in `config.js → lottie`. The play
 | `saveTheDate` | full-screen overlay behind the car | *(empty)* |
 | `countdown` | above "Counting the days" | *(empty)* |
 | `rsvp` | plays when a guest sends a reply | `assets/lottie/heart-burst.json` |
-| `closing` | petals falling over the final scene | `assets/lottie/petals.json` |
+| `closing` | golden light rising over the final scene | `assets/lottie/light-motes.json` |
 
 The three current animations were made for this site. **To use one from LottieFiles:**
 1. Open the animation on lottiefiles.com and choose **Download → Lottie JSON**. Don't pick `.lottie`, because this player reads only `.json`.
@@ -127,10 +134,11 @@ The empty `.nojekyll` file tells Pages to serve files as they are. All paths are
 - **Information sections.** Events sit in framed cards with a photograph, title, details and a location button. The countdown uses small tiles on a textured ivory paper. Then comes "Will you join us?" with an RSVP call to action.
 - **Closing.** A wide landscape scene is the final, still image.
 
-**Visual system:**
-- **Illustrated scenes.** A watercolour sky over pale paper, a white church on the right edge, and a wedding car that drives across "Save the Date" and stops at the church in the closing scene.
-- **Colour.** Watercolour blue and navy for the scenes. Ivory, stone and deep navy sections with muted gold line-work in between.
-- **Type.** Great Vibes script for the names. Cormorant Garamond for headings and body. Jost in uppercase for labels.
+**Visual system ("sanctuary light"):**
+- **Darkness and light.** Deep candle-lit sections, with stained glass glowing out of the dark: a rose window behind the verse and gothic windows over a reflective floor.
+- **Opening.** A slow film of the statue of Christ against the sky, with soft light rays.
+- **Type.** Cinzel engraved capitals for names and titles, with a Great Vibes script word as a flourish. Cormorant Garamond for reading text, Jost for labels.
+- **Colour.** Near-black sanctuary brown, candle gold and cream. Parchment sections (engagement, timeline, RSVP) for rhythm, and a sky-blue "Save the Date".
 
 **Performance and accessibility.**
 - All scroll motion is `transform` and `opacity`, driven by one `requestAnimationFrame` loop. That loop only measures sections currently near the viewport.

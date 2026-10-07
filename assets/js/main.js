@@ -235,6 +235,28 @@
     items.forEach(function (n) { n.classList.add("fade"); io.observe(n); });
   }
 
+  /* --------------------------------------------------- hero video */
+  // Picks the portrait or landscape cut, plays muted inline (allowed on
+  // iOS/Android without a tap), pauses when scrolled away.
+  function initVideo() {
+    var V = C.video || {};
+    var v = doc.querySelector("[data-video]");
+    if (!v) return;
+    var land = window.matchMedia("(min-aspect-ratio: 1/1)").matches;
+    var webm = land ? V.landscapeWebm : V.portraitWebm;
+    var src = land ? V.landscape : V.portrait, poster = land ? V.landscapePoster : V.portraitPoster;
+    if (webm && v.canPlayType('video/webm; codecs="vp9"')) src = webm;
+    if (poster) v.poster = poster;
+    if (!src || reduceMotion.matches || (navigator.connection && navigator.connection.saveData)) return;
+    v.src = src;
+    v.muted = true;
+    var tryPlay = function () { var p = v.play(); if (p && p.catch) p.catch(function () {}); };
+    v.addEventListener("loadeddata", function () { v.classList.add("is-playing"); });
+    new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting) tryPlay(); else v.pause();
+    }).observe(v);
+  }
+
   /* ------------------------------------------- Lottie animations */
   // Slots: <div data-lottie="name">, configured in config.js → lottie.
   // The player (assets/js/vendor/lottie_light.min.js) is only downloaded
@@ -380,6 +402,7 @@
   initScroll();
   initFades();
   initLottie();
+  initVideo();
   initCountdown();
   initMusic();
   if (window.RSVP) window.RSVP.init(doc.querySelector(".rsvp__form"), C.rsvp || {});

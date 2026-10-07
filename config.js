@@ -107,18 +107,29 @@ window.WEDDING = {
     googleFormFields: { name: "entry.000000", guests: "entry.000001", attending: "entry.000002", message: "entry.000003" },
   },
 
+  /* ------------------------------------------------------------ HERO VIDEO */
+  // Background film behind the names. Phones get the portrait cut.
+  // Keep each file under ~1 MB (H.264 MP4, no audio). Leave src "" to use the poster only.
+  video: {
+    portrait:        "assets/video/hero-portrait.mp4",
+    portraitWebm:    "assets/video/hero-portrait.webm",   // smaller; used where supported (Chrome, Android, Firefox)
+    portraitPoster:  "assets/video/hero-portrait-poster.webp",
+    landscape:       "assets/video/hero-landscape.mp4",
+    landscapeWebm:   "assets/video/hero-landscape.webm",
+    landscapePoster: "assets/video/hero-landscape-poster.webp",
+  },
+
   /* --------------------------------------------------------------- ARTWORK */
-  // Illustrations used on the opening, "Save the Date" and closing scenes.
-  //   church, car → transparent background (WebP or PNG)
-  //   wash        → watercolour sky (portrait for phones, landscape for wider screens)
   art: {
-    washPortrait:  "assets/images/illustrations/wash-portrait.webp",
-    washLandscape: "assets/images/illustrations/wash-landscape.webp",
-    church:        "assets/images/illustrations/church.webp",
-    car:           "assets/images/illustrations/wedding-car.webp",
-    // Credit line shown at the very bottom of the page. If the church / car
-    // illustrations come from a stock site (e.g. Freepik), its licence usually
-    // requires attribution — put it here, e.g. "Illustrations: Freepik".
+    roseWindow:        "assets/images/glass/rose-window.webp",        // Bible verse
+    windowsPortrait:   "assets/images/glass/windows-portrait.webp",   // invitation + closing (phones)
+    windowsLandscape:  "assets/images/glass/windows-landscape.webp",  // invitation + closing (wide screens)
+    rosesPortrait:     "assets/images/glass/roses-portrait.webp",     // "Save the Date"
+    rosesLandscape:    "assets/images/glass/roses-landscape.webp",
+    car:               "assets/images/illustrations/wedding-car.webp",
+    // Credit line shown at the very bottom of the page. The hero film is from
+    // Vecteezy and the car from a stock template: their free licences usually
+    // require attribution — e.g. "Video: Vecteezy · Car illustration: Freepik".
     credits: "",
   },
 
@@ -133,7 +144,7 @@ window.WEDDING = {
     saveTheDate: { src: "",                               loop: true  }, // full-screen overlay behind the car
     countdown:   { src: "",                               loop: true  }, // small, above "Counting the days"
     rsvp:        { src: "assets/lottie/heart-burst.json", loop: false }, // plays when a reply is sent
-    closing:     { src: "assets/lottie/petals.json",      loop: true  }, // petals falling over the final scene
+    closing:     { src: "assets/lottie/light-motes.json", loop: true  }, // golden light rising over the final scene
   },
 
   /* ------------------------------------------------------------------ MUSIC */
