@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 560">
+  <!-- Groom, facing right (original silhouette). Rim light = backlight from the rose window. -->
+  <defs>
+    <filter id="rim" x="-10%" y="-10%" width="120%" height="120%">
+      <feOffset in="SourceAlpha" dx="0" dy="3" result="o"/>
+      <feComposite in="SourceAlpha" in2="o" operator="out" result="edge"/>
+      <feGaussianBlur in="edge" stdDeviation=".9" result="b"/>
+      <feFlood flood-color="#FFD08A" flood-opacity=".85"/>
+      <feComposite in2="b" operator="in" result="glow"/>
+      <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="glow"/></feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#rim)" fill="#060403">
+    <!-- head: hair, brow, nose, lips, chin, jaw -->
+    <path d="M96 26 C104 14 124 12 134 22 C140 28 142 36 141 44 C143 48 144 52 143 56 L149 66 C150 68 148 70 145 70 L144 74
+      C145 76 144 78 142 79 C143 82 141 86 137 87 C135 92 131 95 125 96 C119 96 113 93 110 88 C104 86 99 80 98 72
+      C94 70 92 64 94 58 C90 46 90 34 96 26 Z"/>
+    <!-- neck, collar, shoulders, jacket, arms, trousers -->
+    <path d="M112 90 L128 92 L130 106
+      C146 110 158 118 162 134 C166 150 166 172 166 196
+      C170 214 178 232 190 248 C196 256 202 262 202 270 C202 276 196 278 190 272
+      C180 262 170 250 162 236 L160 270
+      C162 290 162 306 158 316 L152 318
+      L150 420 C150 460 152 500 154 530 C160 534 174 538 182 544 C184 550 178 553 170 553 L132 553
+      C130 520 126 470 122 424 L114 352 L108 424 C104 470 102 512 102 553 L64 553
+      C56 553 54 547 60 543 C68 538 76 535 82 530 C82 494 84 450 86 410
+      L86 318 L78 316 C74 300 74 284 76 264
+      C72 240 70 214 70 190 C70 166 72 146 78 132 C84 118 96 110 110 106 Z"/>
+  </g>
+  <!-- lapel line and buttonhole flower catch a little light -->
+  <path d="M130 108 L140 150 L134 210" fill="none" stroke="#2a1d12" stroke-width="2"/>
+  <circle cx="146" cy="128" r="3.2" fill="#E9D8B8" opacity=".85"/>
+</svg>

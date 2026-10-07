@@ -120,16 +120,15 @@ window.WEDDING = {
   },
 
   /* --------------------------------------------------------------- ARTWORK */
+  // The church interior that sits behind the whole page (see main.js → initNave).
   art: {
-    roseWindow:        "assets/images/glass/rose-window.webp",        // Bible verse
-    windowsPortrait:   "assets/images/glass/windows-portrait.webp",   // invitation + closing (phones)
-    windowsLandscape:  "assets/images/glass/windows-landscape.webp",  // invitation + closing (wide screens)
-    rosesPortrait:     "assets/images/glass/roses-portrait.webp",     // "Save the Date"
-    rosesLandscape:    "assets/images/glass/roses-landscape.webp",
-    car:               "assets/images/illustrations/wedding-car.webp",
-    // Credit line shown at the very bottom of the page. The hero film is from
-    // Vecteezy and the car from a stock template: their free licences usually
-    // require attribution — e.g. "Video: Vecteezy · Car illustration: Freepik".
+    apse:   "assets/images/nave/apse.webp",     // far end: rose window, altar, candles
+    pillar: "assets/images/nave/pillar.webp",   // stone column (transparent), repeated down the aisle
+    shafts: "assets/images/nave/shafts.webp",   // light beams from the high windows (screen-blended)
+    groom:  "assets/images/nave/groom.svg",     // silhouettes at the altar — they move together as you scroll
+    bride:  "assets/images/nave/bride.svg",
+    // Credit line shown at the very bottom of the page. The opening film is from
+    // Vecteezy; its free licence requires attribution, e.g. "Video: Vecteezy".
     credits: "",
   },
 
@@ -141,10 +140,9 @@ window.WEDDING = {
   //   loop: false = plays once when it first comes into view, then holds
   lottie: {
     hero:        { src: "assets/lottie/rings.json",       loop: false }, // above the names
-    saveTheDate: { src: "",                               loop: true  }, // full-screen overlay behind the car
     countdown:   { src: "",                               loop: true  }, // small, above "Counting the days"
     rsvp:        { src: "assets/lottie/heart-burst.json", loop: false }, // plays when a reply is sent
-    closing:     { src: "assets/lottie/light-motes.json", loop: true  }, // golden light rising over the final scene
+    nave:        { src: "assets/lottie/light-motes.json", loop: true  }, // dust in the light, over the whole nave
   },
 
   /* ------------------------------------------------------------------ MUSIC */

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 560">
+  <!-- Bride, facing left, veil and gown (original silhouette). Rim light from the rose window. -->
+  <defs>
+    <filter id="rim" x="-10%" y="-10%" width="120%" height="120%">
+      <feOffset in="SourceAlpha" dx="0" dy="3" result="o"/>
+      <feComposite in="SourceAlpha" in2="o" operator="out" result="edge"/>
+      <feGaussianBlur in="edge" stdDeviation=".9" result="b"/>
+      <feFlood flood-color="#FFD08A" flood-opacity=".85"/>
+      <feComposite in2="b" operator="in" result="glow"/>
+      <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="glow"/></feMerge>
+    </filter>
+    <linearGradient id="veil" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F6E7CF" stop-opacity=".55"/>
+      <stop offset=".6" stop-color="#F6E7CF" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#F6E7CF" stop-opacity=".05"/>
+    </linearGradient>
+  </defs>
+  <!-- translucent veil behind, catching the window light -->
+  <path fill="url(#veil)" d="M174 34 C198 38 210 58 214 86 C222 140 232 196 248 252 C262 306 276 380 288 456
+    C294 494 297 526 298 553 L246 553 C244 520 236 470 226 420 C214 360 202 300 192 250 C184 210 180 160 178 120 C177 90 176 60 174 34 Z"/>
+  <g filter="url(#rim)" fill="#060403">
+    <!-- head with chignon: brow, nose, lips, chin -->
+    <path d="M170 26 C158 16 140 18 132 30 C128 36 127 44 128 50 C126 54 125 58 126 61 L120 70 C119 72 121 74 124 74
+      L124 78 C123 80 124 82 126 83 C125 86 127 90 131 91 C134 96 139 98 145 98 C152 98 158 94 161 88
+      C168 88 174 84 176 78 C186 80 194 72 192 62 C190 54 184 50 178 50 C178 40 176 32 170 26 Z"/>
+    <!-- neck, bodice, arms, flowing gown with train -->
+    <path d="M140 94 L156 94 L158 108
+      C168 112 176 120 178 134 C182 154 184 176 184 196 C186 222 184 240 180 254
+      C190 290 204 340 220 400 C232 446 246 492 262 553 L44 553
+      C56 500 72 444 88 396 C104 346 120 296 130 260
+      C126 246 124 230 124 214 L118 222 C110 234 100 244 92 250 C86 256 80 254 80 248 C80 242 86 236 92 228
+      C102 214 110 200 116 186 C118 166 120 148 124 134 C128 120 134 112 142 108 Z"/>
+  </g>
+  <!-- small bouquet held in front -->
+  <g transform="translate(96 244)">
+    <circle r="9" fill="#EAD7BE"/><circle cx="-8" cy="4" r="6" fill="#D9B8A0"/><circle cx="7" cy="6" r="6" fill="#E7CFB5"/>
+    <circle cx="-2" cy="-7" r="5" fill="#F3E4CC"/>
+  </g>
+</svg>

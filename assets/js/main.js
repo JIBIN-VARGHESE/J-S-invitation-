@@ -182,6 +182,7 @@
     ticking = false;
     active.forEach(measure);
     // Feature 1 · three-layer parallax: one number drives every layer's speed (see CSS)
+    if (nave && !reduceMotion.matches) renderNave(naveProgress());
     if (hero && heroVisible) {
       var y = Math.round(Math.min(window.scrollY, window.innerHeight * 1.2));
       if (y !== lastY) { lastY = y; hero.style.setProperty("--y", y); }
@@ -233,6 +234,91 @@
       });
     }, { rootMargin: "0px 0px -10% 0px", threshold: 0 });
     items.forEach(function (n) { n.classList.add("fade"); io.observe(n); });
+  }
+
+  /* ------------------------------------------------------- the nave */
+  // A simple perspective camera. World units: metres. The camera stands at
+  // eye height in the aisle and walks forward (z) as the page scrolls.
+  //   pillars  : pairs every SPACING metres, AISLE metres either side
+  //   couple   : stand in front of the altar, start apart, meet near the end
+  //   apse     : the far wall (rose window + altar), a flat backdrop
+  var nave = null;
+  var NAVE = { pairs: 7, spacing: 3.2, aisle: 2.1, eye: 1.6, pillarW: .62, coupleZ: 25.5, apseZ: 28, apseW: 13, walkTo: 20.5, coupleH: 1.72 };
+  function initNave() {
+    var el = doc.querySelector(".nave");
+    if (!el) return;
+    var wrap = el.querySelector(".nave__pillars");
+    var pillarSrc = (C.art && C.art.pillar) || "";
+    var pillars = [];
+    for (var i = 0; i < NAVE.pairs; i++) {
+      [-1, 1].forEach(function (side) {
+        var img = el.ownerDocument.createElement("img");
+        img.src = pillarSrc; img.alt = ""; img.decoding = "async";
+        img.className = "pillar" + (side < 0 ? " pillar--l" : "");
+        wrap.appendChild(img);
+        pillars.push({ el: img, z: NAVE.spacing * (i + 1), x: side * NAVE.aisle });
+      });
+    }
+    nave = {
+      el: el, pillars: pillars,
+      apse: el.querySelector(".nave__apse"),
+      groom: el.querySelector(".nave__groom"), bride: el.querySelector(".nave__bride"),
+      shafts: el.querySelector(".nave__shafts"),
+      hero: doc.querySelector(".hero"),
+      last: -1,
+    };
+    window.addEventListener("resize", function () { nave.last = -1; reduceMotion.matches ? renderNave(.55) : requestFrame(); }, { passive: true });
+    if (reduceMotion.matches) { renderNave(.55); return; }
+    renderNave(0);
+  }
+  function naveProgress() {
+    var heroH = nave.hero ? nave.hero.offsetHeight : 0;
+    var max = root.scrollHeight - window.innerHeight - heroH;
+    return Math.min(1, Math.max(0, (window.scrollY - heroH * .5) / Math.max(1, max)));
+  }
+  function renderNave(t) {
+    if (!nave || Math.abs(t - nave.last) < .0003) return;
+    nave.last = t;
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var k = Math.min(vw * .95, vh * .62);                 // focal length (px at 1 m)
+    var cx = vw / 2, hz = vh * .42;                         // vanishing point
+    var ease = t * t * (3 - 2 * t);
+    var camZ = NAVE.walkTo * (t * .7 + ease * .3);
+    function place(node, x, z, wM, hM, anchor) {           // anchor: fraction of height that sits on the floor
+      var dz = z - camZ;
+      if (dz < .45) { node.style.visibility = "hidden"; return; }
+      var s = k / dz;
+      var w = wM * s, h = hM * s;
+      var sx = cx + x * s - w / 2, sy = hz + NAVE.eye * s - h * anchor;
+      node.style.visibility = "visible";
+      node.style.width = w.toFixed(1) + "px";
+      node.style.transform = "translate3d(" + sx.toFixed(1) + "px," + sy.toFixed(1) + "px,0)";
+      node.style.opacity = Math.min(1, (dz - .45) / 1.2).toFixed(3);
+      return dz;
+    }
+    nave.pillars.forEach(function (p) {
+      var dz = place(p.el, p.x, p.z, NAVE.pillarW, NAVE.pillarW * 6.19, 1);
+      if (dz) p.el.style.zIndex = String(1000 - Math.round(dz * 10));
+    });
+    // far wall: the image's floor line sits at 64 % of its height
+    place(nave.apse, 0, NAVE.apseZ, NAVE.apseW, NAVE.apseW * .85, .64);
+    nave.apse.style.opacity = "1";
+    // couple: apart → together (meet at ~85 % of the page)
+    var m = Math.min(1, t / .85), meet = m * m * (3 - 2 * m);
+    var gap = 1.5 * (1 - meet);
+    var H = NAVE.coupleH;
+    place(nave.groom, -(.27 + gap / 2), NAVE.coupleZ, H * 220 / 560, H, 1);
+    place(nave.bride, (.36 + gap / 2), NAVE.coupleZ, H * 300 / 560, H, 1);
+    nave.groom.style.opacity = nave.bride.style.opacity = "1";
+    // carpet: from the camera to the altar steps
+    nave.el.style.setProperty("--carpet-top", (hz + NAVE.eye * k / (NAVE.coupleZ + .8 - camZ)).toFixed(1) + "px");
+    nave.el.style.setProperty("--hz", hz.toFixed(1) + "px");
+    // light shafts breathe as you pass each window bay
+    nave.shafts.style.opacity = (.45 + .25 * Math.sin(camZ / NAVE.spacing * Math.PI)).toFixed(3);
+    nave.shafts.style.transform = "translate3d(" + (-camZ * 6).toFixed(1) + "px,0,0) scale(1.15)";
+    // entering from the bright film: fade the nave in over the first screen
+    var heroH = nave.hero ? nave.hero.offsetHeight : vh;
+    nave.el.style.opacity = Math.min(1, Math.max(0, window.scrollY / (heroH * .7))).toFixed(3);
   }
 
   /* --------------------------------------------------- hero video */
@@ -403,6 +489,7 @@
   initFades();
   initLottie();
   initVideo();
+  initNave();
   initCountdown();
   initMusic();
   if (window.RSVP) window.RSVP.init(doc.querySelector(".rsvp__form"), C.rsvp || {});

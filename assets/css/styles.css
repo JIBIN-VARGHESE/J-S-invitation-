@@ -1,10 +1,10 @@
 /* =============================================================================
    Jibin Varghese & Sofia John — styles
-   Direction: "sanctuary light". Deep candle-lit darkness, luminous stained
-   glass, engraved Roman capitals (Cinzel) with a flowing script swash,
-   parchment interludes. Mobile-first; motion uses transform / opacity only.
-   Colours are scoped: every section reads --bg / --fg / --accent / --line,
-   and `.light` sections swap them for parchment tones.
+   Direction: "walking down the aisle". After the opening film, a fixed church
+   interior (.nave) sits behind the whole page; main.js moves a perspective
+   camera down the aisle as you scroll. Information floats over it on dark
+   glass panels. One palette throughout: candle-lit dark, candle gold, cream.
+   Mobile-first; motion uses transform / opacity only.
    ========================================================================== */
 
 /* ---------------------------------------------------------------- Fonts */
@@ -63,14 +63,6 @@
   --ease-out: cubic-bezier(.16, 1, .3, 1);
   --dur:      1.2s;
 }
-.light {
-  --bg: var(--parchment);
-  --fg: var(--ink);
-  --fg-soft: var(--ink-soft);
-  --accent: var(--gold-deep);
-  --line: rgba(135, 96, 31, .32);
-  --glow: none;
-}
 
 /* ---------------------------------------------------------------- Base */
 *, *::before, *::after { box-sizing: border-box; }
@@ -97,12 +89,24 @@ button { font: inherit; color: inherit; cursor: pointer; }
 [hidden] { display: none !important; }
 em { font-style: italic; }
 
-section { position: relative; padding: var(--section) var(--gutter); background: var(--bg); color: var(--fg); }
+main { position: relative; z-index: 1; padding-bottom: 20svh; }
+section { position: relative; color: var(--fg); }
+/* every information block is a dark glass panel floating in the nave, with
+   a full screen of church between panels so the walk is always visible */
+.panel {
+  width: min(100% - 2 * var(--gutter), 42rem);
+  margin: 70svh auto 0;
+  padding: clamp(2.6rem, 9vw, 4.4rem) clamp(1.3rem, 6vw, 3.6rem);
+  background: linear-gradient(180deg, rgba(14, 10, 7, .84), rgba(14, 10, 7, .74));
+  border: 1px solid rgba(217, 174, 98, .32);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 220, 160, .08);
+}
+.panel--wide { width: min(100% - 2 * var(--gutter), 64rem); }
+.panel::before { content: ""; position: absolute; inset: 7px; border: 1px solid rgba(217, 174, 98, .12); pointer-events: none; }
 
 .eyebrow { font-family: var(--sans); font-weight: 500; font-size: .7rem; letter-spacing: .26em; text-transform: uppercase; color: var(--accent); }
 .rule { display: inline-block; width: 2.6rem; height: 1px; background: currentColor; opacity: .6; vertical-align: middle; }
 .orn { display: block; width: 30px; height: 46px; margin: 0 auto 1.4rem; color: var(--accent); filter: drop-shadow(0 0 6px rgba(240, 184, 102, .35)); }
-.light .orn { filter: none; }
 .orn--lg { width: 44px; height: 68px; margin-bottom: 2rem; }
 
 /* Display type: engraved capitals, with an italic word set as a script swash */
@@ -180,11 +184,26 @@ section { position: relative; padding: var(--section) var(--gutter); background:
 .js .fade { opacity: 0; transform: translate3d(0, 40px, 0); transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease-out); }
 .js .fade.is-in { opacity: 1; transform: none; }
 
+/* ============================================================ THE NAVE */
+.nave { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: #080605; opacity: 0; pointer-events: none; }
+.nave > * { position: absolute; }
+.nave__floor { left: 0; right: 0; top: var(--hz, 42vh); bottom: 0; background: linear-gradient(180deg, #0c0907 0%, #15100c 60%, #1d1610 100%); }
+.nave__carpet { left: 0; right: 0; top: var(--carpet-top, 60vh); bottom: 0; background: linear-gradient(180deg, #2a0d0b, #55190f 70%, #6b2214); clip-path: polygon(47% 0, 53% 0, 72% 100%, 28% 100%); opacity: .75; }
+.nave__apse, .pillar, .nave__groom, .nave__bride { left: 0; top: 0; transform-origin: 0 0; will-change: transform; max-width: none; height: auto; }
+.nave__couple { inset: 0; z-index: 1; }
+.nave__couple img { position: absolute; filter: drop-shadow(0 0 18px rgba(255, 200, 130, .2)); }
+.nave__pillars { inset: 0; z-index: 2; }
+.pillar { position: absolute; }
+.pillar--l { scale: -1 1; }
+.nave__shafts { inset: -10% -20%; width: 140%; height: 120%; z-index: 3; object-fit: cover; mix-blend-mode: screen; opacity: .5; }
+.nave__motes { z-index: 4; }
+.nave__vignette { inset: 0; z-index: 5; background: radial-gradient(120% 90% at 50% 40%, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, .7) 100%); }
+
 /* ======================================================= HERO (film) */
 .hero {
   position: relative;
   height: 100vh; height: 100svh; min-height: 580px;
-  overflow: hidden; background: var(--sanctuary); color: var(--cream);
+  overflow: hidden; background: var(--sanctuary); color: var(--cream); z-index: 2;
   --y: 0;    /* scroll offset in px, written by JS */
 }
 .layer { position: absolute; will-change: transform; }
@@ -238,37 +257,15 @@ section { position: relative; padding: var(--section) var(--gutter); background:
 @keyframes drip { 0% { transform: scaleY(0); } 60%, 100% { transform: scaleY(1); } }
 
 /* ================================================ SAVE THE DATE (car drive) */
-.savedate {
-  padding: 0; height: 220vh; height: 220svh; background: var(--sky);
-  --drive: clamp(0, (var(--p) + .08) / 1.02, 1);
-  --text: clamp(0, var(--p) / .2, 1);
-}
-.savedate .pin { background: var(--sky); }
-/* fade the pastel scene into the sanctuary below */
-.savedate .pin::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 9svh; z-index: 1; background: linear-gradient(rgba(14, 10, 7, 0), var(--sanctuary)); pointer-events: none; }
-.savedate__bg { position: absolute; inset: 0; }
-.savedate__bg img { width: 100%; height: 100%; object-fit: cover; transform: scale(calc(1.08 - var(--p) * .08)); will-change: transform; }
-.savedate__text { position: absolute; left: 0; right: 0; top: 17svh; padding: 0 var(--gutter); text-align: center; color: #FFFCF4; opacity: var(--text); transform: translate3d(0, calc((1 - var(--text)) * 24px), 0); text-shadow: 0 2px 24px rgba(40, 70, 110, .25); }
+/* ======================================== SAVE THE DATE (words in the nave) */
+.savedate { height: 200vh; height: 200svh; --text: clamp(0, var(--p) / .3, 1) ; --out: clamp(0, (var(--p) - .75) / .2, 1); }
+.savedate__text { position: absolute; left: 0; right: 0; top: 30svh; padding: 0 var(--gutter); text-align: center; color: #FFF8EA; opacity: calc(var(--text) - var(--out)); transform: translate3d(0, calc((1 - var(--text)) * 30px), 0) scale(calc(.94 + var(--text) * .06)); text-shadow: 0 0 40px rgba(240, 184, 102, .45), 0 2px 18px rgba(0, 0, 0, .7); }
 .savedate__title { font-size: clamp(2.6rem, 12vw, 7rem); line-height: 1.05; letter-spacing: .1em; margin-right: -.1em; display: flex; flex-direction: column; align-items: center; }
-.savedate__title em { color: #FFFCF4; font-size: 1.15em; margin: -.1em 0 -.05em; }
-.savedate__date { margin-top: 1.6rem; font-family: var(--sans); font-weight: 500; font-size: 1rem; letter-spacing: .42em; margin-right: -.42em; }
-.savedate__road { position: absolute; left: 0; right: 0; bottom: 0; height: 9svh; background: linear-gradient(rgba(255, 252, 244, .55), rgba(255, 252, 244, .2) 30%, var(--sanctuary)); }
-.car {
-  position: absolute; left: 0; bottom: calc(9svh - 4px); z-index: 2;
-  width: min(80vw, 36rem);
-  /* the car faces left: it enters from the right edge and leaves on the left */
-  transform: translate3d(calc(100vw - var(--drive) * (100vw + 100%)), 0, 0);
-  will-change: transform;
-}
-.car img { width: 100%; height: auto; }
+.savedate__title em { color: var(--gold); font-size: 1.15em; margin: -.1em 0 -.05em; }
+.savedate__date { margin-top: 1.6rem; font-family: var(--display); font-size: 1.1rem; letter-spacing: .42em; margin-right: -.42em; color: var(--gold); }
 
 /* =========================================================== INVITATION */
-.invite { text-align: center; padding-top: 0; overflow: hidden; }
-.invite__glass { position: relative; height: 78svh; margin: 0 calc(var(--gutter) * -1); }
-.invite__glass img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; }
-.invite__glass::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, var(--sanctuary) 0%, rgba(14, 10, 7, 0) 14%, rgba(14, 10, 7, 0) 60%, var(--sanctuary) 100%); }
-.invite > :not(.invite__glass) { position: relative; max-width: 40rem; margin-left: auto; margin-right: auto; }
-.invite .orn--lg { margin-top: 1rem; }
+.invite { text-align: center; }
 .invite__lines { margin: 1.8rem auto 2.6rem; font-size: var(--fs-lead); font-weight: 300; line-height: 1.55; }
 .invite__names { display: flex; flex-direction: column; align-items: center; font-size: clamp(1.5rem, .8rem + 3.6vw, 3rem); line-height: 1.15; letter-spacing: .1em; text-shadow: var(--glow); }
 .invite__names span { white-space: nowrap; margin-right: -.1em; }
@@ -279,11 +276,9 @@ section { position: relative; padding: var(--section) var(--gutter); background:
 [data-scrub] { --p: 0; }
 .pin { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
 .verse { padding: 0; height: 230vh; height: 230svh; --cap: clamp(0, (var(--p) - .72) / .14, 1); --lit: clamp(0, var(--p) / .6, 1); }
-.verse .pin { display: grid; grid-template-rows: auto auto; place-content: center; justify-items: center; gap: clamp(1.4rem, 4svh, 2.6rem); padding: 0 var(--gutter); }
-.verse__rose { width: min(84vw, 50svh, 34rem); aspect-ratio: 1; opacity: calc(.35 + var(--lit) * .65); transform: scale(calc(.86 + var(--lit) * .14)) rotate(calc(var(--p) * 24deg)); will-change: transform, opacity; }
-.verse__rose img { width: 100%; height: 100%; border-radius: 50%; }
-.verse__body { position: relative; text-align: center; max-width: 34rem; }
-.verse__text { font-weight: 300; font-style: italic; font-size: clamp(1.7rem, min(1rem + 4vw, 4.4svh), 3.1rem); line-height: 1.24; text-shadow: var(--glow); }
+.verse .pin { display: grid; place-content: end center; padding-bottom: 14svh !important; justify-items: center; gap: clamp(1.4rem, 4svh, 2.6rem); padding: 0 var(--gutter); }
+.verse__body { position: relative; text-align: center; max-width: 34rem; padding: 1.6rem 1.4rem; background: radial-gradient(closest-side, rgba(10, 7, 5, .7), rgba(10, 7, 5, 0)); }
+.verse__text { color: #FFF8EA; font-weight: 300; font-style: italic; font-size: clamp(1.7rem, min(1rem + 4vw, 4.4svh), 3.1rem); line-height: 1.24; text-shadow: var(--glow); }
 .verse__text .w { display: inline-block; opacity: clamp(.18, var(--p) * 1.35 * (var(--n) + 2) - var(--i), 1); }
 .verse__ref { margin-top: 1.4rem; display: flex; align-items: center; justify-content: center; gap: 1rem; font-family: var(--sans); font-weight: 500; font-size: .7rem; letter-spacing: var(--track); text-transform: uppercase; color: var(--accent); opacity: var(--cap); }
 
@@ -304,7 +299,7 @@ section { position: relative; padding: var(--section) var(--gutter); background:
 .details dd { font-size: 1.25rem; }
 .tba { font-style: italic; color: var(--fg-soft); }
 
-.event--wedding { background: radial-gradient(80% 50% at 50% 0%, #2B1A0C 0%, var(--sanctuary) 70%); }
+.event--wedding { background: radial-gradient(80% 50% at 50% 0%, rgba(80, 48, 18, .35) 0%, rgba(14, 10, 7, .8) 70%); }
 .wedding__date { margin-top: 1.6rem; display: flex; align-items: center; justify-content: center; gap: clamp(.8rem, 3vw, 1.6rem); font-family: var(--display); font-size: clamp(2.1rem, 9vw, 4rem); line-height: 1; }
 .wedding__date i { width: 1px; height: .9em; background: var(--accent); transform: rotate(18deg); }
 .wedding__place { margin-top: 1.1rem; font-family: var(--sans); font-size: .74rem; letter-spacing: var(--track); text-transform: uppercase; color: var(--fg-soft); }
@@ -330,7 +325,7 @@ section { position: relative; padding: var(--section) var(--gutter); background:
 .tl__note { margin-top: .35rem; font-family: var(--sans); font-weight: 300; font-size: .86rem; color: var(--fg-soft); }
 
 /* ============================================================ COUNTDOWN */
-.countdown { text-align: center; background: radial-gradient(70% 60% at 50% 100%, #2A190B 0%, var(--sanctuary) 70%); }
+.countdown { text-align: center; }
 .countdown__grid { margin: clamp(2.6rem, 8vw, 4rem) auto 0; max-width: 46rem; display: grid; grid-template-columns: repeat(4, 1fr); }
 .countdown__grid > div { display: grid; gap: .6rem; }
 .countdown__grid > div + div { border-left: 1px solid var(--line); }
@@ -392,16 +387,13 @@ section { position: relative; padding: var(--section) var(--gutter); background:
 
 /* ============================================================== CLOSING */
 .closing {
-  padding: 0; height: 260vh; height: 260svh;
+  height: 260vh; height: 260svh;
   --lit: clamp(0, var(--p) / .45, 1);
   --line-in: clamp(0, (var(--p) - .22) / .1, 1);
   --line-out: clamp(0, (var(--p) - .5) / .08, 1);
   --sign: clamp(0, (var(--p) - .58) / .16, 1);
 }
-.closing__glass { position: absolute; inset: 0; }
-.closing__glass img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; opacity: calc(.25 + var(--lit) * .75); transform: scale(calc(1.12 - var(--lit) * .12)); will-change: transform, opacity; }
-.closing__shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(14, 10, 7, .1) 0%, rgba(14, 10, 7, .1) 45%, rgba(14, 10, 7, .82) 70%, var(--sanctuary) 100%); }
-.closing__text { position: absolute; left: 0; right: 0; bottom: 0; height: 44svh; padding: 0 var(--gutter) 3svh; display: grid; place-items: center; text-align: center; z-index: 3; }
+.closing__text { position: absolute; left: 0; right: 0; top: 4svh; height: 40svh; text-shadow: 0 2px 20px rgba(0, 0, 0, .8); padding: 0 var(--gutter) 3svh; display: grid; place-items: center; text-align: center; z-index: 3; }
 .closing__line {
   grid-area: 1 / 1; max-width: 24rem;
   font-weight: 300; font-style: italic; font-size: clamp(1.8rem, 1.2rem + 3.6vw, 3.2rem); line-height: 1.22; text-shadow: var(--glow);
@@ -436,9 +428,6 @@ section { position: relative; padding: var(--section) var(--gutter); background:
   .hero__title { flex-direction: row; align-items: center; gap: .25em; }
   .hero__name { font-size: clamp(3rem, min(7.4vw, 13vh), 7.5rem); }
   .hero__amp { line-height: 1; margin: 0; font-size: clamp(3.6rem, min(9vw, 15vh), 8rem); }
-  .car { width: min(46vw, 34rem); }
-  .invite__glass { height: 84vh; }
-  .closing__glass img { object-position: 50% 40%; }
 }
 @media (min-width: 900px) {
   .event--engagement .event__inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "head head" "date desc" "date details" "place btn"; column-gap: clamp(3rem, 8vw, 7rem); row-gap: 2rem; text-align: left; justify-items: start; align-items: center; }
@@ -461,11 +450,10 @@ section { position: relative; padding: var(--section) var(--gutter); background:
   .layer { transform: none !important; }
   .hero__content { opacity: 1; }
   .verse, .closing, .savedate { height: auto; }
-  .savedate { --drive: .5; --text: 1; } .savedate .pin { height: 100svh; }
+  .savedate { --text: 1; --out: 0; } .savedate .pin { height: 100svh; }
   .pin { position: relative; }
   .verse .w { opacity: 1 !important; }
   .verse { --cap: 1; --lit: 1; }
-  .verse__rose { transform: none; }
   .closing { --lit: 1; --line-in: 0; --line-out: 0; --sign: 1; }
   .closing .pin { height: 120svh; }
   .tl { --on: 1; }
