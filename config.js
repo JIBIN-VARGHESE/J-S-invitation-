@@ -66,26 +66,24 @@ window.WEDDING = {
     region: "Kerala",
 
     // Holy Matrimony
-    ceremonyTime: "",              // e.g. "11:00" — also sets the countdown target
-    churchName: "",                // e.g. "St. ___ Church"
-    churchAddress: "",
-    churchMapsUrl: "https://www.google.com/maps/search/?api=1&query=Kozhikode%2C+Kerala", // ← PLACEHOLDER
+    ceremonyTime: "14:30",         // also sets the countdown target
+    churchName: "St. George Orthodox Cathedral",
+    churchAddress: "",             // street address (optional); the town is shown when empty
+    churchMapsUrl: "https://share.google/KuEEy4EvyO7lj9OsD",
 
     // Reception
-    receptionTime: "",             // e.g. "13:00"
-    receptionVenue: "",
+    receptionTime: "18:30",
+    receptionVenue: "Opulent Convention Centre",
     receptionAddress: "",
-    receptionMapsUrl: "",          // leave "" to reuse churchMapsUrl
+    receptionMapsUrl: "https://www.google.com/search?kgmid=%2Fg%2F11z8g451zb&q=Opulent+Convention+Centre",
 
   },
 
   /* ---------------------------------------------------- WEDDING DAY TIMELINE */
   // Times are optional — empty entries show "Time to follow".
   timeline: [
-    { time: "", title: "Holy Matrimony",  note: "The wedding ceremony" },
-    { time: "", title: "Photographs",     note: "With family and friends" },
-    { time: "", title: "Reception",       note: "Lunch and fellowship" },
-    { time: "", title: "Celebration",     note: "Toasts, music and blessings" },
+    { time: "14:30", title: "Holy Matrimony", note: "St. George Orthodox Cathedral" },
+    { time: "18:30", title: "Reception",      note: "Opulent Convention Centre" },
   ],
 
   /* ------------------------------------------------------------------- RSVP */

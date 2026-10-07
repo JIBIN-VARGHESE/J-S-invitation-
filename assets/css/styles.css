@@ -395,7 +395,7 @@ section { position: relative; color: var(--fg); }
   --lit: clamp(0, var(--p) / .45, 1);
   --line-in: clamp(0, (var(--p) - .22) / .1, 1);
   --line-out: clamp(0, (var(--p) - .5) / .08, 1);
-  --sign: clamp(0, (var(--p) - .65) / .14, 1);
+  --sign: clamp(0, (var(--p) - .58) / .16, 1);
 }
 .closing__text { position: absolute; left: 0; right: 0; bottom: 0; height: 36svh; background: linear-gradient(180deg, rgba(8, 5, 3, 0), rgba(8, 5, 3, .55) 35%, rgba(8, 5, 3, .8)); text-shadow: 0 2px 20px rgba(0, 0, 0, .8); padding: 0 var(--gutter) 3svh; display: grid; place-items: center; text-align: center; z-index: 3; }
 .closing__line {
@@ -443,7 +443,7 @@ section { position: relative; color: var(--fg); }
   .event--engagement .btn { grid-area: btn; }
   .event--engagement .event__title { margin-right: 0; }
   .wedding__cards { grid-template-columns: 1fr 1fr; column-gap: 1.6rem; }
-  .locations__cards { grid-template-columns: 1fr 1fr; }
+  .locations__cards { grid-template-columns: repeat(3, 1fr); }
   .closing__line { max-width: 36rem; }
   .closing__text { height: 32svh; }
 }

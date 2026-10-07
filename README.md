@@ -29,13 +29,13 @@ Open **`config.js`**. It holds the names, dates, times, venues, addresses, map l
 - Times use 24-hour Kerala time: `"11:00"`, `"16:30"`.
 - `wedding.ceremonyTime` also sets the countdown target. Until you set it, the countdown runs to 00:00 IST on 25 April 2027.
 
-**Values still to fill in:** engagement time, venue and address. Wedding church name, address and time. Reception venue, address and time. All Google Maps URLs (they currently search for the town name). Timeline times. RSVP provider and deadline.
+**Values still to fill in:** engagement time, venue, address and Maps link (it currently searches for the town). Street addresses for the church and reception (optional; the town is shown instead). RSVP provider and deadline.
 
 **The one exception is the link preview.** WhatsApp and iMessage read the `<meta property="og:…">` tags at the top of `index.html` without running JavaScript, so edit those by hand. After deploying, change `og:image` to the full URL, for example `https://YOUR-USERNAME.github.io/YOUR-REPO/assets/images/og-image.jpg`. Otherwise many apps won't show the image.
 
 ## 2. The walk down the aisle
 
-After the opening film, a church interior sits **fixed behind the whole page**, drawn in real 3D with WebGL by `assets/js/nave.js`. As guests scroll, the camera walks down the aisle between pews and clustered stone pillars, under pointed arches, with light falling from the high windows and candles flickering on the pillars. The camera eases toward the scroll position, so it keeps gliding for a moment after the finger stops. In the last section the bride (ivory gown) and groom (white boutonnière) walk in from either side toward each other: their weight shifts from foot to foot, his feet alternate and her gown swings. They meet hand in hand, then a soft glow dissolves the scene into an embrace, which sways gently while the names appear. Every section floats over the church on a parchment card, with a screen of church between cards.
+After the opening film, a church interior sits **fixed behind the whole page**, drawn in real 3D with WebGL by `assets/js/nave.js`. As guests scroll, the camera walks down the aisle between pews and clustered stone pillars, under pointed arches, with light falling from the high windows and candles flickering on the pillars. The camera eases toward the scroll position, so it keeps gliding for a moment after the finger stops. The camera stops before the altar as the closing section begins; then the bride (ivory gown) and groom (white boutonnière) appear in an embrace, faded in with a warm glow, and the names follow. The couple don't move. Every section floats over the church on a parchment card, with a screen of church between cards.
 
 | Layer | File | Notes |
 |---|---|---|
@@ -43,16 +43,16 @@ After the opening film, a church interior sits **fixed behind the whole page**, 
 | Floor, carpet, walls, side-aisle windows | `floor.webp`, `carpet.webp`, `wall.webp`, `aisle.webp` | rendered for this site; they repeat |
 | Pillars, arches, pews | `pier.webp`, `arch.webp`, `pew.webp`, `pewend.webp` | rendered for this site |
 | Altar wall (rose window, altar, candles) | `altar.webp` | rendered for this site |
-| The couple | `couple.webp` | two poses from the Freepik pack you supplied (walking hand in hand, and the embrace), recoloured: gown ivory, boutonnière white, everything else dark. The walking pose is cut into parts (his body and two legs; her veil, arm, bodice and skirt) so they can walk separately. Source shapes in `assets/images/nave/source/` |
+| The couple | `couple.webp` | the embrace from the Freepik pack you supplied, recoloured: gown ivory, boutonnière white, everything else dark. Source shapes in `assets/images/nave/source/` |
 
 All in `assets/images/nave/`; paths are listed in `config.js → art`. Texture sizes are powers of two (512, 1024, 2048); keep them that way if you replace one.
 
 **Tuning the walk.** The `M` settings at the top of `assets/js/nave.js` control the scene:
 - number of pillar pairs and their spacing (`piers`, `bay`);
 - eye height (`eye`) and where the pews start and end;
-- where the couple meet (`coupleZ`), how far apart and how far back they start (`apartX`, `apartZ`), and how close the camera ends up (`endDist`).
+- where the couple stand (`coupleZ`) and how close the camera ends up (`endDist`).
 
-The couple walk during the first half of the closing section, the embrace fades in over the next stretch, then the names appear.
+
 
 **Phones without WebGL** (very rare) see a still picture of the altar instead. Guests with "reduce motion" turned on see a still view of the church with the couple already in the embrace.
 

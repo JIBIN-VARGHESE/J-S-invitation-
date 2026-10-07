@@ -1,8 +1,8 @@
 /* =============================================================================
    The nave — a small WebGL renderer for the church interior behind the page.
    World units are metres. The camera stands at eye height in the aisle and
-   walks toward the altar as the page scrolls; at the end the couple walk
-   toward each other and take hands.
+   walks toward the altar as the page scrolls; at the end the couple appear
+   before the altar in an embrace.
 
    Everything is textured quads in true perspective (floor, walls, piers,
    arches, pews, the couple), drawn far to near, plus additive light (window
@@ -17,22 +17,14 @@
     pierX: 2.4, wallX: 2.65, aisleX: 5.6, // pier centres, nave walls, side-aisle walls
     eye: 1.6,
     pewFrom: 1.8, pewTo: 19.8, pewIn: .82, pewOut: 1.86,
-    coupleZ: 23.6, altarZ: 26.2, endDist: 4.3, apartX: 1.75, apartZ: 1.4,
+    coupleZ: 23.6, altarZ: 26.2, endDist: 4.3,
   };
-  // the couple atlas (assets/images/nave/couple.webp), cut from two poses of the
-  // Freepik pack: pose 5 = walking hand in hand (split into bride and groom so
-  // each can walk on their own), pose 8 = the embrace. Frame units: 153 = 1 m.
-  var FIG = { 5: { unit: 153, cx: 402, floor: 300 }, 8: { unit: 153, cx: 538, floor: 480 } };
+  // the couple (assets/images/nave/couple.webp): the embrace from the Freepik
+  // pack, gown ivory, boutonniere white, the rest dark. Frame units: 153 = 1 m.
+  var FIG = { unit: 153, cx: 538, floor: 480 };
   var PIECES = {
-    bVeil: { uv: [0.00293,  0.00781,  0.08789,  0.98633], bb: [298,  14,  401.57,  312.21] },
-    bArm: { uv: [0.09277,  0.00781,  0.12158,  0.30664], bb: [366,  97,  401.12,  188.07] },
-    bSkirt: { uv: [0.12646,  0.00781,  0.21143,  0.42188], bb: [298,  186,  401.57,  312.19] },
-    bTop: { uv: [0.21631,  0.00781,  0.28711,  0.6582], bb: [298,  14,  384.31,  212.21] },
-    gLegL: { uv: [0.29199,  0.00781,  0.3291,  0.54102], bb: [392,  150,  437.24,  312.5] },
-    gLegR: { uv: [0.33398,  0.00781,  0.39502,  0.54102], bb: [432,  150,  506.4,  312.5] },
-    gUpper: { uv: [0.3999,  0.00781,  0.4873,  0.56641], bb: [400,  14,  506.55,  184.24] },
-    eVeil: { uv: [0.49219,  0.00781,  0.61719,  0.96094], bb: [454,  196,  606.38,  486.48] },
-    eBody: { uv: [0.62207,  0.00781,  0.74707,  0.96094], bb: [454,  196,  606.38,  486.48] },
+    eVeil: { uv: [.00586, .00781, .25586, .96094], bb: [454, 196, 606.38, 486.48] },
+    eBody: { uv: [.26563, .00781, .51563, .96094], bb: [454, 196, 606.38, 486.48] },
   };
 
   var VS = [
@@ -77,7 +69,7 @@
   var gl, canvas, prog, progP, U = {}, UP = {}, quadBuf, moteBuf, tex = {}, ready = false;
   var W = 0, H = 0, dpr = 1, k = 1, hz = 0;
   var solids = [], lights = [], motes, moteData, NM = 70;
-  var state = { sy: 0, t: 0, camZ: 0, walk: 0, hug: 0, phase: 0, w: 0, prevE: 0, time: 0 };
+  var state = { sy: 0, t: 0, camZ: 0, hug: 0 };
   var layout = { heroH: 0, closeTop: 0, closeH: 0, vh: 0 };
   var opts = {}, reduce = false, dirty = true, rafId = 0, lastNow = 0, slowFrames = 0, host;
 
@@ -245,53 +237,14 @@
   }
 
   /* --------------------------------------------------------- the couple */
-  function rot(px, py, cx, cy, a) {
-    var c = Math.cos(a), s = Math.sin(a), dx = px - cx, dy = py - cy;
-    return [cx + dx * c - dy * s, cy + dx * s + dy * c];
+  // a still picture standing before the altar; it only fades in
+  function piece(name, a) {
+    var p = PIECES[name], b = p.bb, x0 = (b[0] - FIG.cx) / FIG.unit, x1 = (b[2] - FIG.cx) / FIG.unit;
+    var y0 = (FIG.floor - b[3]) / FIG.unit, y1 = (FIG.floor - b[1]) / FIG.unit;
+    return { O: [x0, y0, M.coupleZ], U: [x1 - x0, 0, 0], V: [0, y1 - y0, 0], uv: p.uv, a: a };
   }
-  // a body part as a world quad. pos = [x, z] in metres, bob in metres,
-  // dy = shift in frame units, ang = rotation about a frame-space pivot
-  function piece(name, pose, pos, bob, ang, pv, dy, alpha) {
-    var p = PIECES[name], b = p.bb, F = FIG[pose];
-    var bl = [b[0], b[3] + dy], br = [b[2], b[3] + dy], tl = [b[0], b[1] + dy];
-    if (ang) { bl = rot(bl[0], bl[1], pv[0], pv[1], ang); br = rot(br[0], br[1], pv[0], pv[1], ang); tl = rot(tl[0], tl[1], pv[0], pv[1], ang); }
-    function w(f) { return [pos[0] + (f[0] - F.cx) / F.unit, (F.floor - f[1]) / F.unit + bob, pos[1]]; }
-    var O = w(bl), R = w(br), T = w(tl);
-    return { O: O, U: [R[0] - O[0], R[1] - O[1], 0], V: [T[0] - O[0], T[1] - O[1], 0], uv: p.uv, a: alpha, z: pos[1] };
-  }
-  // Walking toward the camera and toward each other: weight shifts from foot
-  // to foot (sway + roll), the body rises over each step (bob), his feet
-  // alternate, her gown swings. They meet hand in hand (the original pose),
-  // then dissolve into the embrace.
-  function coupleQuads(time) {
-    var e = state.walk, hug = state.hug, w = state.w, out = [];
-    var rest = 1 - e, a5 = 1 - hug;
-    if (a5 > .001) {
-      [["b", -1, 0], ["g", 1, .42]].forEach(function (who) {
-        var s = state.phase + who[2], f = Math.sin(s * Math.PI), c = Math.cos(s * Math.PI);
-        var pos = [who[1] * M.apartX * rest + w * .028 * f, M.coupleZ + M.apartZ * rest];
-        var bob = w * .018 * (Math.abs(c) - .6), roll = w * .018 * f;
-        if (who[0] === "b") {
-          var feet = [350, 300], hang = Math.min(1, Math.max(0, (2 * M.apartX * rest - .25) / .7));
-          out.push(piece("bVeil", 5, pos, bob, roll * 1.4, feet, 0, a5));
-          out.push(piece("bArm", 5, pos, bob, roll + .42 * hang, [369, 104], 0, a5));
-          out.push(piece("bSkirt", 5, pos, bob, roll + w * .024 * f, [350, 205], 0, a5));
-          out.push(piece("bTop", 5, pos, bob, roll, feet, 0, a5));
-        } else {
-          var fw = w * f + (1 - w), lift = (1 - fw) / 2 * 9;   // the drawing has his left foot lifted
-          out.push(piece("gLegL", 5, pos, bob, roll, [450, 297], lift, a5));
-          out.push(piece("gLegR", 5, pos, bob, roll, [450, 297], -lift, a5));
-          out.push(piece("gUpper", 5, pos, bob, roll, [450, 297], 0, a5));
-        }
-      });
-      out.sort(function (p, q) { return q.z - p.z; });
-    }
-    if (hug > .001) {
-      var sway = reduce ? 0 : .007 * Math.sin(time * .0008) * hug;    // a slow, gentle sway in the embrace
-      out.push(piece("eVeil", 8, [0, M.coupleZ], 0, sway, [538, 480], 0, hug));
-      out.push(piece("eBody", 8, [0, M.coupleZ], 0, sway, [538, 480], 0, hug));
-    }
-    return out;
+  function coupleQuads() {
+    return state.hug > .001 ? [piece("eVeil", state.hug), piece("eBody", state.hug)] : [];
   }
 
   /* ------------------------------------------------------------- render */
@@ -332,7 +285,7 @@
     gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     boundTex = null;
 
-    var couple = coupleQuads(time);
+    var couple = coupleQuads();
     // planes: floor, carpet, walls, altar
     for (var i = 0; i < 2; i++) { bind(solids[i].t); setQuad(solids[i], solids[i].tint, solids[i].fog, solids[i].cut); }
     // the couple's reflection in the polished floor
@@ -444,25 +397,14 @@
     if (Math.abs(y - state.sy) < .05) state.sy = y;
     var sy = reduce ? (opts.stillY != null ? opts.stillY : y) : state.sy;
     var vh = layout.vh, start = layout.heroH * .5;
-    var walkLen = (layout.closeH - vh) * .5;
-    var end = layout.closeTop + walkLen;
+    var end = layout.closeTop;                       // the camera arrives as the closing begins
     var t = Math.min(1, Math.max(0, (sy - start) / Math.max(1, end - start)));
     var endZ = M.coupleZ - M.endDist;
     state.t = t;
     state.camZ = reduce ? endZ * .62 : endZ * (.78 * t + .22 * smooth(t));
-    var wp = reduce ? 1 : Math.min(1, Math.max(0, (sy - layout.closeTop + vh * .1) / Math.max(1, walkLen + vh * .1)));
-    var e = .85 * wp + .15 * smooth(wp);            // near-constant walking pace
-    var d = Math.abs(e - state.prevE) * Math.sqrt(M.apartX * M.apartX + M.apartZ * M.apartZ);
-    state.prevE = e;
-    state.phase += d / .62;                         // one step every ~0.62 m
-    var speed = dt > 0 ? d / dt : 0;
-    var target = e >= 1 ? 0 : Math.min(1, speed / .3);
-    state.w += (target - state.w) * (1 - Math.exp(-dt / .16));
-    if (state.w < .002) state.w = 0;
-    state.walk = e;
-    // after they meet: dissolve into the embrace over the next stretch of scroll
-    var hugLen = (layout.closeH - vh) * .13;
-    state.hug = reduce ? 1 : smooth(Math.min(1, Math.max(0, (sy - end) / Math.max(1, hugLen))));
+    // the couple appear once, as a transition, early in the closing section
+    var hugFrom = layout.closeTop + (layout.closeH - vh) * .06, hugLen = (layout.closeH - vh) * .16;
+    state.hug = reduce ? 1 : smooth(Math.min(1, Math.max(0, (sy - hugFrom) / Math.max(1, hugLen))));
     // fade the church in as the opening film scrolls away
     var op = reduce ? 1 : Math.min(1, Math.max(0, y / (layout.heroH * .7)));
     if (op !== state.op) { state.op = op; host.style.opacity = op.toFixed(3); }
