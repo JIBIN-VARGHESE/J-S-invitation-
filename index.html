@@ -20,7 +20,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#0E0A07">
   <!-- the design is already dark: stops phone browsers (Samsung Internet, Chrome) from "auto-darkening" it -->
-  <meta name="color-scheme" content="dark">
+  <meta name="color-scheme" content="dark only">
   <meta name="supported-color-schemes" content="dark">
 
   <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
@@ -278,11 +278,11 @@
       <p class="finale__date" data-bind="weddingDateDots">25.04.2027</p>
       <p class="finale__quote" data-bind="closing.signoff"></p>
       <p class="finale__ref" data-bind="closing.signoffRef"></p>
-      <div class="finale__candle" aria-hidden="true"><i></i></div>
+      <canvas class="finale__candle" aria-hidden="true"></canvas>
     </div>
   </section>
 </main>
-<div class="flash" aria-hidden="true"></div>
+<canvas class="flash" aria-hidden="true"></canvas>
 <div class="scroller" aria-hidden="true"></div>
 <button class="next-hint" type="button" aria-label="Continue"><i aria-hidden="true"></i><span>Swipe up</span></button>
 

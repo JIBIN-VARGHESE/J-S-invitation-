@@ -60,6 +60,8 @@
   ];
 
   var doc = document, root = doc.documentElement;
+  var lastScroll = 0;
+  window.addEventListener("scroll", function () { lastScroll = performance.now(); }, { passive: true });
   var el = {}, cards = [], camAt, chapterPx = 1, sm = 0, vel = 0, last = 0, frozen = null, dust = null, opts = {}, chapter = 0, started = false;
 
   /* ---------------------------------------------------------- helpers */
@@ -185,17 +187,24 @@
     last = now;
     // the chapter you have swiped to; the timeline plays toward its stop on
     // its own, easing out of rest and settling gently at the stop
-    chapter = frozen != null ? frozen : chapterFromScroll();
-    var target = STOPS[chapter], gap = target - sm, dist = Math.abs(gap);
-    // a jump across several chapters (e.g. tapping back to the top) moves faster
-    var hurry = Math.abs(STOPS.indexOf(target) - stopIndexNear(sm)) > 1 ? 3 : 1;
+    // while the finger is still moving the scene follows it (between stops);
+    // once the page settles on a chapter it plays on to that chapter's stop
+    var raw = frozen != null ? frozen : clamp(window.scrollY / chapterPx, 0, STOPS.length - 1);
+    chapter = clamp(Math.round(raw), 0, STOPS.length - 1);
+    var i0 = Math.floor(raw), fr = raw - i0;
+    var target = i0 >= STOPS.length - 1 ? STOPS[STOPS.length - 1] : lerp(STOPS[i0], STOPS[i0 + 1], fr);
+    var gap = target - sm, dist = Math.abs(gap);
+    var hurry = 1;
+    if (gap < 0) hurry = 4.5;                                    // going back: quick, never a slow replay
+    else if (now - lastScroll < 220) hurry = 1.8;                // following an active swipe
+    if (Math.abs(stopIndexNear(target) - stopIndexNear(sm)) > 1) hurry = Math.max(hurry, 3);   // long jumps
     var want = dist < 1e-4 ? 0 : rate(sm) * hurry * Math.min(1, .12 + dist / .45);
     vel += (want - vel) * (1 - Math.exp(-dt / .28));
     var step = Math.min(dist, vel * dt);
     sm += gap > 0 ? step : -step;
     if (dist - step < 1e-4) { sm = target; vel = 0; }
     var s = sm;
-    var resting = sm === target;
+    var resting = sm === target && STOPS.indexOf(target) >= 0;
 
     /* arrival */
     var heroOut = ss(.3, 1.05, s);
@@ -257,6 +266,7 @@
     setStyle(el.presence, "pr", "opacity", pr.toFixed(3));
     setStyle(el.presence, "pr", "visibility", pr > 0 ? "visible" : "hidden");
     var fl = ss(16.15, 16.75, s) * (1 - ss(16.8, 17.5, s));
+    if (fl > 0 && !el.flashDrawn) paintFlash();
     setStyle(el.flash, "fl", "opacity", fl.toFixed(3));
 
     /* 6 · together */
@@ -270,10 +280,21 @@
       setStyle(el.fin.date, "fd", "opacity", ss(18.05, 18.4, s).toFixed(3));
       setStyle(el.fin.quote, "fq", "opacity", ss(18.45, 18.9, s).toFixed(3));
       setStyle(el.fin.ref, "fr", "opacity", ss(18.7, 19.0, s).toFixed(3));
-      setStyle(el.fin.candle, "fc", "opacity", ss(19.05, 19.5, s).toFixed(3));
-      if (dust) dust.draw(now, ss(16.8, 17.6, s));
+      if (dust) dust.draw(now, ss(16.8, 17.6, s), ss(19.05, 19.5, s));
     }
   }
+
+  // the flood of light at the altar: a warm white radial glow, painted once
+  function paintFlash() {
+    var c = el.flash; if (!c || !c.getContext) return;
+    c.width = Math.max(1, Math.round(c.clientWidth / 2)); c.height = Math.max(1, Math.round(c.clientHeight / 2));
+    var g = c.getContext("2d"), w = c.width, h = c.height;
+    var rg = g.createRadialGradient(w / 2, h * .3, 0, w / 2, h * .3, Math.max(w, h) * .9);
+    rg.addColorStop(0, "#FFFDF7"); rg.addColorStop(.45, "#FFF2D8"); rg.addColorStop(1, "#F0CE98");
+    g.fillStyle = rg; g.fillRect(0, 0, w, h);
+    el.flashDrawn = true;
+  }
+  window.addEventListener("resize", function () { el.flashDrawn = false; }, { passive: true });
 
   // a page element hanging in the church at (x, y, z): it is drawn at its
   // CSS size when it is `at` metres away and grows/shrinks with distance
@@ -324,13 +345,43 @@
     var sg = sprite.getContext("2d"), rg = sg.createRadialGradient(16, 16, 0, 16, 16, 16);
     rg.addColorStop(0, "rgba(255,236,190,1)"); rg.addColorStop(.35, "rgba(255,206,130,.55)"); rg.addColorStop(1, "rgba(255,190,110,0)");
     sg.fillStyle = rg; sg.fillRect(0, 0, 32, 32);
-    var lastT = 0;
+    var lastT = 0, cc = doc.querySelector(".finale__candle"), cg = cc && cc.getContext ? cc.getContext("2d") : null;
+    // the last candle: a slim taper with a living flame, drawn on its own
+    // canvas above the text shading (page styles would be repainted by dark modes)
+    function drawCandle(now, a) {
+      if (!cg) return;
+      var d = Math.min(2, window.devicePixelRatio || 1), w = 60, h = 64;
+      if (cc.width !== w * d) { cc.width = w * d; cc.height = h * d; }
+      cg.setTransform(d, 0, 0, d, 0, 0);
+      cg.clearRect(0, 0, w, h);
+      var x = w / 2, base = h - 2;
+      var t = now / 1000, fl = 1 + .06 * Math.sin(t * 7.3) + .04 * Math.sin(t * 13.1) + .03 * Math.sin(t * 23.7);
+      var sway = 1.2 * Math.sin(t * 2.1) + .6 * Math.sin(t * 5.3);
+      cg.globalAlpha = a;
+      var halo = cg.createRadialGradient(x, base - 28, 0, x, base - 28, 30 * fl);
+      halo.addColorStop(0, "rgba(255,205,130,.55)"); halo.addColorStop(1, "rgba(255,170,80,0)");
+      cg.fillStyle = halo; cg.fillRect(0, 0, w, h);
+      var wax = cg.createLinearGradient(x - 3, 0, x + 3, 0);
+      wax.addColorStop(0, "#C9B28C"); wax.addColorStop(.45, "#FFF4DE"); wax.addColorStop(1, "#B39C77");
+      cg.fillStyle = wax; cg.fillRect(x - 3, base - 20, 6, 20);
+      cg.fillStyle = "#2a1d10"; cg.fillRect(x - .5, base - 23, 1, 3);
+      var fx = x + sway * .4, fy = base - 23, hg = 17 * fl;
+      cg.beginPath();
+      cg.moveTo(fx + sway * .6, fy - hg);
+      cg.bezierCurveTo(fx + 4.6, fy - hg * .55, fx + 4.4, fy - 1, fx, fy + 1.2);
+      cg.bezierCurveTo(fx - 4.4, fy - 1, fx - 4.6, fy - hg * .55, fx + sway * .6, fy - hg);
+      var fg = cg.createRadialGradient(fx, fy - 4, 0, fx, fy - 6, hg);
+      fg.addColorStop(0, "rgba(255,255,245,1)"); fg.addColorStop(.35, "rgba(255,225,150,1)"); fg.addColorStop(.8, "rgba(255,160,70,.7)"); fg.addColorStop(1, "rgba(255,120,40,0)");
+      cg.fillStyle = fg; cg.fill();
+      cg.globalAlpha = 1;
+    }
     return {
-      draw: function (now, a) {
+      draw: function (now, a, candle) {
         if (!W) size();
         if (now - lastT < 33) return;                 // 30 fps is plenty for drifting dust
         var dt = lastT ? Math.min(.1, (now - lastT) / 1000) : .03; lastT = now;
         g.clearRect(0, 0, W, H);
+        if (candle > 0) drawCandle(now, candle);
         if (a <= 0) return;
         g.globalCompositeOperation = "lighter";
         parts.forEach(function (q) {

@@ -22,7 +22,7 @@
 
 /* --------------------------------------------------------------- Tokens */
 :root {
-  color-scheme: dark;   /* the page is designed dark: browsers must not auto-darken or re-colour it */
+  color-scheme: dark only;   /* the page is designed dark: browsers must not auto-darken or re-colour it */
   /* Palette */
   --sanctuary:   #0E0A07;   /* candle-lit dark */
   --sanctuary-2: #17100B;
@@ -362,7 +362,7 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 .presence__line { max-width: 21rem; font-style: italic; font-size: clamp(1.8rem, 7.4vw, 2.6rem); line-height: 1.25; color: #FFF8EA; text-shadow: 0 1px 2px rgba(60, 30, 0, .7), 0 0 26px rgba(70, 40, 10, .6); }
 
 /* ------------------------------------------------------------ the finale */
-.flash { position: fixed; inset: 0; z-index: 4; pointer-events: none; opacity: 0; background: radial-gradient(circle at 50% 30%, #FFFDF7 0%, #FFF2D8 45%, #F0CE98 100%); }
+.flash { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 4; pointer-events: none; opacity: 0; }
 .scene--finale { min-height: 100svh; overflow: hidden; background: #0a0705; color: #FFF8EA; }
 .finale__photo { position: absolute; inset: 0; overflow: hidden; }
 .finale__photo img { width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: 57% 42%; transform-origin: 57% 47%; }
@@ -386,14 +386,8 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 .finale__date { font-family: var(--display); font-size: 1rem; letter-spacing: .4em; margin-right: -.4em; color: var(--gold); }
 .finale__quote { margin-top: .4rem; max-width: 22rem; font-style: italic; font-size: 1.25rem; line-height: 1.35; color: var(--cream); }
 .finale__ref { margin-top: -.3rem; font-family: var(--sans); font-weight: 500; font-size: .62rem; letter-spacing: var(--track); text-transform: uppercase; color: var(--gold); }
-/* the last candle */
-.finale__candle { position: relative; width: 10px; height: 34px; margin-top: .6rem; }
-.finale__candle::before { content: ""; position: absolute; left: 3px; bottom: 0; width: 4px; height: 14px; background: linear-gradient(#F3E6CF, #B9A27E); border-radius: 1px; }
-.finale__candle i { position: absolute; left: 0; bottom: 13px; width: 10px; height: 20px; border-radius: 50% 50% 45% 45% / 65% 65% 35% 35%;
-  background: radial-gradient(ellipse at 50% 75%, #FFFDF2 0 22%, #FFD27A 45%, rgba(255, 140, 40, .55) 70%, rgba(255, 120, 40, 0) 100%);
-  box-shadow: 0 0 18px 6px rgba(255, 190, 100, .45), 0 0 50px 18px rgba(255, 170, 80, .18);
-  transform-origin: 50% 90%; animation: flame 2.2s ease-in-out infinite alternate; }
-@keyframes flame { 0% { transform: scale(1, 1) rotate(-1.5deg); } 35% { transform: scale(.94, 1.06) rotate(1deg); } 70% { transform: scale(1.04, .96) rotate(-.5deg); } 100% { transform: scale(.97, 1.04) rotate(1.5deg); } }
+/* the last candle: a placeholder; the flame is drawn on the dust canvas */
+.finale__candle { display: block; width: 60px; height: 64px; margin-top: -.2rem; }
 
 /* ================================================== JOURNEY MODE (JS on)
    Everything is fixed; journey.js places and fades each scene. */
@@ -459,9 +453,25 @@ html:not(.journey) .nave { opacity: 1; }
    this page handles dark mode itself, so they leave the candlelit gold alone. */
 @media (prefers-color-scheme: dark) {
   :root { color-scheme: dark; }
-  .card { background: linear-gradient(180deg, rgba(224, 198, 154, .95) 0%, rgba(200, 168, 120, .95) 55%, rgba(178, 142, 94, .95) 100%); color: #1F150A; }
 }
 @media (prefers-color-scheme: light) {
   :root { color-scheme: dark; }
 }
 .journey .scroll-cue { display: none; }
+
+/* ============================================ Samsung Internet dark mode
+   Its forced dark mode can't be switched off by a website: it darkens light
+   backgrounds and lightens dark text, which turned the gold cards brown.
+   It leaves deep colours and light text alone, so on that browser in dark
+   mode the cards use a richer candlelit gold with cream lettering. */
+.safe-gold .card {
+  --fg: #FFF4DE; --fg-soft: #F2DEBC; --accent: #FFDFA0; --line: rgba(255, 223, 160, .38);
+  background: linear-gradient(180deg, #A97F42 0%, #946B33 55%, #7C5826 100%);
+  border-color: rgba(255, 214, 150, .75);
+  text-shadow: 0 1px 2px rgba(40, 22, 4, .55);
+}
+.safe-gold .card::before { border-color: rgba(255, 223, 160, .3); }
+.safe-gold .card__title em, .safe-gold .invite__names em { color: #FFDFA0; }
+.safe-gold .card .btn { border-color: rgba(255, 223, 160, .7); color: #FFF4DE; }
+.safe-gold .card .btn--solid, .safe-gold .card .choice input:checked + label { background: #3A260C; border-color: #3A260C; color: #FFF4DE; }
+.safe-gold .card .field input, .safe-gold .card .field textarea { color: #FFF4DE; }
