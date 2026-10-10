@@ -399,7 +399,9 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 .next-hint { position: fixed; z-index: 5; left: 50%; bottom: max(.9rem, env(safe-area-inset-bottom)); transform: translateX(-50%); display: none; flex-direction: column; align-items: center; gap: .4rem; margin: 0; padding: .7rem 1.4rem; border: 0; background: none; pointer-events: none; cursor: pointer;
   font-family: var(--sans); font-weight: 500; font-size: .56rem; letter-spacing: .3em; text-transform: uppercase; color: rgba(243, 232, 213, .85); text-shadow: 0 1px 8px rgba(0, 0, 0, .8); opacity: 0; transition: opacity .8s var(--ease); }
 .journey .next-hint { display: flex; }
-.next-hint.is-on { opacity: 1; pointer-events: auto; transition-delay: .7s; }
+.next-hint.is-on { opacity: 1; pointer-events: auto; transition-delay: .5s; }
+.next-hint.is-on span { animation: beckon 2.4s ease-in-out 1s infinite; }
+@keyframes beckon { 0%, 100% { box-shadow: 0 0 0 0 rgba(240, 184, 102, 0); border-color: rgba(217, 174, 98, .45); } 50% { box-shadow: 0 0 18px 2px rgba(240, 184, 102, .45); border-color: rgba(240, 200, 130, .9); } }
 .next-hint span { white-space: nowrap; padding: .45rem .9rem; border: 1px solid rgba(217, 174, 98, .45); border-radius: 999px; background: rgba(14, 10, 7, .45); }
 .next-hint i { width: 10px; height: 10px; border-left: 1px solid currentColor; border-top: 1px solid currentColor; transform: rotate(45deg); animation: nudge 2.2s var(--ease) infinite; }
 @keyframes nudge { 0%, 100% { transform: translateY(3px) rotate(45deg); opacity: .5; } 50% { transform: translateY(-3px) rotate(45deg); opacity: 1; } }
@@ -450,6 +452,23 @@ html:not(.journey) .nave { opacity: 1; }
 
 .journey .scroll-cue { display: none; }
 
+
+/* ============================================ Samsung Internet
+   Its dark mode darkens light backgrounds and lightens dark text, can't be
+   switched off by a site, and often doesn't report itself. On that browser
+   the cards use a deeper candlelit gold with cream lettering, which it
+   leaves alone, so they look the same with its dark mode on or off. */
+.safe-gold .card {
+  --fg: #FFF4DE; --fg-soft: #F2DEBC; --accent: #FFDFA0; --line: rgba(255, 223, 160, .38);
+  background: linear-gradient(180deg, #A97F42 0%, #946B33 55%, #7C5826 100%);
+  border-color: rgba(255, 214, 150, .75);
+  text-shadow: 0 1px 2px rgba(40, 22, 4, .55);
+}
+.safe-gold .card::before { border-color: rgba(255, 223, 160, .3); }
+.safe-gold .card__title em, .safe-gold .invite__names em { color: #FFDFA0; }
+.safe-gold .card .btn { border-color: rgba(255, 223, 160, .7); color: #FFF4DE; }
+.safe-gold .card .btn--solid, .safe-gold .card .choice input:checked + label { background: #3A260C; border-color: #3A260C; color: #FFF4DE; }
+.safe-gold .card .field input, .safe-gold .card .field textarea, .safe-gold .card .stepper button { color: #FFF4DE; }
 
 /* =============================================== Cards in dark mode
    Light mode: candlelit gold (above). Dark mode gets its own design,

@@ -24,12 +24,13 @@
 
   var TOTAL = 20.5;          // length of the timeline (in "screens" of the original scroll story)
   // the chapters: where the timeline rests after each swipe
-  var STOPS = [0, 4.75, 6.9, 8.22, 9.82, 11.42, 12.98, 14.85, 20.4];
+  var STOPS = [0, 4.75, 8.22, 9.82, 11.42, 12.98, 14.85, 20.4];   // (the verse plays on the way from the invitation to the engagement)
   // how fast the timeline plays (units per second) in each stretch
   function rate(x) {
     if (x < 1.1) return .38;            // the statue fades
-    if (x > 2.85 && x < 3.35) return .1;   // Save the Date rests in the centre for a few seconds
+    if (x > 2.9 && x < 3.3) return .11;    // Save the Date rests in the centre (~3.5 s)
     if (x < 3.9) return .42;            // the church wakes, Save the Date
+    if (x > 5.6 && x < 7.55) return .32;  // the verse: the walk slows while its words light up
     if (x < 15.6) return .46;           // walking between the cards (an unhurried glide)
     if (x < 16.9) return .36;           // the light
     return .42;                         // the finale reveals
@@ -61,7 +62,7 @@
   ];
 
   var doc = document, root = doc.documentElement;
-  var lastScroll = 0;
+  var lastScroll = 0, settled = 0, intro = false, introGo = false;
   window.addEventListener("scroll", function () { lastScroll = performance.now(); }, { passive: true });
   var el = {}, cards = [], camAt, chapterPx = 1, sm = 0, vel = 0, last = 0, frozen = null, dust = null, opts = {}, chapter = 0, started = false;
 
@@ -108,7 +109,7 @@
     el.scroller.textContent = "";
     STOPS.forEach(function () { var d = doc.createElement("div"); d.className = "snap"; el.scroller.appendChild(d); });
     el.hint = doc.querySelector(".next-hint");
-    if (el.hint) el.hint.addEventListener("click", function () { goTo(Math.min(STOPS.length - 1, chapter + 1)); });
+    if (el.hint) el.hint.addEventListener("click", function () { if (!intro) goTo(Math.min(STOPS.length - 1, settled + 1)); });
     // after a reply is sent, the ending begins on its own
     doc.addEventListener("rsvp:sent", function () {
       setTimeout(function () { if (doc.activeElement && doc.activeElement.blur) doc.activeElement.blur(); frozen = null; goTo(STOPS.length - 1); }, 3200);
@@ -163,12 +164,16 @@
     if (!location.hash) window.scrollTo(0, 0);
     chapter = chapterFromScroll();
     sm = STOPS[chapter];
-    // the journey begins on its own after a moment on the statue
+    settled = chapter;
+    // the opening (statue → church → Save the Date → invitation) plays on its
+    // own; scrolling during it is ignored. A scroll on the statue starts it early.
+    intro = chapter === 0;
     var t0 = Date.now();
     (function autostart() {
-      if (window.scrollY > 4 || chapter > 0) return;
-      if (!root.classList.contains("is-ready") || Date.now() - t0 < AUTO_START) return setTimeout(autostart, 250);
-      goTo(1);
+      if (!intro) return;
+      var go = window.scrollY > 4 || (root.classList.contains("is-ready") && Date.now() - t0 >= AUTO_START);
+      if (!go) return setTimeout(autostart, 200);
+      introGo = true;
     })();
     requestAnimationFrame(frame);
   }
@@ -187,25 +192,31 @@
     var dt = last ? Math.min(.05, (now - last) / 1000) : .016;
     last = now;
     // the chapter you have swiped to; the timeline plays toward its stop on
-    // its own, easing out of rest and settling gently at the stop
-    // while the finger is still moving the scene follows it (between stops);
-    // once the page settles on a chapter it plays on to that chapter's stop
-    var raw = frozen != null ? frozen : clamp(window.scrollY / chapterPx, 0, STOPS.length - 1);
-    chapter = clamp(Math.round(raw), 0, STOPS.length - 1);
-    var i0 = Math.floor(raw), fr = raw - i0;
-    var target = i0 >= STOPS.length - 1 ? STOPS[STOPS.length - 1] : lerp(STOPS[i0], STOPS[i0 + 1], fr);
+    // its own, easing out of rest and settling gently at the stop. However
+    // far a swipe flings the page, the journey moves one chapter at a time.
+    var target;
+    if (intro) {
+      chapter = introGo ? 1 : 0;
+      target = STOPS[chapter];
+    } else {
+      var want = frozen != null ? frozen : chapterFromScroll();
+      chapter = clamp(want, settled - 1, settled + 1);
+      if (frozen == null && want !== chapter && now - lastScroll > 140) goTo(chapter);   // drop the extra fling
+      target = STOPS[chapter];
+    }
     var gap = target - sm, dist = Math.abs(gap);
-    var hurry = 1;
-    if (gap < 0) hurry = 4.5;                                    // going back: quick, never a slow replay
-    else if (now - lastScroll < 220) hurry = 1.8;                // following an active swipe
-    if (Math.abs(stopIndexNear(target) - stopIndexNear(sm)) > 1) hurry = Math.max(hurry, 3);   // long jumps
-    var want = dist < 1e-4 ? 0 : rate(sm) * hurry * Math.min(1, .12 + dist / .45);
-    vel += (want - vel) * (1 - Math.exp(-dt / .28));
+    var hurry = gap < 0 ? 2.2 : 1;                                // going back is a little quicker
+    var speed = dist < 1e-4 ? 0 : rate(sm) * hurry * Math.min(1, .12 + dist / .45);
+    vel += (speed - vel) * (1 - Math.exp(-dt / .28));
     var step = Math.min(dist, vel * dt);
     sm += gap > 0 ? step : -step;
     if (dist - step < 1e-4) { sm = target; vel = 0; }
     var s = sm;
-    var resting = sm === target && STOPS.indexOf(target) >= 0;
+    var resting = sm === target;
+    if (resting) {
+      settled = chapter;
+      if (intro && chapter === 1) { intro = false; goTo(1); }   // the opening is over: hand over to the guest
+    }
 
     /* arrival */
     var heroOut = ss(.3, 1.05, s);
@@ -222,7 +233,7 @@
 
     // a quiet "swipe up" cue whenever the journey rests and there is more
     if (el.hint) {
-      var showHint = resting && chapter < STOPS.length - 1 && frozen == null;
+      var showHint = resting && !intro && chapter > 0 && chapter < STOPS.length - 1 && frozen == null;
       el.hint.classList.toggle("is-on", showHint);
     }
 
