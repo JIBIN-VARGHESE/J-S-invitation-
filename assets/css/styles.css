@@ -402,17 +402,25 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 .journey .scroller { display: block; }
 .journey .snap { height: 100vh; height: 100lvh; scroll-snap-align: start; scroll-snap-stop: always; }
 /* "swipe up" cue while the journey rests on a chapter */
-.next-hint { position: fixed; z-index: 5; left: 50%; bottom: max(1.1rem, env(safe-area-inset-bottom)); transform: translateX(-50%); display: none; flex-direction: column; align-items: center; gap: .35rem; margin: 0; pointer-events: none;
+.next-hint { position: fixed; z-index: 5; left: 50%; bottom: max(.9rem, env(safe-area-inset-bottom)); transform: translateX(-50%); display: none; flex-direction: column; align-items: center; gap: .4rem; margin: 0; padding: .7rem 1.4rem; border: 0; background: none; pointer-events: none; cursor: pointer;
   font-family: var(--sans); font-weight: 500; font-size: .56rem; letter-spacing: .3em; text-transform: uppercase; color: rgba(243, 232, 213, .85); text-shadow: 0 1px 8px rgba(0, 0, 0, .8); opacity: 0; transition: opacity .8s var(--ease); }
 .journey .next-hint { display: flex; }
-.next-hint.is-on { opacity: 1; transition-delay: 1.4s; }
+.next-hint.is-on { opacity: 1; pointer-events: auto; transition-delay: .7s; }
+.next-hint span { white-space: nowrap; padding: .45rem .9rem; border: 1px solid rgba(217, 174, 98, .45); border-radius: 999px; background: rgba(14, 10, 7, .45); }
 .next-hint i { width: 10px; height: 10px; border-left: 1px solid currentColor; border-top: 1px solid currentColor; transform: rotate(45deg); animation: nudge 2.2s var(--ease) infinite; }
 @keyframes nudge { 0%, 100% { transform: translateY(3px) rotate(45deg); opacity: .5; } 50% { transform: translateY(-3px) rotate(45deg); opacity: 1; } }
 .journey .hero { position: fixed; inset: 0; height: 100%; min-height: 0; z-index: 3; }
 .journey .hero__film, .journey .hero__content { will-change: transform, opacity; }
 .journey .scenes { position: fixed; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
 .journey .scene { position: absolute; left: 0; top: 0; visibility: hidden; opacity: 0; will-change: transform, opacity; }
-.journey .card { max-height: calc(100svh - 2rem); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.journey .card { overflow: visible; }
+/* words reveal one after another once a card has settled in front of you */
+.journey .card > * { opacity: 0; transform: translate3d(0, 10px, 0); transition: opacity .9s var(--ease), transform 1s var(--ease-out); }
+.journey .card.is-held > * { opacity: 1; transform: none; }
+.journey .card.is-held > :nth-child(2) { transition-delay: .18s; } .journey .card.is-held > :nth-child(3) { transition-delay: .36s; }
+.journey .card.is-held > :nth-child(4) { transition-delay: .54s; } .journey .card.is-held > :nth-child(5) { transition-delay: .72s; }
+.journey .card.is-held > :nth-child(6) { transition-delay: .9s; } .journey .card.is-held > :nth-child(7) { transition-delay: 1.05s; }
+.journey .card.is-held > :nth-child(n+8) { transition-delay: 1.2s; }
 .journey .scene--wake, .journey .scene--verse, .journey .scene--line { right: 0; bottom: 0; display: grid; place-items: center; padding: 0 var(--gutter); text-align: center; will-change: opacity; }
 .journey .scene--finale { right: 0; bottom: 0; opacity: 1; z-index: 3; pointer-events: auto; }
 .journey .nave { opacity: 1; }
@@ -456,3 +464,4 @@ html:not(.journey) .nave { opacity: 1; }
 @media (prefers-color-scheme: light) {
   :root { color-scheme: dark; }
 }
+.journey .scroll-cue { display: none; }

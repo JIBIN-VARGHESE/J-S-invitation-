@@ -43,7 +43,9 @@ The page is one continuous scene, run by `assets/js/journey.js`. Scrolling doesn
 5. **The light:** at the altar the rose window swells until light fills the screen ("Your presence would make our celebration complete").
 6. **Together:** out of the light, the couple photo. It drifts slowly closer, gold dust floats, the names write themselves, the verse and one candle appear.
 
-**Changing the pacing.** At the top of `journey.js`:
+**Chapters.** Scrolling is cut into short chapters (one swipe each, or tap "Swipe up"). On arriving at a chapter the timeline plays on its own to that chapter's stop: the camera glides, the card settles, then its words reveal one by one. The opening plays by itself after a moment on the statue; after a reply is sent, the ending starts by itself.
+
+**Changing the pacing.** At the top of `journey.js`: `STOPS` (where each chapter rests), `rate()` (how fast each stretch plays), `AUTO_START` (time on the statue);
 - `TOTAL` is the length in screens of scrolling;
 - `STATIONS` says where each card stands (`z` along the aisle, `x` left/right) and when it arrives (`a`), holds until (`b`) and is passed (`s1`);
 - `CAM` lists the camera's position along the aisle at given scroll points.

@@ -27,13 +27,13 @@
   var STOPS = [0, 4.75, 6.9, 8.22, 9.82, 11.42, 12.98, 14.85, 20.4];
   // how fast the timeline plays (units per second) in each stretch
   function rate(x) {
-    if (x < 1.1) return .55;            // the statue fades
-    if (x < 3.9) return .75;            // the church wakes, Save the Date
-    if (x < 15.6) return 1.25;          // walking between the cards
-    if (x < 16.9) return .6;            // the light
-    return .78;                         // the finale reveals
+    if (x < 1.1) return .38;            // the statue fades
+    if (x < 3.9) return .42;            // the church wakes, Save the Date
+    if (x < 15.6) return .72;           // walking between the cards
+    if (x < 16.9) return .36;           // the light
+    return .42;                         // the finale reveals
   }
-  var AUTO_START = 2600;     // ms on the statue before the journey begins by itself
+  var AUTO_START = 1600;     // ms on the statue before the journey begins by itself
   var HOLD = 2.35;           // metres between camera and a card while you read it
   var CARD_Y = 1.5;          // card height above the floor (metres)
 
@@ -94,6 +94,7 @@
   function measure() {
     chapterPx = Math.max(1, el.scroller.offsetHeight / STOPS.length);
   }
+  function stopIndexNear(x) { var k = 0; for (var i = 0; i < STOPS.length; i++) if (STOPS[i] <= x + 1e-6) k = i; return k; }
   function chapterFromScroll() { return clamp(Math.round(window.scrollY / chapterPx), 0, STOPS.length - 1); }
   function goTo(i) { window.scrollTo(0, Math.round(i * chapterPx)); }
 
@@ -104,6 +105,11 @@
     el.scroller.textContent = "";
     STOPS.forEach(function () { var d = doc.createElement("div"); d.className = "snap"; el.scroller.appendChild(d); });
     el.hint = doc.querySelector(".next-hint");
+    if (el.hint) el.hint.addEventListener("click", function () { goTo(Math.min(STOPS.length - 1, chapter + 1)); });
+    // after a reply is sent, the ending begins on its own
+    doc.addEventListener("rsvp:sent", function () {
+      setTimeout(function () { if (doc.activeElement && doc.activeElement.blur) doc.activeElement.blur(); frozen = null; goTo(STOPS.length - 1); }, 3200);
+    });
     el.hero = doc.querySelector(".hero");
     el.heroImg = doc.querySelector(".hero__film");
     el.heroText = doc.querySelector(".hero__content");
@@ -151,6 +157,7 @@
     }
 
     dust = makeDust(doc.querySelector(".finale__dust"));
+    if (!location.hash) window.scrollTo(0, 0);
     chapter = chapterFromScroll();
     sm = STOPS[chapter];
     // the journey begins on its own after a moment on the statue
@@ -180,7 +187,9 @@
     // its own, easing out of rest and settling gently at the stop
     chapter = frozen != null ? frozen : chapterFromScroll();
     var target = STOPS[chapter], gap = target - sm, dist = Math.abs(gap);
-    var want = dist < 1e-4 ? 0 : rate(sm) * Math.min(1, .12 + dist / .45);
+    // a jump across several chapters (e.g. tapping back to the top) moves faster
+    var hurry = Math.abs(STOPS.indexOf(target) - stopIndexNear(sm)) > 1 ? 3 : 1;
+    var want = dist < 1e-4 ? 0 : rate(sm) * hurry * Math.min(1, .12 + dist / .45);
     vel += (want - vel) * (1 - Math.exp(-dt / .28));
     var step = Math.min(dist, vel * dt);
     sm += gap > 0 ? step : -step;
@@ -203,7 +212,7 @@
 
     // a quiet "swipe up" cue whenever the journey rests and there is more
     if (el.hint) {
-      var showHint = resting && chapter > 0 && chapter < STOPS.length - 1 && frozen == null;
+      var showHint = resting && chapter < STOPS.length - 1 && frozen == null;
       el.hint.classList.toggle("is-on", showHint);
     }
 
@@ -282,17 +291,25 @@
     if (!on) { setStyle(node, key, "visibility", "hidden"); setStyle(node, key, "opacity", "0"); return; }
     var p = window.Nave.project(st.x, CARD_Y, st.z), vw = root.clientWidth, vh = window.innerHeight;
     var h = c.h;
+    // a card never needs scrolling inside: if it is taller than the screen
+    // (small phones), it is shown slightly smaller, leaving room for "Continue"
+    if (!c.ht || c.vh !== vh) { c.ht = node.offsetHeight; c.vh = vh; }
+    var fit = Math.min(1, (vh - 110) / Math.max(1, c.ht));
     var x, y, sc, o;
     if (p) {
-      x = lerp(p.x, vw / 2, h); y = lerp(p.y, vh / 2, h); sc = lerp(HOLD / p.dz, 1, h);
+      x = lerp(p.x, vw / 2, h); y = lerp(p.y, vh / 2 - 24, h); sc = lerp(HOLD / p.dz * fit, fit, h);
       // appears in the distance just before its approach, gone before it grows past you
       o = ss(11, 7.5, p.dz) * ss(st.s0 - .6, st.s0 + .05, s) * (st.stay ? 1 : ss(1.5, 2.2, p.dz));
     } else { x = vw / 2; y = vh / 2; sc = 1; o = 0; }
     var away = st.stay ? 1 - ss(st.b + .02, st.b + .3, s) : 1;   // the reply card dissolves into the light
-    o = Math.max(o, h) * away;
+    // the card comes into view as the camera turns to it (not hanging empty in the distance)
+    o = Math.max(o * ss(.12, .6, h), h) * away;
     setStyle(node, key, "visibility", o > .002 ? "visible" : "hidden");
     setStyle(node, key, "opacity", o.toFixed(3));
     setStyle(node, key, "transform", "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0) translate(-50%,-50%) scale(" + Math.min(sc, 1.3).toFixed(4) + ")");
+    // the words inside reveal one after another once the card has settled
+    var held = h > .97;
+    if (held !== c.held) { c.held = held; node.classList.toggle("is-held", held); }
     var pe = h > .6 ? "auto" : "none";
     if (pe !== c.pe) { c.pe = pe; node.style.pointerEvents = pe; }
   }
@@ -327,7 +344,8 @@
       resize: size,
     };
   }
-  window.addEventListener("resize", function () { if (dust) dust.resize(); }, { passive: true });
+  window.addEventListener("resize", function () { if (dust) dust.resize(); cards.forEach(function (c) { c.ht = 0; }); }, { passive: true });
+  document.addEventListener("rsvp:sent", function () { cards.forEach(function (c) { c.ht = 0; }); });
 
   window.Journey = { init: init, TOTAL: TOTAL, STATIONS: STATIONS, STOPS: STOPS, go: goTo, state: function () { return { s: sm, chapter: chapter }; } };
 })();
