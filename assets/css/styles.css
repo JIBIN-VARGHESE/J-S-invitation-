@@ -289,33 +289,28 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 .scene { position: relative; }
 
 /* ------------------------------------------------------- the cards
-   One design in every browser and colour scheme: midnight bronze with
-   gold-leaf edges, gold headings and cream lettering. Phone dark modes
-   (Samsung Internet's, which a site can't switch off, WebViews, Chrome's
-   auto-dark) leave deep backgrounds and light text alone, so it looks the
-   same everywhere. Opaque, so the church never shows through the words.
-   Contrast: text 13.8:1, soft text 9.5:1, gold labels 10:1. */
+   Candlelit gold, the same in light mode, dark mode and every browser:
+   lighter than the church, never white, with dark ink. Opaque, so the
+   church never shows through the words. Contrast at the card's darkest
+   (bottom) edge: text 6.8:1, soft text 5.1:1, gold-ink labels 4.7:1,
+   errors 4.3:1 (large italic), script words 3.2:1 (large display). */
 .card {
-  --fg: #F7ECD8; --fg-soft: #D8C4A2; --accent: #E4BB70; --bg: #1D130A;
-  --line: rgba(228, 187, 112, .34); --glow: none; --error: #E58A73;   /* errors 6.3:1 */
+  --fg: #1F150A; --fg-soft: #3B2C18; --accent: #4A2E08; --bg: #CDAE80;
+  --line: rgba(74, 46, 8, .34); --glow: none; --error: #6E1C10;
   width: min(100vw - 2.4rem, 23.5rem);
   padding: 1.9rem 1.45rem 1.8rem;
   display: grid; justify-items: center; gap: .55rem; text-align: center;
   color: var(--fg);
-  background:
-    radial-gradient(120% 55% at 50% 0%, rgba(236, 192, 118, .2), rgba(236, 192, 118, 0) 62%),
-    radial-gradient(90% 40% at 50% 100%, rgba(236, 192, 118, .1), rgba(236, 192, 118, 0) 70%),
-    linear-gradient(180deg, #2C1E11 0%, #1D130A 100%);
-  border: 1px solid rgba(232, 194, 124, .8);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, .5), 0 26px 60px rgba(0, 0, 0, .6), 0 0 60px rgba(240, 184, 102, .22), inset 0 1px 0 rgba(255, 226, 170, .25);
+  background: linear-gradient(180deg, #E0C69A 0%, #CDAE80 55%, #BC9A6A 100%);
+  border: 1px solid rgba(244, 210, 150, .8);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .3), 0 24px 60px rgba(0, 0, 0, .55), 0 0 80px rgba(240, 184, 102, .22), inset 0 1px 0 rgba(255, 242, 214, .7);
 }
 .card, .card * { forced-color-adjust: none; }
-.card::before { content: ""; position: absolute; inset: 6px; border: 1px solid rgba(228, 187, 112, .3); pointer-events: none; }
+.card::before { content: ""; position: absolute; inset: 6px; border: 1px solid rgba(74, 46, 8, .26); pointer-events: none; }
 .card .orn { width: 24px; height: 37px; margin: 0 0 .1rem; color: var(--accent); filter: none; }
 .card .eyebrow { color: var(--accent); }
 .card__title { font-size: clamp(1.75rem, 7.8vw, 2.25rem); line-height: 1.1; letter-spacing: .08em; margin-right: -.08em; }
-.card__title em { color: #E9C27A; font-size: 1.3em; margin-right: .1em; }
-.card__title, .invite__names, .card__venue, .card__bigdate, .countdown__num { color: #FFF3DE; text-shadow: 0 0 22px rgba(240, 184, 102, .25); }
+.card__title em { color: #6B4413; font-size: 1.3em; margin-right: .1em; }
 .card__date { display: flex; align-items: center; gap: .85rem; margin-top: .2rem; }
 .card__date b { font-family: var(--display); font-weight: 400; font-size: 3.6rem; line-height: .9; color: var(--accent); }
 .card__date > span { padding-left: .85rem; border-left: 1px solid var(--line); text-align: left; width: 5.2em; font-family: var(--sans); font-weight: 500; font-size: .72rem; letter-spacing: var(--track); text-transform: uppercase; }
@@ -330,13 +325,13 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 .card__time { font-style: italic; font-size: 1.15rem; }
 .card__addr { color: var(--fg-soft); font-size: 1rem; }
 .card__addr:empty { display: none; }
-.card .btn { margin-top: .45rem; min-height: 44px; padding: .7rem 1.4rem; border-color: rgba(228, 187, 112, .75); color: #F3D9A4; }
-.card .btn:hover { background: rgba(228, 187, 112, .15); border-color: #E4BB70; color: #FFF3DE; box-shadow: none; }
+.card .btn { margin-top: .45rem; min-height: 44px; padding: .7rem 1.4rem; border-color: rgba(74, 46, 8, .6); color: var(--fg); }
+.card .btn:hover { background: #3A260C; border-color: #3A260C; color: #F3E3C4; box-shadow: none; }
 .card .tba { color: var(--fg-soft); }
 .invite__lines { margin: .3rem 0 .4rem; font-size: 1.12rem; line-height: 1.45; }
 .invite__names { display: flex; flex-direction: column; align-items: center; font-size: 1.42rem; line-height: 1.15; letter-spacing: .1em; }
 .invite__names span { white-space: nowrap; margin-right: -.1em; }
-.invite__names em { font-family: var(--script); font-style: normal; text-transform: none; letter-spacing: 0; font-size: 1.5em; line-height: .85; color: #E9C27A; }
+.invite__names em { font-family: var(--script); font-style: normal; text-transform: none; letter-spacing: 0; font-size: 1.5em; line-height: .85; color: #6B4413; }
 
 /* countdown and reply, inside cards */
 .countdown__grid { width: 100%; margin-top: .6rem; display: grid; grid-template-columns: repeat(4, 1fr); }
@@ -353,10 +348,36 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 .card--rsvp .stepper button { height: 40px; }
 .card--rsvp .field__error { min-height: 0; font-size: .95rem; }
 .card--rsvp .field__error:empty { display: none; }
-.card .btn--solid { width: 100%; background: #120B05; border-color: #E4BB70; color: #F3D9A4; }
-.card .btn--solid:hover { background: rgba(228, 187, 112, .18); color: #FFF3DE; }
-.card .choice label { border-color: rgba(228, 187, 112, .45); }
-.card .choice input:checked + label { background: rgba(228, 187, 112, .18); border-color: #E4BB70; color: #FFF3DE; }
+.card .btn--solid { width: 100%; background: #2A1B0B; border-color: #2A1B0B; color: #F3E3C4; }
+.card .btn--solid:hover { background: #4A300F; border-color: #4A300F; }
+.card .choice input:checked + label { background: #2A1B0B; border-color: #2A1B0B; color: #F3E3C4; }
+
+/* Ink that phone dark modes can't recolour. Some (Samsung Internet's, which
+   a site can't switch off) lighten dark text but leave the card's gold
+   gradient alone, which would leave cream words on gold. Each line of text
+   is painted with a gradient of its own colour clipped to its letters,
+   which those modes treat like a picture and leave as it is. Everywhere
+   else it looks exactly like plain text. */
+.card :is(.eyebrow, .invite__lines, .invite__names span, .invite__names em, .card__title, .card__title em,
+  .card__date b, .card__date > span, .card__place, .card__text, .card__meta, .card__foot, .card__bigdate,
+  .card__venue, .card__time, .card__addr, .countdown__num, .countdown__lbl, .field > label, .field legend,
+  .field label span, .field__error, .rsvp__status, .btn:not(.btn--solid) > span) {
+  background-image: linear-gradient(currentColor, currentColor);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+/* Fields have their own solid parchment ground, so a dark mode that
+   darkens it also lightens the typing: readable either way. */
+.card .field input[type="text"], .card .field textarea, .card .stepper, .card .choice label { background-color: #EBDCBF; }
+.card .field input[type="text"], .card .field textarea { padding-left: .6rem; padding-right: .6rem; }
+.card .stepper input[type="number"] { background: transparent; }
+/* the chosen answer carries a tick, so it never depends on colour alone */
+.card .choice label { display: flex; align-items: center; justify-content: center; }
+.card .choice input:checked + label::before { content: "\2713\00a0"; font-style: normal; }
+/* the cross is drawn the same way: its own colour, cut out by the shape */
+.card .orn { background: linear-gradient(currentColor, currentColor);
+  -webkit-mask: url("../icons/ornate-cross.svg") center / contain no-repeat; mask: url("../icons/ornate-cross.svg") center / contain no-repeat; }
+.card .orn use { display: none; }
 
 /* ------------------------------------------------------ words in the church */
 .wake__line { max-width: 20rem; font-weight: 400; font-style: italic; font-size: clamp(1.7rem, 7vw, 2.4rem); line-height: 1.3; color: #FFF4E0; text-shadow: 0 0 30px rgba(240, 184, 102, .5), 0 2px 16px rgba(0, 0, 0, .8); }

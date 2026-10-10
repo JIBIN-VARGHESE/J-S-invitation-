@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 184">
+      <g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke-width="1.4" d="M54 30H66V54H90V66H66V154H54V66H30V54H54Z"/>
+        <path stroke-width=".7" d="M57.5 33.5H62.5V57.5H86.5V62.5H62.5V150.5H57.5V62.5H33.5V57.5H57.5Z"/>
+        <g stroke-width="1.2">
+          <circle cx="60" cy="21" r="6.5"/><circle cx="51.5" cy="27" r="4.2"/><circle cx="68.5" cy="27" r="4.2"/>
+          <circle cx="60" cy="163" r="6.5"/><circle cx="51.5" cy="157" r="4.2"/><circle cx="68.5" cy="157" r="4.2"/>
+          <circle cx="21" cy="60" r="6.5"/><circle cx="27" cy="51.5" r="4.2"/><circle cx="27" cy="68.5" r="4.2"/>
+          <circle cx="99" cy="60" r="6.5"/><circle cx="93" cy="51.5" r="4.2"/><circle cx="93" cy="68.5" r="4.2"/>
+        </g>
+        <path stroke-width="1" d="M60 11V6M60 173v5M11 60H6M109 60h5"/>
+        <circle stroke-width="1.2" cx="60" cy="60" r="10"/>
+        <path stroke-width="1" d="M60 50.5c3 3 3 6 0 9.5c-3-3.5-3-6.5 0-9.5zM60 69.5c3-3 3-6 0-9.5c-3 3.5-3 6.5 0 9.5zM50.5 60c3-3 6-3 9.5 0c-3.5 3-6.5 3-9.5 0zM69.5 60c-3-3-6-3-9.5 0c3.5 3 6.5 3 9.5 0z"/>
+        <g stroke-width=".9">
+          <path d="M52 52c-7 0-11-5-8-9c2-3 7-1 5 2"/>
+          <path d="M68 52c7 0 11-5 8-9c-2-3-7-1-5 2"/>
+          <path d="M52 68c-7 0-11 5-8 9c2 3 7 1 5-2"/>
+          <path d="M68 68c7 0 11 5 8 9c-2 3-7 1-5-2"/>
+        </g>
+      </g>
+</svg>
