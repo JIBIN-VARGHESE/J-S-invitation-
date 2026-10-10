@@ -130,6 +130,7 @@ Every provider is a small function in `assets/js/rsvp.js`. To add a new one, wri
 3. Under **Build and deployment**, set *Source* to **Deploy from a branch**, the branch to **`main`** (or whichever branch holds the site), and the folder to **`/ (root)`**. Click **Save**.
 4. Wait about 1 minute. The site will be live at `https://YOUR-USERNAME.github.io/YOUR-REPO/`.
 5. Update `og:image` in `index.html` to that absolute URL (see section 1), commit, and push. Pages redeploys automatically on every push.
+   **On every update, change the `?v=` number** on the files in `index.html` (and the photo paths in `config.js`). Phone browsers keep old copies for a long time; a new number makes them fetch the new files.
 6. Test the link by sending it to yourself on WhatsApp. If the preview is stale, add `?v=2` to the URL.
 
 The empty `.nojekyll` file tells Pages to serve files as they are. All paths are relative, so the site works under any repo name. A custom domain can be added later under Settings → Pages → Custom domain.

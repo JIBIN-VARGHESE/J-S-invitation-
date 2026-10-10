@@ -37,8 +37,8 @@
     if (x < 16.9) return .36;           // the light
     return .42;                         // the finale reveals
   }
-  var REVEAL = 3000;         // ms for the names, date and place to finish fading in (styles.css: .hero__content)
-  var AUTO_START = 3200;     // ms the opening then rests, fully shown, before the journey begins by itself
+  var REVEAL = 2200;         // ms for the names, date and place to finish fading in (styles.css: .hero__content)
+  var AUTO_START = 1000;     // ms the opening then rests, fully shown, before the journey begins by itself
   var HURRY = 2.8;           // a tap or swipe while the journey moves plays it this much faster, to the next stop
   var REPEAT_INTRO = 2;      // a guest who has seen the opening before gets it this much faster
   var HOLD = 2.35;           // metres between camera and a card while you read it

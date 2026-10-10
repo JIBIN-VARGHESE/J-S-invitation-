@@ -220,12 +220,12 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 .hero__date b { font-family: var(--display); font-weight: 400; font-size: 1.6rem; letter-spacing: .04em; line-height: 1; color: #FFF8EA; }
 .hero__date i { width: 1px; height: 1.4rem; background: var(--gold); opacity: .7; }
 .hero__place { margin-top: .8rem; font-style: italic; font-size: 1.2rem; color: var(--cream); }
-.js .hero__content > * { opacity: 0; transform: translateY(16px); transition: opacity 1.6s var(--ease), transform 1.8s var(--ease-out); }
+.js .hero__content > * { opacity: 0; transform: translateY(16px); transition: opacity 1.2s var(--ease), transform 1.4s var(--ease-out); }
 .is-ready .hero__content > * { opacity: 1; transform: none; }
-.is-ready .hero__content > :nth-child(2) { transition-delay: .5s; }
-.is-ready .hero__content > :nth-child(3) { transition-delay: .8s; }
-.is-ready .hero__content > :nth-child(4) { transition-delay: 1.2s; }
-.is-ready .hero__content > :nth-child(5) { transition-delay: 1.4s; }
+.is-ready .hero__content > :nth-child(2) { transition-delay: .3s; }
+.is-ready .hero__content > :nth-child(3) { transition-delay: .5s; }
+.is-ready .hero__content > :nth-child(4) { transition-delay: .8s; }
+.is-ready .hero__content > :nth-child(5) { transition-delay: 1s; }
 
 .scroll-cue {
   position: absolute; z-index: 3; left: 50%; bottom: max(1rem, env(safe-area-inset-bottom)); transform: translateX(-50%);
