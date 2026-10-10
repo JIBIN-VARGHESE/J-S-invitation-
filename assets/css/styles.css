@@ -22,7 +22,7 @@
 
 /* --------------------------------------------------------------- Tokens */
 :root {
-  color-scheme: only dark;   /* the page is designed dark: no forced dark mode */
+  color-scheme: dark;   /* the page is designed dark: browsers must not auto-darken or re-colour it */
   /* Palette */
   --sanctuary:   #0E0A07;   /* candle-lit dark */
   --sanctuary-2: #17100B;
@@ -302,6 +302,7 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
   border: 1px solid rgba(244, 210, 150, .8);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, .3), 0 24px 60px rgba(0, 0, 0, .55), 0 0 80px rgba(240, 184, 102, .22), inset 0 1px 0 rgba(255, 242, 214, .7);
 }
+.card, .card * { forced-color-adjust: none; }
 .card::before { content: ""; position: absolute; inset: 6px; border: 1px solid rgba(74, 48, 12, .26); pointer-events: none; }
 .card .orn { width: 24px; height: 37px; margin: 0 0 .1rem; color: var(--accent); filter: none; }
 .card .eyebrow { color: var(--accent); }
@@ -397,7 +398,16 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 /* ================================================== JOURNEY MODE (JS on)
    Everything is fixed; journey.js places and fades each scene. */
 .scroller { display: none; }
-.journey .scroller { display: block; height: calc(var(--screens, 22) * 100vh); height: calc(var(--screens, 22) * 100lvh); }
+.journey { scroll-snap-type: y mandatory; }
+.journey .scroller { display: block; }
+.journey .snap { height: 100vh; height: 100lvh; scroll-snap-align: start; scroll-snap-stop: always; }
+/* "swipe up" cue while the journey rests on a chapter */
+.next-hint { position: fixed; z-index: 5; left: 50%; bottom: max(1.1rem, env(safe-area-inset-bottom)); transform: translateX(-50%); display: none; flex-direction: column; align-items: center; gap: .35rem; margin: 0; pointer-events: none;
+  font-family: var(--sans); font-weight: 500; font-size: .56rem; letter-spacing: .3em; text-transform: uppercase; color: rgba(243, 232, 213, .85); text-shadow: 0 1px 8px rgba(0, 0, 0, .8); opacity: 0; transition: opacity .8s var(--ease); }
+.journey .next-hint { display: flex; }
+.next-hint.is-on { opacity: 1; transition-delay: 1.4s; }
+.next-hint i { width: 10px; height: 10px; border-left: 1px solid currentColor; border-top: 1px solid currentColor; transform: rotate(45deg); animation: nudge 2.2s var(--ease) infinite; }
+@keyframes nudge { 0%, 100% { transform: translateY(3px) rotate(45deg); opacity: .5; } 50% { transform: translateY(-3px) rotate(45deg); opacity: 1; } }
 .journey .hero { position: fixed; inset: 0; height: 100%; min-height: 0; z-index: 3; }
 .journey .hero__film, .journey .hero__content { will-change: transform, opacity; }
 .journey .scenes { position: fixed; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
@@ -435,3 +445,14 @@ html:not(.journey) .nave { opacity: 1; }
   .hero__content { opacity: 1; }
 }
 .still .topbar__mark { display: none; }
+
+/* The site has one look in every theme. Declaring it for both light and dark
+   preferences tells phone browsers (e.g. Samsung Internet's dark mode) that
+   this page handles dark mode itself, so they leave the candlelit gold alone. */
+@media (prefers-color-scheme: dark) {
+  :root { color-scheme: dark; }
+  .card { background: linear-gradient(180deg, rgba(224, 198, 154, .95) 0%, rgba(200, 168, 120, .95) 55%, rgba(178, 142, 94, .95) 100%); color: #1F150A; }
+}
+@media (prefers-color-scheme: light) {
+  :root { color-scheme: dark; }
+}

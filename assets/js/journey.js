@@ -1,11 +1,12 @@
 /* =============================================================================
    The journey — one continuous scene driven by one number.
 
-   The page is a tall empty scroller; everything you see is fixed and placed
-   here, every frame, from a single eased scroll position measured in
-   "screens" (1 = one screen height of scrolling). Because the church camera,
-   the cards, the light and the text all read that same number in the same
-   frame, nothing can drift out of step.
+   Everything you see is fixed and placed here, every frame, from a single
+   timeline position `s`. Scrolling doesn't move s directly: the page is cut
+   into short CHAPTERS (one swipe each, with scroll snapping), and when you
+   arrive at a chapter the timeline plays on its own to that chapter's stop:
+   the camera glides to the next card, the card settles, words reveal.
+   The opening plays by itself after a moment, and so does the finale.
 
      0    – 1.1   arrival: the statue, fading to black
      1.0  – 2.5   the church wakes: candles light down the aisle, then windows
@@ -21,7 +22,18 @@
 (function () {
   "use strict";
 
-  var TOTAL = 20.5;          // screens of scrolling
+  var TOTAL = 20.5;          // length of the timeline (in "screens" of the original scroll story)
+  // the chapters: where the timeline rests after each swipe
+  var STOPS = [0, 4.75, 6.9, 8.22, 9.82, 11.42, 12.98, 14.85, 20.4];
+  // how fast the timeline plays (units per second) in each stretch
+  function rate(x) {
+    if (x < 1.1) return .55;            // the statue fades
+    if (x < 3.9) return .75;            // the church wakes, Save the Date
+    if (x < 15.6) return 1.25;          // walking between the cards
+    if (x < 16.9) return .6;            // the light
+    return .78;                         // the finale reveals
+  }
+  var AUTO_START = 2600;     // ms on the statue before the journey begins by itself
   var HOLD = 2.35;           // metres between camera and a card while you read it
   var CARD_Y = 1.5;          // card height above the floor (metres)
 
@@ -48,7 +60,7 @@
   ];
 
   var doc = document, root = doc.documentElement;
-  var el = {}, cards = [], camAt, unit = 1, sm = 0, last = 0, frozen = null, dust = null, opts = {};
+  var el = {}, cards = [], camAt, chapterPx = 1, sm = 0, vel = 0, last = 0, frozen = null, dust = null, opts = {}, chapter = 0, started = false;
 
   /* ---------------------------------------------------------- helpers */
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
@@ -80,14 +92,18 @@
 
   /* ------------------------------------------------------------ setup */
   function measure() {
-    unit = Math.max(1, el.scroller.offsetHeight / (TOTAL + 1));
+    chapterPx = Math.max(1, el.scroller.offsetHeight / STOPS.length);
   }
+  function chapterFromScroll() { return clamp(Math.round(window.scrollY / chapterPx), 0, STOPS.length - 1); }
+  function goTo(i) { window.scrollTo(0, Math.round(i * chapterPx)); }
 
   function init(o) {
     opts = o || {};
     root.classList.add("journey");
     el.scroller = doc.querySelector(".scroller");
-    el.scroller.style.setProperty("--screens", TOTAL + 1);
+    el.scroller.textContent = "";
+    STOPS.forEach(function () { var d = doc.createElement("div"); d.className = "snap"; el.scroller.appendChild(d); });
+    el.hint = doc.querySelector(".next-hint");
     el.hero = doc.querySelector(".hero");
     el.heroImg = doc.querySelector(".hero__film");
     el.heroText = doc.querySelector(".hero__content");
@@ -124,18 +140,26 @@
     // typing in the reply form: hold the scene still while the keyboard is up
     var form = doc.querySelector(".rsvp__form");
     if (form) {
-      form.addEventListener("focusin", function () { if (frozen == null) frozen = sm; });
+      form.addEventListener("focusin", function () { if (frozen == null) frozen = chapter; });
       form.addEventListener("focusout", function () {
         setTimeout(function () {
           if (form.contains(doc.activeElement) || frozen == null) return;
           var keep = frozen; frozen = null;
-          window.scrollTo(0, keep * unit); sm = keep;
+          goTo(keep);
         }, 250);
       });
     }
 
     dust = makeDust(doc.querySelector(".finale__dust"));
-    sm = window.scrollY / unit;
+    chapter = chapterFromScroll();
+    sm = STOPS[chapter];
+    // the journey begins on its own after a moment on the statue
+    var t0 = Date.now();
+    (function autostart() {
+      if (window.scrollY > 4 || chapter > 0) return;
+      if (!root.classList.contains("is-ready") || Date.now() - t0 < AUTO_START) return setTimeout(autostart, 250);
+      goTo(1);
+    })();
     requestAnimationFrame(frame);
   }
 
@@ -152,11 +176,17 @@
     requestAnimationFrame(frame);
     var dt = last ? Math.min(.05, (now - last) / 1000) : .016;
     last = now;
-    // one eased value for everything (glides gently after the finger stops)
-    var target = frozen != null ? frozen : window.scrollY / unit;
-    sm += (target - sm) * (1 - Math.exp(-dt / .09));
-    if (Math.abs(target - sm) < .0004) sm = target;
+    // the chapter you have swiped to; the timeline plays toward its stop on
+    // its own, easing out of rest and settling gently at the stop
+    chapter = frozen != null ? frozen : chapterFromScroll();
+    var target = STOPS[chapter], gap = target - sm, dist = Math.abs(gap);
+    var want = dist < 1e-4 ? 0 : rate(sm) * Math.min(1, .12 + dist / .45);
+    vel += (want - vel) * (1 - Math.exp(-dt / .28));
+    var step = Math.min(dist, vel * dt);
+    sm += gap > 0 ? step : -step;
+    if (dist - step < 1e-4) { sm = target; vel = 0; }
     var s = sm;
+    var resting = sm === target;
 
     /* arrival */
     var heroOut = ss(.3, 1.05, s);
@@ -170,6 +200,12 @@
     }
     if (el.mark) el.mark.classList.toggle("is-away", s > .8);
     if (el.progress) setStyle(el.progress, "pg", "--progress", clamp(s / TOTAL, 0, 1).toFixed(4));
+
+    // a quiet "swipe up" cue whenever the journey rests and there is more
+    if (el.hint) {
+      var showHint = resting && chapter > 0 && chapter < STOPS.length - 1 && frozen == null;
+      el.hint.classList.toggle("is-on", showHint);
+    }
 
     /* the church: camera, turn toward the card being read, light */
     var camZ = camAt(s), yaw = 0, holdAny = 0;
@@ -293,5 +329,5 @@
   }
   window.addEventListener("resize", function () { if (dust) dust.resize(); }, { passive: true });
 
-  window.Journey = { init: init, TOTAL: TOTAL, STATIONS: STATIONS };
+  window.Journey = { init: init, TOTAL: TOTAL, STATIONS: STATIONS, STOPS: STOPS, go: goTo, state: function () { return { s: sm, chapter: chapter }; } };
 })();
