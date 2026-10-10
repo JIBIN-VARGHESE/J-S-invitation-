@@ -392,19 +392,20 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 /* ================================================== JOURNEY MODE (JS on)
    Everything is fixed; journey.js places and fades each scene. */
 .scroller { display: none; }
-.journey { scroll-snap-type: y mandatory; }
-.journey .scroller { display: block; }
-.journey .snap { height: 100vh; height: 100lvh; scroll-snap-align: start; scroll-snap-stop: always; }
-/* "swipe up" cue while the journey rests on a chapter */
-.next-hint { position: fixed; z-index: 5; left: 50%; bottom: max(.9rem, env(safe-area-inset-bottom)); transform: translateX(-50%); display: none; flex-direction: column; align-items: center; gap: .4rem; margin: 0; padding: .7rem 1.4rem; border: 0; background: none; pointer-events: none; cursor: pointer;
-  font-family: var(--sans); font-weight: 500; font-size: .56rem; letter-spacing: .3em; text-transform: uppercase; color: rgba(243, 232, 213, .85); text-shadow: 0 1px 8px rgba(0, 0, 0, .8); opacity: 0; transition: opacity .8s var(--ease); }
-.journey .next-hint { display: flex; }
-.next-hint.is-on { opacity: 1; pointer-events: auto; transition-delay: .5s; }
-.next-hint.is-on span { animation: beckon 2.4s ease-in-out 1s infinite; }
-@keyframes beckon { 0%, 100% { box-shadow: 0 0 0 0 rgba(240, 184, 102, 0); border-color: rgba(217, 174, 98, .45); } 50% { box-shadow: 0 0 18px 2px rgba(240, 184, 102, .45); border-color: rgba(240, 200, 130, .9); } }
-.next-hint span { white-space: nowrap; padding: .45rem .9rem; border: 1px solid rgba(217, 174, 98, .45); border-radius: 999px; background: rgba(14, 10, 7, .45); }
-.next-hint i { width: 10px; height: 10px; border-left: 1px solid currentColor; border-top: 1px solid currentColor; transform: rotate(45deg); animation: nudge 2.2s var(--ease) infinite; }
-@keyframes nudge { 0%, 100% { transform: translateY(3px) rotate(45deg); opacity: .5; } 50% { transform: translateY(-3px) rotate(45deg); opacity: 1; } }
+.journey, .journey body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+/* "Continue" (and a quiet "Back") while the journey rests on a chapter */
+.next-hint, .back-hint { position: fixed; z-index: 6; bottom: max(1rem, calc(env(safe-area-inset-bottom) + .4rem)); display: none; align-items: center; margin: 0; border: 0; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity .7s var(--ease); -webkit-tap-highlight-color: transparent; }
+.journey .next-hint, .journey .back-hint { display: flex; }
+.next-hint { left: 50%; transform: translateX(-50%); gap: .6rem; padding: .85rem 1.6rem; border-radius: 999px;
+  font-family: var(--sans); font-weight: 500; font-size: .72rem; letter-spacing: .26em; text-transform: uppercase; color: #FFF3DE;
+  background: rgba(20, 13, 7, .62); border: 1px solid rgba(232, 194, 124, .75); box-shadow: 0 6px 24px rgba(0, 0, 0, .45); }
+.next-hint i { width: 7px; height: 7px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(-45deg); margin-left: -.1rem; }
+.next-hint.is-on, .back-hint.is-on { opacity: 1; pointer-events: auto; transition-delay: .4s; }
+.next-hint.is-on { animation: beckon 2.4s ease-in-out 1.2s infinite; }
+@keyframes beckon { 0%, 100% { box-shadow: 0 6px 24px rgba(0, 0, 0, .45), 0 0 0 0 rgba(240, 184, 102, 0); } 50% { box-shadow: 0 6px 24px rgba(0, 0, 0, .45), 0 0 22px 3px rgba(240, 184, 102, .5); } }
+.back-hint { left: max(.9rem, env(safe-area-inset-left)); gap: .4rem; padding: .7rem .5rem; background: none;
+  font-family: var(--sans); font-weight: 500; font-size: .6rem; letter-spacing: .22em; text-transform: uppercase; color: rgba(243, 232, 213, .75); text-shadow: 0 1px 8px rgba(0, 0, 0, .9); }
+.back-hint i { width: 6px; height: 6px; border-left: 1.3px solid currentColor; border-bottom: 1.3px solid currentColor; transform: rotate(45deg); }
 .journey .hero { position: fixed; inset: 0; height: 100%; min-height: 0; z-index: 3; }
 .journey .hero__film, .journey .hero__content { will-change: transform, opacity; }
 .journey .scenes { position: fixed; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
@@ -417,7 +418,8 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 .journey .card.is-held > :nth-child(4) { transition-delay: .54s; } .journey .card.is-held > :nth-child(5) { transition-delay: .72s; }
 .journey .card.is-held > :nth-child(6) { transition-delay: .9s; } .journey .card.is-held > :nth-child(7) { transition-delay: 1.05s; }
 .journey .card.is-held > :nth-child(n+8) { transition-delay: 1.2s; }
-.journey .scene--wake, .journey .scene--verse, .journey .scene--line { right: 0; bottom: 0; display: grid; place-items: center; padding: 0 var(--gutter); text-align: center; will-change: opacity; }
+.journey .scene--verse { width: min(92vw, 24rem); }
+.journey .scene--wake, .journey .scene--line { right: 0; bottom: 0; display: grid; place-items: center; padding: 0 var(--gutter); text-align: center; will-change: opacity; }
 .journey .scene--finale { right: 0; bottom: 0; opacity: 1; z-index: 3; pointer-events: auto; }
 .journey .nave { opacity: 1; }
 

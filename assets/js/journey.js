@@ -2,11 +2,11 @@
    The journey — one continuous scene driven by one number.
 
    Everything you see is fixed and placed here, every frame, from a single
-   timeline position `s`. Scrolling doesn't move s directly: the page is cut
-   into short CHAPTERS (one swipe each, with scroll snapping), and when you
-   arrive at a chapter the timeline plays on its own to that chapter's stop:
-   the camera glides to the next card, the card settles, words reveal.
-   The opening plays by itself after a moment, and so does the finale.
+   timeline position `s`. The page doesn't scroll: the journey is cut into
+   CHAPTERS and the guest taps "Continue" (or swipes once) to move on; the
+   timeline then plays on its own to that chapter's stop: the camera glides,
+   turns to the next card, the card settles, words reveal. The opening plays
+   by itself, and so does the finale.
 
      0    – 1.1   arrival: the statue, fading to black
      1.0  – 2.5   the church wakes: candles light down the aisle, then windows
@@ -28,9 +28,10 @@
   // how fast the timeline plays (units per second) in each stretch
   function rate(x) {
     if (x < 1.1) return .38;            // the statue fades
-    if (x > 2.9 && x < 3.3) return .11;    // Save the Date rests in the centre (~3.5 s)
+    if (x > 2.95 && x < 3.2) return .15;   // Save the Date rests in the centre (~1.5 s), then you walk through it
     if (x < 3.9) return .42;            // the church wakes, Save the Date
-    if (x > 5.6 && x < 7.55) return .32;  // the verse: the walk slows while its words light up
+    if (x > 5.6 && x < 6.25) return .3;    // the verse appears and its words light up
+    if (x > 6.25 && x < 6.75) return .25;  // ...it rests (~2 s), then you walk through it
     if (x < 15.6) return .46;           // walking between the cards (an unhurried glide)
     if (x < 16.9) return .36;           // the light
     return .42;                         // the finale reveals
@@ -42,29 +43,32 @@
   // where each card stands (z along the aisle, x left/right) and when (screens):
   // s0 approach starts, a = arrives and holds, b = hold ends, s1 = walked past
   var STATIONS = [
-    { id: "invitation", z: 8.0,  x: .7,  s0: 3.9,  a: 4.35,  b: 5.15, s1: 5.6 },
-    { id: "engagement", z: 12.4, x: -.7, s0: 7.4,  a: 7.85,  b: 8.6,  s1: 9.0 },
-    { id: "ceremony",   z: 15.0, x: .7,  s0: 9.0,  a: 9.45,  b: 10.2, s1: 10.6 },
-    { id: "reception",  z: 17.4, x: -.7, s0: 10.6, a: 11.05, b: 11.8, s1: 12.2 },
-    { id: "countdown",  z: 19.6, x: .6,  s0: 12.2, a: 12.65, b: 13.3, s1: 13.6 },
-    { id: "rsvp",       z: 22.6, x: 0,   s0: 13.6, a: 14.1,  b: 15.6, s1: 16.1, stay: true },
+    { id: "invitation", z: 6.6,  x: .7,  s0: 3.9,  a: 4.35,  b: 5.15, s1: 5.6 },
+    { id: "engagement", z: 11.4, x: -.7, s0: 7.4,  a: 7.85,  b: 8.6,  s1: 9.0 },
+    { id: "ceremony",   z: 13.8, x: .7,  s0: 9.0,  a: 9.45,  b: 10.2, s1: 10.6 },
+    { id: "reception",  z: 16.2, x: -.7, s0: 10.6, a: 11.05, b: 11.8, s1: 12.2 },
+    { id: "countdown",  z: 18.6, x: .6,  s0: 12.2, a: 12.65, b: 13.3, s1: 13.6 },
+    { id: "rsvp",       z: 21.6, x: 0,   s0: 13.6, a: 14.1,  b: 15.6, s1: 16.1, stay: true },
   ];
-  // camera position along the aisle (metres) at given scroll positions;
-  // a smooth curve runs through these, so it eases into every stop
+  var VERSE_Z = 9.0, SAVE_Z = 4.2;
+  // camera position along the aisle (metres) at given timeline positions;
+  // a smooth curve runs through these, so it eases into every stop. Words
+  // (Save the Date, the verse) hang in the aisle and the camera walks
+  // through them; at each card it stops 2.35 m away and turns to it.
   var CAM = [
-    [0, -1.5], [1.0, -1.5], [2.4, .4], [2.9, 1.45], [3.35, 1.65], [3.9, 5.0],
-    [4.35, 5.65], [5.15, 5.9], [5.6, 8.0], [7.4, 9.8],
-    [7.85, 10.05], [8.6, 10.3], [9.0, 12.2],
-    [9.45, 12.65], [10.2, 12.9], [10.6, 14.6],
-    [11.05, 15.05], [11.8, 15.3], [12.2, 16.8],
-    [12.65, 17.25], [13.3, 17.5], [13.6, 18.6],
-    [14.1, 20.25], [15.6, 20.45], [16.8, 21.3], [TOTAL + 1, 21.3],
+    [0, -1.5], [1.0, -1.5], [2.4, .4], [2.95, 1.5], [3.2, 1.6], [3.75, 3.4], [3.9, 3.6],
+    [4.35, 4.25], [5.15, 4.45], [5.6, 5.7],
+    [6.25, 6.6], [6.75, 6.75], [7.3, 8.4],
+    [7.85, 9.05], [8.6, 9.25], [9.0, 10.5],
+    [9.45, 11.45], [10.2, 11.65], [10.6, 12.9],
+    [11.05, 13.85], [11.8, 14.05], [12.2, 15.3],
+    [12.65, 16.25], [13.3, 16.45], [13.6, 17.7],
+    [14.1, 19.25], [15.6, 19.45], [16.8, 20.4], [TOTAL + 1, 20.4],
   ];
 
   var doc = document, root = doc.documentElement;
-  var lastScroll = 0, settled = 0, intro = false, introGo = false;
-  window.addEventListener("scroll", function () { lastScroll = performance.now(); }, { passive: true });
-  var el = {}, cards = [], camAt, chapterPx = 1, sm = 0, vel = 0, last = 0, frozen = null, dust = null, opts = {}, chapter = 0, started = false;
+  var settled = 0, intro = false, introGo = false, resting = false;
+  var el = {}, cards = [], camAt, sm = 0, vel = 0, last = 0, dust = null, opts = {}, chapter = 0;
 
   /* ---------------------------------------------------------- helpers */
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
@@ -95,24 +99,50 @@
   }
 
   /* ------------------------------------------------------------ setup */
-  function measure() {
-    chapterPx = Math.max(1, el.scroller.offsetHeight / STOPS.length);
-  }
+  function measure() {}
   function stopIndexNear(x) { var k = 0; for (var i = 0; i < STOPS.length; i++) if (STOPS[i] <= x + 1e-6) k = i; return k; }
-  function chapterFromScroll() { return clamp(Math.round(window.scrollY / chapterPx), 0, STOPS.length - 1); }
-  function goTo(i) { window.scrollTo(0, Math.round(i * chapterPx)); }
+  // move one chapter at a time, and only once the current one has finished
+  function goTo(i) {
+    if (intro) return;
+    i = clamp(i, 0, STOPS.length - 1);
+    if (Math.abs(i - settled) > 1) i = settled + (i > settled ? 1 : -1);
+    chapter = i;
+  }
+  function next() { if (resting && !intro) goTo(settled + 1); }
+  function back() { if (resting && !intro && settled > 1) goTo(settled - 1); }
 
   function init(o) {
     opts = o || {};
     root.classList.add("journey");
     el.scroller = doc.querySelector(".scroller");
-    el.scroller.textContent = "";
-    STOPS.forEach(function () { var d = doc.createElement("div"); d.className = "snap"; el.scroller.appendChild(d); });
     el.hint = doc.querySelector(".next-hint");
-    if (el.hint) el.hint.addEventListener("click", function () { if (!intro) goTo(Math.min(STOPS.length - 1, settled + 1)); });
+    el.back = doc.querySelector(".back-hint");
+    if (el.hint) el.hint.addEventListener("click", next);
+    if (el.back) el.back.addEventListener("click", back);
+    // a single deliberate swipe (or wheel / arrow key) counts as one tap
+    var ty = null, tx = null;
+    window.addEventListener("touchstart", function (e) { var t = e.touches[0]; ty = t.clientY; tx = t.clientX; }, { passive: true });
+    window.addEventListener("touchend", function (e) {
+      if (ty == null) return;
+      var t = e.changedTouches[0], dy = t.clientY - ty, dx = t.clientX - tx; ty = null;
+      if (Math.abs(dy) < 60 || Math.abs(dy) < Math.abs(dx) * 1.3) return;
+      if (doc.activeElement && /INPUT|TEXTAREA/.test(doc.activeElement.tagName)) return;
+      dy < 0 ? next() : back();
+    }, { passive: true });
+    var wheelAt = 0;
+    window.addEventListener("wheel", function (e) {
+      if (Math.abs(e.deltaY) < 25 || performance.now() - wheelAt < 900) return;
+      wheelAt = performance.now();
+      e.deltaY > 0 ? next() : back();
+    }, { passive: true });
+    window.addEventListener("keydown", function (e) {
+      if (/INPUT|TEXTAREA/.test((e.target && e.target.tagName) || "")) return;
+      if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") { e.preventDefault(); next(); }
+      if (e.key === "ArrowUp" || e.key === "PageUp") { e.preventDefault(); back(); }
+    });
     // after a reply is sent, the ending begins on its own
     doc.addEventListener("rsvp:sent", function () {
-      setTimeout(function () { if (doc.activeElement && doc.activeElement.blur) doc.activeElement.blur(); frozen = null; goTo(STOPS.length - 1); }, 3200);
+      setTimeout(function () { if (doc.activeElement && doc.activeElement.blur) doc.activeElement.blur(); goTo(STOPS.length - 1); }, 3200);
     });
     el.hero = doc.querySelector(".hero");
     el.heroImg = doc.querySelector(".hero__film");
@@ -147,31 +177,16 @@
     window.addEventListener("resize", measure, { passive: true });
     if (el.mark) el.mark.addEventListener("click", function (e) { e.preventDefault(); window.scrollTo(0, 0); });
 
-    // typing in the reply form: hold the scene still while the keyboard is up
-    var form = doc.querySelector(".rsvp__form");
-    if (form) {
-      form.addEventListener("focusin", function () { if (frozen == null) frozen = chapter; });
-      form.addEventListener("focusout", function () {
-        setTimeout(function () {
-          if (form.contains(doc.activeElement) || frozen == null) return;
-          var keep = frozen; frozen = null;
-          goTo(keep);
-        }, 250);
-      });
-    }
-
     dust = makeDust(doc.querySelector(".finale__dust"));
-    if (!location.hash) window.scrollTo(0, 0);
-    chapter = chapterFromScroll();
-    sm = STOPS[chapter];
-    settled = chapter;
+    window.scrollTo(0, 0);
+    chapter = 0; sm = 0; settled = 0;
     // the opening (statue → church → Save the Date → invitation) plays on its
     // own; scrolling during it is ignored. A scroll on the statue starts it early.
     intro = chapter === 0;
     var t0 = Date.now();
     (function autostart() {
       if (!intro) return;
-      var go = window.scrollY > 4 || (root.classList.contains("is-ready") && Date.now() - t0 >= AUTO_START);
+      var go = root.classList.contains("is-ready") && Date.now() - t0 >= AUTO_START;
       if (!go) return setTimeout(autostart, 200);
       introGo = true;
     })();
@@ -194,16 +209,8 @@
     // the chapter you have swiped to; the timeline plays toward its stop on
     // its own, easing out of rest and settling gently at the stop. However
     // far a swipe flings the page, the journey moves one chapter at a time.
-    var target;
-    if (intro) {
-      chapter = introGo ? 1 : 0;
-      target = STOPS[chapter];
-    } else {
-      var want = frozen != null ? frozen : chapterFromScroll();
-      chapter = clamp(want, settled - 1, settled + 1);
-      if (frozen == null && want !== chapter && now - lastScroll > 140) goTo(chapter);   // drop the extra fling
-      target = STOPS[chapter];
-    }
+    if (intro) chapter = introGo ? 1 : 0;
+    var target = STOPS[chapter];
     var gap = target - sm, dist = Math.abs(gap);
     var hurry = gap < 0 ? 2.2 : 1;                                // going back is a little quicker
     var speed = dist < 1e-4 ? 0 : rate(sm) * hurry * Math.min(1, .12 + dist / .45);
@@ -212,10 +219,10 @@
     sm += gap > 0 ? step : -step;
     if (dist - step < 1e-4) { sm = target; vel = 0; }
     var s = sm;
-    var resting = sm === target;
+    resting = sm === target;
     if (resting) {
       settled = chapter;
-      if (intro && chapter === 1) { intro = false; goTo(1); }   // the opening is over: hand over to the guest
+      if (intro && chapter === 1) intro = false;              // the opening is over: hand over to the guest
     }
 
     /* arrival */
@@ -233,8 +240,9 @@
 
     // a quiet "swipe up" cue whenever the journey rests and there is more
     if (el.hint) {
-      var showHint = resting && !intro && chapter > 0 && chapter < STOPS.length - 1 && frozen == null;
+      var showHint = resting && !intro && chapter > 0 && chapter < STOPS.length - 1;
       el.hint.classList.toggle("is-on", showHint);
+      if (el.back) el.back.classList.toggle("is-on", resting && !intro && chapter > 1);
     }
 
     /* the church: camera, turn toward the card being read, light */
@@ -263,16 +271,15 @@
 
     /* 3 · Save the Date hangs in the aisle */
     // it settles in the centre of the screen, rests, then you walk through it
-    anchor(el.save, "sv", 0, 2.05, 4.2, 2.6, ss(2.35, 2.9, s), 1.8, bump(2.45, 2.9, 3.35, 3.75, s));
+    anchor(el.save, "sv", 0, 2.05, SAVE_Z, 2.6, ss(2.35, 2.9, s), 1.6, bump(2.45, 2.95, 3.2, 3.6, s));
 
     /* 4 · the cards */
     cards.forEach(function (c) { placeCard(c, s); });
 
-    /* the verse, under the brightening rose window */
-    var v = bump(5.65, 5.95, 7.1, 7.4, s);
-    setStyle(el.verse, "vs", "opacity", v.toFixed(3));
-    setStyle(el.verse, "vs", "--p", clamp((s - 5.85) / 1.05, 0, 1).toFixed(4));
-    setStyle(el.verse, "vs", "visibility", v > 0 ? "visible" : "hidden");
+    /* the verse hangs in the aisle under the brightening rose window: it
+       settles, its words light up, it rests, then you walk through it */
+    anchor(el.verse, "vs", 0, 1.75, VERSE_Z, 2.4, ss(5.6, 5.95, s), 1.4, bump(5.6, 6.0, 6.75, 7.1, s));
+    setStyle(el.verse, "vs", "--p", clamp((s - 5.75) / .75, 0, 1).toFixed(4));
 
     /* 5 · the light */
     var pr = bump(15.75, 16.05, 16.45, 16.75, s);
@@ -414,5 +421,5 @@
   window.addEventListener("resize", function () { if (dust) dust.resize(); cards.forEach(function (c) { c.ht = 0; }); }, { passive: true });
   document.addEventListener("rsvp:sent", function () { cards.forEach(function (c) { c.ht = 0; }); });
 
-  window.Journey = { init: init, TOTAL: TOTAL, STATIONS: STATIONS, STOPS: STOPS, go: goTo, state: function () { return { s: sm, chapter: chapter }; } };
+  window.Journey = { init: init, TOTAL: TOTAL, STATIONS: STATIONS, STOPS: STOPS, go: goTo, next: next, back: back, state: function () { return { s: sm, chapter: chapter, resting: resting }; } };
 })();
