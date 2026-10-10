@@ -316,6 +316,9 @@
     root.classList.add("is-ready");
   }
 
+  // test mode: cards drawn from pictures (?gold=photo), see styles.css
+  if (/[?&]gold=photo\b/.test(location.search)) root.classList.add("ink-photo");
+
   bindContent();
   renderLists();
   initLottie();

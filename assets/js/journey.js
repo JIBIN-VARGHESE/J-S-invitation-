@@ -147,6 +147,11 @@
     window.addEventListener("touchend", function (e) {
       if (ty == null) return;
       var t = e.changedTouches[0], dy = t.clientY - ty, dx = t.clientX - tx; ty = null;
+      // a tap: iPhones send no "click" for taps on plain parts of the page, so catch it here
+      if (Math.abs(dy) < 12 && Math.abs(dx) < 12) {
+        if ((!resting || intro) && !(e.target.closest && e.target.closest("a, button, input, textarea, select, label"))) hurry();
+        return;
+      }
       if (Math.abs(dy) < 60 || Math.abs(dy) < Math.abs(dx) * 1.3) return;
       if (doc.activeElement && /INPUT|TEXTAREA/.test(doc.activeElement.tagName)) return;
       dy < 0 ? next() : back();
