@@ -28,8 +28,9 @@
   // how fast the timeline plays (units per second) in each stretch
   function rate(x) {
     if (x < 1.1) return .38;            // the opening photo fades
-    if (x > 2.95 && x < 3.2) return .15;   // Save the Date rests in the centre (~1.5 s), then you walk through it
-    if (x < 3.9) return .42;            // the church wakes, Save the Date
+    if (x < 2.35) return .42;           // the church wakes
+    if (x > 2.95 && x < 3.2) return .1;    // Save the Date rests in the centre (~2.5 s), then you walk through it
+    if (x < 3.9) return .34;            // Save the Date settles, and you walk through it
     if (x > 5.6 && x < 6.25) return .3;    // the verse appears and its words light up
     if (x > 6.25 && x < 6.75) return .25;  // ...it rests (~2 s), then you walk through it
     if (x < 15.6) return .46;           // walking between the cards (an unhurried glide)
@@ -239,7 +240,8 @@
     var target = STOPS[chapter];
     var gap = target - sm, dist = Math.abs(gap);
     var backward = gap < 0 ? 2.2 : 1;                             // going back is a little quicker
-    var speed = dist < 1e-4 ? 0 : rate(sm) * backward * (intro ? introBoost : 1) * boost * Math.min(1, .12 + dist / .45);
+    var again = intro && (sm < 2.35 || sm > 3.9) ? introBoost : 1;   // returning guests: faster, but Save the Date keeps its full time
+    var speed = dist < 1e-4 ? 0 : rate(sm) * backward * again * boost * Math.min(1, .12 + dist / .45);
     vel += (speed - vel) * (1 - Math.exp(-dt / .28));
     var step = Math.min(dist, vel * dt);
     sm += gap > 0 ? step : -step;
