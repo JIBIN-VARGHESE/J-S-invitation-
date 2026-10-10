@@ -56,7 +56,11 @@
           Sent: data.submittedAt,
         }),
       }).then(ok).then(function (r) { return r.json(); }).then(function (j) {
-        if (String(j.success) !== "true") throw new Error(j.message || "FormSubmit refused the reply");
+        if (String(j.success) !== "true") {
+          var err = new Error(j.message || "FormSubmit refused the reply");
+          if (/activat/i.test(j.message || "")) err.activation = true;
+          throw err;
+        }
       });
     },
 
@@ -191,9 +195,12 @@
         status.textContent = attending === "yes"
           ? "Thank you, " + data.name.split(" ")[0] + ". We can't wait to celebrate with you."
           : "Thank you, " + data.name.split(" ")[0] + ". We will miss you, and we are grateful for your prayers.";
-      }).catch(function () {
+      }).catch(function (err) {
         status.classList.add("is-error");
-        status.textContent = "Something went wrong. Please try again in a moment.";
+        if (window.console) console.warn("RSVP:", err && err.message);
+        status.textContent = err && err.activation
+          ? "Replies aren't switched on yet. (Form owner: click \u201CActivate Form\u201D in the FormSubmit email, then send again.)"
+          : "Something went wrong. Please check your connection and try again.";
       }).then(function () { submit.disabled = false; });
     });
   }

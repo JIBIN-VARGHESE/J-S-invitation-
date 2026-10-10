@@ -22,6 +22,7 @@
 
 /* --------------------------------------------------------------- Tokens */
 :root {
+  color-scheme: only dark;   /* the page is designed dark: no forced dark mode */
   /* Palette */
   --sanctuary:   #0E0A07;   /* candle-lit dark */
   --sanctuary-2: #17100B;

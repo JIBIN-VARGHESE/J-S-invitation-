@@ -26,24 +26,25 @@ window.WEDDING = {
 
   /* ---------------------------------------------------------------- INVITE */
   invitation: {
-    eyebrow: "Together with our families",
+    eyebrow: "You are invited",
     welcome: "In the presence of God and our families…",   // first words as the church wakes
     // Each array item is rendered as its own line.
     lines: [
       "By the grace of God,",
-      "and with hearts full of gratitude,",
-      "we invite you to share the day",
-      "our two lives become one.",
+      "together with our families,",
+      "we joyfully invite you",
+      "to celebrate our marriage.",
     ],
+
   },
 
   /* ----------------------------------------------------------- BIBLE VERSE */
-  // King James Version (public domain).
-  // Alternative if you prefer:  "And a threefold cord is not quickly broken."
-  //                             — Ecclesiastes 4:12
+  // Shown under the rose window. (The closing uses Mark 10:9.)
+  // Other options: "Love is patient, love is kind." (1 Corinthians 13:4)
+  //                "Two are better than one." (Ecclesiastes 4:9)
   verse: {
-    text: "Many waters cannot quench love, neither can the floods drown it.",
-    reference: "Song of Solomon 8:7",
+    text: "A cord of three strands is not quickly broken.",
+    reference: "Ecclesiastes 4:12",
   },
 
   /* ------------------------------------------------------------- ENGAGEMENT */
