@@ -8,7 +8,7 @@
    turns to the next card, the card settles, words reveal. The opening plays
    by itself, and so does the finale.
 
-     0    – 1.1   arrival: the statue, fading to black
+     0    – 1.1   arrival: the photo and names, fading to black
      1.0  – 2.5   the church wakes: candles light down the aisle, then windows
      2.4  – 3.9   "Save the Date" hangs in the aisle; you walk through it
      3.9  – 15.6  stations: each card stands in the aisle; the camera turns
@@ -27,7 +27,7 @@
   var STOPS = [0, 4.75, 8.22, 9.82, 11.42, 12.98, 14.85, 20.4];   // (the verse plays on the way from the invitation to the engagement)
   // how fast the timeline plays (units per second) in each stretch
   function rate(x) {
-    if (x < 1.1) return .38;            // the statue fades
+    if (x < 1.1) return .38;            // the opening photo fades
     if (x > 2.95 && x < 3.2) return .15;   // Save the Date rests in the centre (~1.5 s), then you walk through it
     if (x < 3.9) return .42;            // the church wakes, Save the Date
     if (x > 5.6 && x < 6.25) return .3;    // the verse appears and its words light up
@@ -113,7 +113,7 @@
   }
   // input while the journey moves is never lost: it hurries the move along
   function hurry() {
-    if (intro && !introGo) { introGo = true; return; }       // a tap on the statue starts the opening
+    if (intro && !introGo) { introGo = true; return; }       // a tap on the opening photo starts it
     boost = HURRY;
   }
   function next() {
@@ -204,9 +204,9 @@
     dust = makeDust(doc.querySelector(".finale__dust"));
     window.scrollTo(0, 0);
     chapter = 0; sm = 0; settled = 0;
-    // the opening (statue → church → Save the Date → invitation) plays on its
+    // the opening (photo → church → Save the Date → invitation) plays on its
     // own once the names, date and place have fully appeared and rested. A tap,
-    // swipe or key on the statue starts it early; during it, the same hurries it.
+    // swipe or key on the photo starts it early; during it, the same hurries it.
     intro = chapter === 0;
     try { if (localStorage.getItem("journey-seen")) introBoost = REPEAT_INTRO; } catch (e) {}
     var readyAt = 0;

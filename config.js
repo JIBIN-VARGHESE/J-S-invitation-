@@ -128,10 +128,9 @@ window.WEDDING = {
     pewend: "assets/images/nave/pewend.webp",   // carved pew end
     altar:  "assets/images/nave/altar.webp",    // far wall: rose window, altar, candles
     closingPhoto: "assets/images/closing/couple-arches.webp", // the couple at the end; fades in over the church
-    // The footer credit was removed at the couple's request. The free Vecteezy
-    // licence (opening picture) requires attribution, so hold a premium licence
-    // or put a credit line back in index.html. The closing photo must be one
-    // you own or have permission to use.
+    // The opening picture is the top of the couple's collage, fading into the
+    // dark where the names sit (the bottom panels are left out). Both photos
+    // must be ones you own or have permission to use.
   },
 
   /* ------------------------------------------------------------- ANIMATIONS */

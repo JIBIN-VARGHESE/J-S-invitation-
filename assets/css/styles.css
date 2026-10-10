@@ -92,7 +92,7 @@ em { font-style: italic; }
 /* even line lengths, no single-word last lines */
 h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 
-.eyebrow { font-family: var(--sans); font-weight: 500; font-size: .7rem; letter-spacing: .26em; text-transform: uppercase; color: var(--accent); }
+.eyebrow { font-family: var(--sans); font-weight: 500; font-size: .74rem; letter-spacing: .26em; text-transform: uppercase; color: var(--accent); }
 .rule { display: inline-block; width: 2.6rem; height: 1px; background: currentColor; opacity: .6; vertical-align: middle; }
 .orn { display: block; width: 30px; height: 46px; margin: 0 auto 1.4rem; color: var(--accent); filter: drop-shadow(0 0 6px rgba(240, 184, 102, .35)); }
 .orn--lg { width: 44px; height: 68px; margin-bottom: 2rem; }
@@ -159,7 +159,7 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 .is-ready .topbar__mark.is-away { opacity: 0; pointer-events: none; transition-delay: 0s; transition-duration: .4s; }
 .topbar__mark { font-family: var(--display); font-size: .92rem; letter-spacing: .12em; }
 .topbar__mark i { font-family: var(--script); font-style: normal; font-size: 1.2rem; color: var(--gold); }
-.music { font-family: var(--sans); font-size: .62rem; font-weight: 500; letter-spacing: var(--track); text-transform: uppercase; }
+.music { font-family: var(--sans); font-size: .7rem; font-weight: 500; letter-spacing: var(--track); text-transform: uppercase; }
 .music__bars { display: inline-flex; align-items: flex-end; gap: 2px; height: 12px; }
 .music__bars i { width: 2px; height: 30%; background: var(--gold); border-radius: 1px; }
 .music.is-playing .music__bars i { animation: bar 1.4s var(--ease) infinite alternate; }
@@ -185,14 +185,14 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 }
 .layer { position: absolute; will-change: transform; }
 .hero__film picture { display: block; width: 100%; height: 100%; }
-.hero__film { left: 0; right: 0; top: -16svh; height: calc(100% + 16svh); transform: translate3d(0, calc(var(--y) * .45px), 0); }
+.hero__film { inset: 0; }
 .hero__photo { display: block; }
 .hero__photo { width: 100%; height: 100%; object-fit: cover; object-position: 50% 0%; transform: scale(1.06); transition: transform 10s cubic-bezier(.2, .6, .2, 1); }
 .is-ready .hero__photo { display: block; }
 .hero__photo { transform: scale(1); }
 .hero__shade {
   inset: 0; z-index: 1;
-  background: linear-gradient(180deg, rgba(14, 10, 7, .25) 0%, rgba(14, 10, 7, 0) 18%, rgba(14, 10, 7, 0) 40%, rgba(14, 10, 7, .55) 64%, rgba(14, 10, 7, .92) 86%, var(--sanctuary) 100%);
+  background: linear-gradient(180deg, rgba(14, 10, 7, .3) 0%, rgba(14, 10, 7, 0) 16%, rgba(14, 10, 7, 0) 38%, rgba(14, 10, 7, .55) 52%, rgba(14, 10, 7, .85) 64%, var(--sanctuary) 82%);
 }
 /* heavenly light: soft rays fanning from above, turning very slowly */
 .hero__rays { inset: -30% -30% 30%; z-index: 1; pointer-events: none; opacity: .5; mix-blend-mode: screen; }
@@ -212,14 +212,14 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
   transform: translate3d(0, calc(var(--y) * -.2px), 0);
   opacity: calc(1 - var(--y) / 520);
 }
-.hero__eyebrow { font-family: var(--sans); font-weight: 500; font-size: .66rem; letter-spacing: .32em; margin-right: -.32em; text-transform: uppercase; color: var(--gold); }
-.hero__title { margin-top: .9rem; display: flex; flex-direction: column; align-items: center; line-height: .92; text-shadow: 0 2px 30px rgba(0, 0, 0, .45), 0 0 40px rgba(240, 184, 102, .25); }
+.hero__eyebrow { font-family: var(--sans); font-weight: 500; font-size: .74rem; letter-spacing: .3em; margin-right: -.3em; text-transform: uppercase; color: var(--gold); text-shadow: 0 1px 12px rgba(0, 0, 0, .9); }
+.hero__title { margin-top: .9rem; display: flex; flex-direction: column; align-items: center; line-height: .92; text-shadow: 0 2px 4px rgba(0, 0, 0, .55), 0 2px 30px rgba(0, 0, 0, .6), 0 0 40px rgba(240, 184, 102, .25); }
 .hero__name { font-size: clamp(3.2rem, 17vw, 7.5rem); letter-spacing: .12em; margin-right: -.12em; color: #FFF8EA; }
 .hero__amp { font-family: var(--script); font-size: clamp(3.6rem, 18vw, 7rem); line-height: .55; color: var(--gold); margin: .02em 0 .08em; position: relative; z-index: 1; }
-.hero__date { margin-top: 1.4rem; display: flex; align-items: center; gap: .8rem; font-family: var(--sans); font-weight: 500; font-size: .76rem; letter-spacing: .26em; text-transform: uppercase; color: var(--cream); }
+.hero__date { margin-top: 1.4rem; display: flex; align-items: center; gap: .8rem; font-family: var(--sans); font-weight: 500; font-size: .8rem; letter-spacing: .26em; text-transform: uppercase; color: var(--cream); }
 .hero__date b { font-family: var(--display); font-weight: 400; font-size: 1.6rem; letter-spacing: .04em; line-height: 1; color: #FFF8EA; }
 .hero__date i { width: 1px; height: 1.4rem; background: var(--gold); opacity: .7; }
-.hero__place { margin-top: .8rem; font-style: italic; font-size: 1.1rem; color: var(--cream-soft); }
+.hero__place { margin-top: .8rem; font-style: italic; font-size: 1.2rem; color: var(--cream); }
 .js .hero__content > * { opacity: 0; transform: translateY(16px); transition: opacity 1.6s var(--ease), transform 1.8s var(--ease-out); }
 .is-ready .hero__content > * { opacity: 1; transform: none; }
 .is-ready .hero__content > :nth-child(2) { transition-delay: .5s; }
@@ -239,7 +239,7 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 /* ================================================================= RSVP */
 .rsvp__form { max-width: 30rem; margin: clamp(3rem, 9vw, 4.5rem) auto 0; display: grid; gap: 2.2rem; }
 .field { display: grid; gap: .55rem; border: 0; margin: 0; padding: 0; min-width: 0; }
-.field label, .field legend { font-family: var(--sans); font-weight: 500; font-size: .66rem; letter-spacing: var(--track); text-transform: uppercase; color: var(--accent); padding: 0; }
+.field label, .field legend { font-family: var(--sans); font-weight: 500; font-size: .7rem; letter-spacing: var(--track); text-transform: uppercase; color: var(--accent); padding: 0; }
 .field label span { text-transform: none; letter-spacing: .02em; color: var(--fg-soft); font-weight: 400; }
 .field legend { margin-bottom: .9rem; }
 .field input[type="text"], .field input[type="number"], .field textarea {
@@ -321,7 +321,7 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 .card__date > span { padding-left: .85rem; border-left: 1px solid var(--line); text-align: left; width: 5.2em; font-family: var(--sans); font-weight: 500; font-size: .72rem; letter-spacing: var(--track); text-transform: uppercase; }
 .card__place { font-family: var(--display); font-size: 1.05rem; letter-spacing: .32em; margin-right: -.32em; }
 .card__text { max-width: 19.5rem; font-style: italic; font-size: 1.08rem; line-height: 1.42; color: var(--fg-soft); }
-.card__meta, .card__foot { font-family: var(--sans); font-weight: 500; font-size: .66rem; letter-spacing: var(--track); text-transform: uppercase; color: var(--accent); }
+.card__meta, .card__foot { font-family: var(--sans); font-weight: 500; font-size: .7rem; letter-spacing: var(--track); text-transform: uppercase; color: var(--accent); }
 .card__meta.tba { font-style: normal; }
 .card__foot { margin-top: .5rem; padding-top: .8rem; border-top: 1px solid var(--line); color: var(--fg-soft); }
 .card__bigdate { display: flex; align-items: center; gap: .55rem; font-family: var(--display); font-size: 1.9rem; line-height: 1; }
@@ -343,7 +343,7 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 .countdown__grid > div { display: grid; gap: .35rem; }
 .countdown__grid > div + div { border-left: 1px solid var(--line); }
 .countdown__num { font-family: var(--display); font-size: clamp(1.7rem, 8vw, 2.2rem); line-height: 1; font-variant-numeric: tabular-nums; }
-.countdown__lbl { font-family: var(--sans); font-weight: 500; font-size: .56rem; letter-spacing: var(--track); text-transform: uppercase; color: var(--accent); }
+.countdown__lbl { font-family: var(--sans); font-weight: 500; font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
 .card--rsvp { gap: .4rem; padding-top: 1.6rem; }
 .card--rsvp .rsvp__form { width: 100%; margin: .4rem 0 0; gap: .9rem; max-width: none; text-align: left; }
 .card--rsvp .field input[type="text"], .card--rsvp .field input[type="number"], .card--rsvp .field textarea { font-size: 1.15rem; padding: .3rem 0 .4rem; }
@@ -359,15 +359,15 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 .card .choice input:checked + label { background: rgba(228, 187, 112, .18); border-color: #E4BB70; color: #FFF3DE; }
 
 /* ------------------------------------------------------ words in the church */
-.wake__line { max-width: 20rem; font-weight: 300; font-style: italic; font-size: clamp(1.7rem, 7vw, 2.4rem); line-height: 1.3; color: #FFF4E0; text-shadow: 0 0 30px rgba(240, 184, 102, .5), 0 2px 16px rgba(0, 0, 0, .8); }
+.wake__line { max-width: 20rem; font-weight: 400; font-style: italic; font-size: clamp(1.7rem, 7vw, 2.4rem); line-height: 1.3; color: #FFF4E0; text-shadow: 0 0 30px rgba(240, 184, 102, .5), 0 2px 16px rgba(0, 0, 0, .8); }
 .scene--save { width: min(92vw, 30rem); text-align: center; color: #FFF8EA; text-shadow: 0 0 40px rgba(240, 184, 102, .7), 0 2px 18px rgba(0, 0, 0, .75); }
 .savedate__title { display: flex; flex-direction: column; align-items: center; font-size: clamp(2.8rem, 13vw, 5.4rem); line-height: 1.04; letter-spacing: .1em; margin-right: -.1em; }
 .savedate__title em { color: var(--gold); font-size: 1.15em; margin: -.1em 0 -.05em; }
 .savedate__date { margin-top: 1.2rem; font-family: var(--display); font-size: 1.05rem; letter-spacing: .42em; margin-right: -.42em; color: var(--gold); }
 .verse__body { position: relative; max-width: 22rem; padding: 2.4rem 1.6rem; text-align: center; background: radial-gradient(closest-side, rgba(8, 5, 3, .8), rgba(8, 5, 3, .5) 60%, rgba(8, 5, 3, 0)); }
-.verse__text { color: #FFF8EA; font-weight: 300; font-style: italic; font-size: clamp(1.75rem, 7.4vw, 2.6rem); line-height: 1.26; text-shadow: 0 0 28px rgba(240, 184, 102, .35); }
+.verse__text { color: #FFF8EA; font-weight: 400; font-style: italic; font-size: clamp(1.75rem, 7.4vw, 2.6rem); line-height: 1.26; text-shadow: 0 0 28px rgba(240, 184, 102, .35); }
 .verse__text .w { display: inline-block; opacity: clamp(.16, calc(var(--p, 1) * 1.35 * (var(--n) + 2) - var(--i)), 1); }
-.verse__ref { margin-top: 1.3rem; display: flex; align-items: center; justify-content: center; gap: 1rem; font-family: var(--sans); font-weight: 500; font-size: .68rem; letter-spacing: var(--track); text-transform: uppercase; color: var(--gold); opacity: clamp(0, calc((var(--p, 1) - .72) / .15), 1); }
+.verse__ref { margin-top: 1.3rem; display: flex; align-items: center; justify-content: center; gap: 1rem; font-family: var(--sans); font-weight: 500; font-size: .74rem; letter-spacing: var(--track); text-transform: uppercase; color: var(--gold); opacity: clamp(0, calc((var(--p, 1) - .72) / .15), 1); }
 .presence__line { max-width: 21rem; font-style: italic; font-size: clamp(1.8rem, 7.4vw, 2.6rem); line-height: 1.25; color: #FFF8EA; text-shadow: 0 1px 2px rgba(60, 30, 0, .7), 0 0 26px rgba(70, 40, 10, .6); }
 
 /* ------------------------------------------------------------ the finale */
@@ -391,10 +391,10 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
   mask-image: linear-gradient(90deg, #000 calc(var(--write, 1) * 125% - 25%), transparent calc(var(--write, 1) * 125%));
 }
 .finale__names em { font-family: var(--script); font-style: normal; text-transform: none; letter-spacing: 0; font-size: 1.3em; color: var(--gold); margin: 0 .18em 0 .02em; }
-.finale__full { font-family: var(--sans); font-weight: 500; font-size: .68rem; letter-spacing: var(--track); text-transform: uppercase; color: var(--cream); }
+.finale__full { font-family: var(--sans); font-weight: 500; font-size: .74rem; letter-spacing: var(--track); text-transform: uppercase; color: var(--cream); }
 .finale__date { font-family: var(--display); font-size: 1rem; letter-spacing: .4em; margin-right: -.4em; color: var(--gold); }
 .finale__quote { margin-top: .4rem; max-width: 22rem; font-style: italic; font-size: 1.25rem; line-height: 1.35; color: var(--cream); }
-.finale__ref { margin-top: -.3rem; font-family: var(--sans); font-weight: 500; font-size: .62rem; letter-spacing: var(--track); text-transform: uppercase; color: var(--gold); }
+.finale__ref { margin-top: -.3rem; font-family: var(--sans); font-weight: 500; font-size: .72rem; letter-spacing: var(--track); text-transform: uppercase; color: var(--gold); }
 /* the last candle: a placeholder; the flame is drawn on the dust canvas */
 .finale__candle { display: block; width: 60px; height: 64px; margin-top: -.2rem; }
 
@@ -413,7 +413,7 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 .next-hint.is-on { animation: beckon 2.4s ease-in-out 1.2s infinite; }
 @keyframes beckon { 0%, 100% { box-shadow: 0 6px 24px rgba(0, 0, 0, .45), 0 0 0 0 rgba(240, 184, 102, 0); } 50% { box-shadow: 0 6px 24px rgba(0, 0, 0, .45), 0 0 22px 3px rgba(240, 184, 102, .5); } }
 .back-hint { left: max(.9rem, env(safe-area-inset-left)); gap: .4rem; padding: .7rem .5rem; background: none;
-  font-family: var(--sans); font-weight: 500; font-size: .6rem; letter-spacing: .22em; text-transform: uppercase; color: rgba(243, 232, 213, .75); text-shadow: 0 1px 8px rgba(0, 0, 0, .9); }
+  font-family: var(--sans); font-weight: 500; font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; color: rgba(243, 232, 213, .85); text-shadow: 0 1px 8px rgba(0, 0, 0, .9); }
 .back-hint i { width: 6px; height: 6px; border-left: 1.3px solid currentColor; border-bottom: 1.3px solid currentColor; transform: rotate(45deg); }
 .journey .hero { position: fixed; inset: 0; height: 100%; min-height: 0; z-index: 3; }
 .journey .hero__film, .journey .hero__content { will-change: transform, opacity; }
@@ -444,8 +444,7 @@ html:not(.journey) .nave { opacity: 1; }
 
 /* ======================================================== Larger screens */
 @media (min-aspect-ratio: 1/1) {
-  .hero__film { top: 0; height: 112%; }
-  .hero__photo { object-position: 50% 30%; }
+  .hero__photo { object-position: 50% 0%; }
   .hero__title { flex-direction: row; align-items: center; gap: 0; }
   .hero__name { font-size: clamp(3rem, min(7.4vw, 13vh), 7.5rem); }
   .hero__amp { line-height: 1; margin: 0 .42em 0 .3em; font-size: clamp(3.6rem, min(9vw, 15vh), 8rem); }

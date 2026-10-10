@@ -36,16 +36,16 @@ Open **`config.js`**. It holds the names, dates, times, venues, addresses, map l
 
 The page is one continuous scene, run by `assets/js/journey.js`. Scrolling doesn't move content up the page; it moves a camera through a 3D church (`assets/js/nave.js`, WebGL). Everything is placed from **one eased scroll value per frame**, so the church, cards and light never drift apart.
 
-1. **Arrival:** the statue picture and your names, then a fade to black.
+1. **Arrival:** your photo and names, then a fade to black.
 2. **The church wakes:** "In the presence of God and our families…", candles light one by one down the aisle, then the windows.
 3. **Save the Date** hangs in the air of the aisle; you walk through it.
 4. **Stations:** invitation, engagement, ceremony, reception, countdown, RSVP. Each card stands in the aisle. As you reach it, the camera turns to it, it comes to the centre and holds while you read, then you walk on past. The verse appears between the invitation and the engagement, under the brightening rose window.
 5. **The light:** at the altar the rose window swells until light fills the screen ("Your presence would make our celebration complete").
 6. **Together:** out of the light, the couple photo. It drifts slowly closer, gold dust floats, the names write themselves, the verse and one candle appear.
 
-**Chapters.** The page doesn't scroll. Guests tap **Continue** (or swipe once) to move to the next chapter, and a small **Back** returns; the journey then plays on its own: the camera glides, turns to the next card, the card settles and its words reveal. The opening (statue → church → Save the Date → invitation) and the ending play by themselves; the opening waits until the names, date and place are fully shown. A tap or swipe while the journey moves hurries it to the next stop (on the statue, it starts the opening), and a guest who has seen the opening before gets it twice as fast. Save the Date and the verse hang in the aisle; each rests a moment and the camera walks through it.
+**Chapters.** The page doesn't scroll. Guests tap **Continue** (or swipe once) to move to the next chapter, and a small **Back** returns; the journey then plays on its own: the camera glides, turns to the next card, the card settles and its words reveal. The opening (photo → church → Save the Date → invitation) and the ending play by themselves; the opening waits until the names, date and place are fully shown. A tap or swipe while the journey moves hurries it to the next stop (on the opening photo, it starts the journey), and a guest who has seen the opening before gets it twice as fast. Save the Date and the verse hang in the aisle; each rests a moment and the camera walks through it.
 
-**Changing the pacing.** At the top of `journey.js`: `STOPS` (where each chapter rests), `rate()` (how fast each stretch plays), `REVEAL` + `AUTO_START` (time on the statue: the names fading in, then resting), `HURRY` (how much faster a tap during a move plays), `REPEAT_INTRO` (opening speed for returning guests);
+**Changing the pacing.** At the top of `journey.js`: `STOPS` (where each chapter rests), `rate()` (how fast each stretch plays), `REVEAL` + `AUTO_START` (time on the opening photo: the names fading in, then resting), `HURRY` (how much faster a tap during a move plays), `REPEAT_INTRO` (opening speed for returning guests);
 - `TOTAL` is the length in screens of scrolling;
 - `STATIONS` says where each card stands (`z` along the aisle, `x` left/right) and when it arrives (`a`), holds until (`b`) and is passed (`s1`);
 - `CAM` lists the camera's position along the aisle at given scroll points.
@@ -57,7 +57,7 @@ Keep the stations and the camera points in step.
 
 | Layer | File | Notes |
 |---|---|---|
-| Opening picture | `assets/images/hero/hero-portrait.webp`, `hero-landscape.webp` | a still from the Vecteezy clip you supplied |
+| Opening picture | `assets/images/hero/hero-portrait.webp`, `hero-landscape.webp` | the top of your collage, fading into the dark where the names sit; on wide screens it stands over a blurred copy of itself |
 | Floor, carpet, walls, side-aisle windows | `floor.webp`, `carpet.webp`, `wall.webp`, `aisle.webp` | rendered for this site; they repeat |
 | Pillars, arches, pews | `pier.webp`, `arch.webp`, `pew.webp`, `pewend.webp` | rendered for this site |
 | Altar wall (rose window, altar, candles) | `altar.webp` | rendered for this site |
@@ -65,7 +65,7 @@ Keep the stations and the camera points in step.
 
 All church textures are in `assets/images/nave/`; paths are listed in `config.js → art`. Texture sizes are powers of two (512, 1024, 2048); keep them that way if you replace one.
 
-**Credits.** The footer credit line was removed at your request. The free Vecteezy licence (opening picture) requires visible attribution, so either hold a premium licence or add a credit line back at the end of `index.html`.
+**Credits.** Both photos are your own, so no credit line is needed.
 
 ## 2b. Animations (Lottie)
 
