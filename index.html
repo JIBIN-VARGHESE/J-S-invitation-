@@ -31,6 +31,7 @@
   <script src="config.js"></script>
   <script src="assets/js/rsvp.js" defer></script>
   <script src="assets/js/nave.js" defer></script>
+  <script src="assets/js/journey.js" defer></script>
   <script src="assets/js/main.js" defer></script>
 </head>
 <body>
@@ -101,9 +102,8 @@
   <audio class="music__audio" preload="none" loop></audio>
 </div>
 
-<!-- ================================================================ HEADER
-     Watercolour sky + church (right edge) + names. Layers scroll at different speeds.
-     Artwork paths: config.js → art -->
+<!-- ================================================================ ARRIVAL
+     The statue and the names. In the journey it stays fixed and fades to black. -->
 <header class="hero" id="top">
   <!-- Background picture: portrait crop on phones, landscape on wide screens (config.js → art.hero*) -->
   <div class="hero__film layer" aria-hidden="true">
@@ -129,29 +129,31 @@
 </header>
 
 <!-- ============================================================ THE NAVE
-     A fixed church interior behind every section. As the page scrolls, the
-     camera walks down the aisle towards the altar, where the couple walk
-     toward each other. Drawn in WebGL by assets/js/nave.js (canvas inserted here). -->
+     The church interior, drawn in WebGL by assets/js/nave.js. journey.js
+     moves its camera and every scene below from one scroll value. -->
 <div class="nave" aria-hidden="true">
   <div class="nave__vignette"></div>
 </div>
 
-<main>
+<!-- ============================================================ THE JOURNEY
+     Each scene is placed and timed by assets/js/journey.js. Without
+     JavaScript (or with "reduce motion") they simply stack as a page. -->
+<main class="scenes">
 
-  <!-- ================================================== SAVE THE DATE
-       Pinned moment: the words appear over the nave as you walk in. -->
-  <section class="savedate" id="save-the-date" data-scrub="pin" data-nofade aria-labelledby="sd-title">
-    <div class="pin">
-      <div class="savedate__text">
-        <h2 class="savedate__title" id="sd-title">Save <em>the</em> Date</h2>
-        <p class="savedate__date" data-bind="weddingDateDots">25.04.2027</p>
-      </div>
-    </div>
+  <!-- 2 · the church wakes -->
+  <section class="scene scene--wake" id="wake" aria-label="Welcome">
+    <p class="wake__line" data-bind="invitation.welcome">In the presence of God<br>and our families…</p>
   </section>
 
-  <!-- ===================================================== INVITATION -->
-  <section class="invite panel" id="invitation" aria-labelledby="invite-title">
-    <svg class="orn orn--lg" aria-hidden="true"><use href="#ornate-cross"/></svg>
+  <!-- 3 · words hanging in the aisle -->
+  <section class="scene scene--save" id="save-the-date" aria-labelledby="sd-title">
+    <h2 class="savedate__title" id="sd-title">Save <em>the</em> Date</h2>
+    <p class="savedate__date" data-bind="weddingDateDots">25.04.2027</p>
+  </section>
+
+  <!-- 4 · stations: cards that stand in the aisle -->
+  <section class="scene card" id="invitation" aria-labelledby="invite-title">
+    <svg class="orn" aria-hidden="true"><use href="#ornate-cross"/></svg>
     <p class="eyebrow" data-bind="invitation.eyebrow">Together with our families</p>
     <div class="invite__lines" data-list="invitation.lines"></div>
     <h2 class="invite__names" id="invite-title">
@@ -159,104 +161,72 @@
       <em>&amp;</em>
       <span data-bind="couple.brideFull">Sofia John</span>
     </h2>
-    <p class="invite__when" data-bind="weddingDateLong"></p>
+    <p class="card__foot" data-bind="weddingDateLong"></p>
   </section>
 
-  <!-- ========================================================== VERSE -->
-  <section class="verse" id="verse" data-scrub="pin" data-nofade aria-labelledby="verse-ref">
-    <div class="pin">
-      <figure class="verse__body">
-        <blockquote class="verse__text" data-words="verse.text"></blockquote>
-        <figcaption class="verse__ref" id="verse-ref">
-          <span class="rule" aria-hidden="true"></span>
-          <span data-bind="verse.reference"></span>
-          <span class="rule" aria-hidden="true"></span>
-        </figcaption>
-      </figure>
-    </div>
+  <section class="scene scene--verse" id="verse" aria-labelledby="verse-ref">
+    <figure class="verse__body">
+      <blockquote class="verse__text" data-words="verse.text"></blockquote>
+      <figcaption class="verse__ref" id="verse-ref">
+        <span class="rule" aria-hidden="true"></span>
+        <span data-bind="verse.reference"></span>
+        <span class="rule" aria-hidden="true"></span>
+      </figcaption>
+    </figure>
   </section>
 
-  <!-- ===================================================== ENGAGEMENT -->
-  <section class="event event--engagement panel" id="engagement" aria-labelledby="eng-title">
-    <div class="event__inner">
-      <header class="event__head">
-        <p class="eyebrow"><span data-bind="engagementWeekday">Saturday</span> · The Betrothal</p>
-        <h2 class="event__title" id="eng-title">Engagement</h2>
-      </header>
-      <div class="event__date" aria-label="17 April 2027">
-        <span class="event__day" data-bind="engagementDay">17</span>
-        <span class="event__month"><span data-bind="engagementMonth">April</span><span data-bind="engagementYear">2027</span></span>
-      </div>
-      <p class="event__place" data-bind="engagement.town">Pandalam</p>
-      <p class="event__desc" data-bind="engagement.description"></p>
-      <dl class="details">
-        <div><dt>Time</dt><dd data-bind="engagementTime"></dd></div>
-        <div><dt>Venue</dt><dd data-bind="engagementVenue"></dd></div>
-        <div><dt>Address</dt><dd data-bind="engagementAddress"></dd></div>
-      </dl>
-      <a class="btn" data-href-bind="engagement.mapsUrl" target="_blank" rel="noopener">View Location</a>
-    </div>
+  <section class="scene card" id="engagement" aria-labelledby="eng-title">
+    <p class="eyebrow"><span data-bind="engagementWeekday">Saturday</span> · The Betrothal</p>
+    <h2 class="card__title" id="eng-title">Engagement</h2>
+    <p class="card__date"><b data-bind="engagementDay">17</b><span><span data-bind="engagementMonth">April</span> <span data-bind="engagementYear">2027</span></span></p>
+    <p class="card__place" data-bind="engagement.town">Pandalam</p>
+    <p class="card__text" data-bind="engagement.description"></p>
+    <p class="card__meta" data-bind="engagementMeta"></p>
+    <a class="btn" data-href-bind="engagement.mapsUrl" target="_blank" rel="noopener">View Location</a>
   </section>
 
-  <!-- ======================================================== WEDDING -->
-  <section class="event event--wedding panel panel--wide" id="wedding" aria-labelledby="wed-title">
-    <div class="event__inner">
-      <header class="event__head">
-        <svg class="orn" aria-hidden="true"><use href="#ornate-cross"/></svg>
-        <p class="eyebrow">Holy Matrimony</p>
-        <h2 class="event__title event__title--xl" id="wed-title"><em>The</em> Wedding</h2>
-        <p class="wedding__date">
-          <span data-bind="weddingD">25</span><i aria-hidden="true"></i><span data-bind="weddingM">04</span><i aria-hidden="true"></i><span data-bind="weddingY">2027</span>
-        </p>
-        <p class="wedding__place"><span data-bind="weddingWeekday">Sunday</span> · <span data-bind="wedding.town">Kozhikode</span>, <span data-bind="wedding.region">Kerala</span></p>
-      </header>
-      <div class="wedding__cards">
-        <article class="wcard">
-          <p class="wcard__label">The Ceremony</p>
-          <h3 class="wcard__title" data-bind="churchName"></h3>
-          <p class="wcard__time" data-bind="ceremonyTime"></p>
-          <p class="wcard__addr" data-bind="churchAddress"></p>
-          <a class="btn btn--light" data-href-bind="wedding.churchMapsUrl" target="_blank" rel="noopener">View Location</a>
-        </article>
-        <article class="wcard">
-          <p class="wcard__label">The Reception</p>
-          <h3 class="wcard__title" data-bind="receptionVenue"></h3>
-          <p class="wcard__time" data-bind="receptionTime"></p>
-          <p class="wcard__addr" data-bind="receptionAddress"></p>
-          <a class="btn btn--light" data-href-bind="receptionMapsUrl" target="_blank" rel="noopener">View Location</a>
-        </article>
-      </div>
-    </div>
+  <section class="scene card" id="ceremony" aria-labelledby="wed-title">
+    <svg class="orn" aria-hidden="true"><use href="#ornate-cross"/></svg>
+    <p class="eyebrow">Holy Matrimony</p>
+    <h2 class="card__title" id="wed-title"><em>The</em> Wedding</h2>
+    <p class="card__bigdate"><span data-bind="weddingD">25</span><i aria-hidden="true"></i><span data-bind="weddingM">04</span><i aria-hidden="true"></i><span data-bind="weddingY">2027</span></p>
+    <h3 class="card__venue" data-bind="churchName"></h3>
+    <p class="card__time"><span data-bind="weddingWeekday">Sunday</span> · <span data-bind="ceremonyTime"></span></p>
+    <p class="card__addr" data-bind="churchAddress"></p>
+    <a class="btn" data-href-bind="wedding.churchMapsUrl" target="_blank" rel="noopener">View Location</a>
   </section>
 
-  <!-- ====================================================== COUNTDOWN -->
-  <section class="countdown panel" id="countdown" aria-labelledby="cd-title">
-    <div class="lottie lottie--countdown" data-lottie="countdown" aria-hidden="true"></div>
-    <h2 class="section-title" id="cd-title"><em>Counting</em> the days</h2>
+  <section class="scene card" id="reception" aria-labelledby="rec-title">
+    <p class="eyebrow">The same evening</p>
+    <h2 class="card__title" id="rec-title"><em>The</em> Reception</h2>
+    <h3 class="card__venue" data-bind="receptionVenue"></h3>
+    <p class="card__time" data-bind="receptionTime"></p>
+    <p class="card__addr" data-bind="receptionAddress"></p>
+    <a class="btn" data-href-bind="receptionMapsUrl" target="_blank" rel="noopener">View Location</a>
+  </section>
+
+  <section class="scene card" id="countdown" aria-labelledby="cd-title">
+    <p class="eyebrow">Until we say “I do”</p>
+    <h2 class="card__title" id="cd-title"><em>Counting</em> the days</h2>
     <div class="countdown__grid" role="timer" aria-live="off">
       <div><span class="countdown__num" data-cd="days">000</span><span class="countdown__lbl">Days</span></div>
       <div><span class="countdown__num" data-cd="hours">00</span><span class="countdown__lbl">Hours</span></div>
       <div><span class="countdown__num" data-cd="minutes">00</span><span class="countdown__lbl">Minutes</span></div>
       <div><span class="countdown__num" data-cd="seconds">00</span><span class="countdown__lbl">Seconds</span></div>
     </div>
-    <p class="countdown__note" data-bind="countdownNote"></p>
+    <p class="card__foot countdown__note" data-bind="countdownNote"></p>
   </section>
 
-  <!-- =========================================================== RSVP -->
-  <section class="rsvp panel" id="rsvp" aria-labelledby="rsvp-title">
-    <header class="section-head">
-      <p class="eyebrow">Kindly Reply</p>
-      <h2 class="section-title" id="rsvp-title"><em>Will</em> you join us?</h2>
-      <p class="section-lede" data-bind="rsvpDeadline"></p>
-    </header>
-
+  <section class="scene card card--rsvp" id="rsvp" aria-labelledby="rsvp-title">
+    <p class="eyebrow">Kindly Reply</p>
+    <h2 class="card__title" id="rsvp-title"><em>Will</em> you join us?</h2>
+    <p class="card__text" data-bind="rsvpDeadline"></p>
     <form class="rsvp__form" novalidate>
       <div class="field">
         <label for="rsvp-name">Your name</label>
         <input id="rsvp-name" name="name" type="text" autocomplete="name" required maxlength="80">
         <p class="field__error" id="err-name" aria-live="polite"></p>
       </div>
-
       <fieldset class="field field--choice">
         <legend>Will you attend?</legend>
         <div class="choice">
@@ -267,7 +237,6 @@
         </div>
         <p class="field__error" id="err-attending" aria-live="polite"></p>
       </fieldset>
-
       <div class="field field--guests">
         <label for="rsvp-guests">Number of guests</label>
         <div class="stepper">
@@ -277,76 +246,41 @@
         </div>
         <p class="field__error" id="err-guests" aria-live="polite"></p>
       </div>
-
       <div class="field">
-        <label for="rsvp-msg">A message for the couple <span>(optional)</span></label>
-        <textarea id="rsvp-msg" name="message" rows="3" maxlength="600"></textarea>
+        <label for="rsvp-msg">A message for us <span>(optional)</span></label>
+        <textarea id="rsvp-msg" name="message" rows="2" maxlength="600"></textarea>
       </div>
-
       <!-- Honeypot: humans never see or fill this; bots often do. -->
       <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
-
       <button class="btn btn--solid" type="submit"><span>Send reply</span></button>
       <div class="lottie lottie--rsvp" data-lottie="rsvp" data-lottie-play="rsvp:sent" aria-hidden="true"></div>
       <p class="rsvp__status" role="status" aria-live="polite"></p>
     </form>
   </section>
 
-  <!-- ====================================================== LOCATIONS -->
-  <section class="locations panel panel--wide" id="locations" aria-labelledby="loc-title">
-    <header class="section-head">
-      <p class="eyebrow">Finding Your Way</p>
-      <h2 class="section-title" id="loc-title"><em>Where</em> we gather</h2>
-    </header>
-    <div class="locations__cards">
-      <article class="lcard">
-        <p class="eyebrow">Engagement</p>
-        <h3 class="lcard__town"><span data-bind="engagement.town">Pandalam</span>, <span data-bind="engagement.region">Kerala</span></h3>
-        <p class="lcard__date" data-bind="engagementDateLong"></p>
-        <p class="lcard__venue" data-bind="engagementVenueFull"></p>
-        <a class="btn" data-href-bind="engagement.mapsUrl" target="_blank" rel="noopener">View Location</a>
-      </article>
-      <article class="lcard">
-        <p class="eyebrow">Wedding</p>
-        <h3 class="lcard__town"><span data-bind="wedding.town">Kozhikode</span>, <span data-bind="wedding.region">Kerala</span></h3>
-        <p class="lcard__date" data-bind="weddingDateLong"></p>
-        <p class="lcard__time" data-bind="ceremonyTime"></p>
-        <p class="lcard__venue" data-bind="weddingVenueFull"></p>
-        <a class="btn" data-href-bind="wedding.churchMapsUrl" target="_blank" rel="noopener">View Location</a>
-      </article>
-      <article class="lcard">
-        <p class="eyebrow">Reception</p>
-        <h3 class="lcard__town"><span data-bind="wedding.town">Kozhikode</span>, <span data-bind="wedding.region">Kerala</span></h3>
-        <p class="lcard__date" data-bind="weddingDateLong"></p>
-        <p class="lcard__time" data-bind="receptionTime"></p>
-        <p class="lcard__venue" data-bind="receptionVenueFull"></p>
-        <a class="btn" data-href-bind="receptionMapsUrl" target="_blank" rel="noopener">View Location</a>
-      </article>
-    </div>
+  <!-- 5 · the light -->
+  <section class="scene scene--line" id="presence" aria-label="A last word">
+    <p class="presence__line" data-bind="closing.line"></p>
   </section>
 
-  <!-- ======================================================== CLOSING -->
-  <section class="closing" id="closing" data-scrub="pin" data-nofade aria-labelledby="close-names">
-    <div class="pin">
-      <!-- the couple: a photograph that fades in over the church (config.js → art.closingPhoto) -->
-      <div class="closing__photo"><img data-art="closingPhoto" src="assets/images/closing/couple-arches.webp" alt="A bride and groom embracing beneath a long arched corridor" loading="lazy" decoding="async"></div>
-      <div class="closing__text">
-        <p class="closing__line" data-bind="closing.line"></p>
-        <div class="closing__sign">
-          <svg class="closing__cross"><use href="#ornate-cross"/></svg>
-          <h2 class="closing__names" id="close-names">
-            <span data-bind="couple.groom">Jibin</span> <em>&amp;</em> <span data-bind="couple.bride">Sofi</span>
-          </h2>
-          <p class="closing__full"><span data-bind="couple.groomFull">Jibin Varghese</span> &amp; <span data-bind="couple.brideFull">Sofia John</span></p>
-          <p class="closing__date" data-bind="weddingDateDots">25.04.2027</p>
-          <p class="closing__signoff" data-bind="closing.signoff"></p>
-          <p class="closing__ref" data-bind="closing.signoffRef"></p>
-        </div>
-      </div>
+  <!-- 6 · together -->
+  <section class="scene scene--finale" id="closing" aria-labelledby="close-names">
+    <div class="finale__photo"><img data-art="closingPhoto" src="assets/images/closing/couple-arches.webp" alt="A bride and groom embracing beneath a long arched corridor" decoding="async"></div>
+    <canvas class="finale__dust" aria-hidden="true"></canvas>
+    <div class="finale__text">
+      <h2 class="finale__names" id="close-names">
+        <span data-bind="couple.groom">Jibin</span> <em>&amp;</em> <span data-bind="couple.bride">Sofi</span>
+      </h2>
+      <p class="finale__full"><span data-bind="couple.groomFull">Jibin Varghese</span> &amp; <span data-bind="couple.brideFull">Sofia John</span></p>
+      <p class="finale__date" data-bind="weddingDateDots">25.04.2027</p>
+      <p class="finale__quote" data-bind="closing.signoff"></p>
+      <p class="finale__ref" data-bind="closing.signoffRef"></p>
+      <div class="finale__candle" aria-hidden="true"><i></i></div>
     </div>
   </section>
-
 </main>
+<div class="flash" aria-hidden="true"></div>
+<div class="scroller" aria-hidden="true"></div>
 
 
 <noscript><style>.curtain{display:none}</style></noscript>

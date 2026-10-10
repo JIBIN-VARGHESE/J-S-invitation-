@@ -1,8 +1,7 @@
 /* =============================================================================
    Jibin & Sofi — main script
    1. Content binding from config.js
-   2. Scroll engine  (sets --p on [data-scrub] elements, one rAF per frame)
-   3. Fade-in on enter (IntersectionObserver)
+   2. The journey (assets/js/journey.js), or a calm static page
    4. Countdown (Asia/Kolkata, IST = UTC+05:30)
    5. Music control
    No wedding details live here — edit config.js instead.
@@ -57,6 +56,7 @@
     engagementDateLong: ed.weekday + " · " + ed.d + " " + ed.month + " " + ed.y,
     engagementTime: E.time ? formatTime(E.time) : tba("To be announced"),
     engagementVenue: E.venueName || tba("To be announced"),
+    engagementMeta: (E.time || E.venueName) ? [E.time ? formatTime(E.time) : "Time to be announced", E.venueName || "Venue to be announced"].join(" · ") : tba("Time and venue to be announced"),
     engagementAddress: E.address || [E.town, E.region].filter(Boolean).join(", "),
     engagementVenueFull: [E.venueName, E.address].filter(Boolean).join(", ") || tba("Venue details to follow"),
     churchName: W.churchName || tba("Church to be announced"),
@@ -159,111 +159,22 @@
 
   }
 
-  /* --------------------------------------------- 2. scroll engine (--p) */
-  // data-scrub="pin":  0 when the section top meets the viewport top,
-  //                    1 when its bottom meets the viewport bottom.
-  // data-scrub="view": 0 when the element enters at the bottom,
-  //                    1 when it leaves at the top.
-  var scrubs = [], active = new Set(), ticking = false, progressBar;
-
-  // read phase only: no style writes in here, so the browser never has to
-  // recalculate layout in the middle of a frame
-  function progressOf(node, vh) {
-    var r = node.getBoundingClientRect(), p;
-    if (node.getAttribute("data-scrub") === "pin") {
-      var dist = r.height - vh;
-      p = dist > 0 ? -r.top / dist : 0;
-    } else {
-      p = (vh - r.top) / (vh + r.height);
+  /* ------------------------------------------------- 2. the journey */
+  // assets/js/journey.js runs the whole scroll story. With "reduce motion"
+  // (or if it fails) the scenes stack as a calm page over a still church.
+  function initExperience() {
+    var nave = doc.querySelector(".nave");
+    if (!reduceMotion.matches && window.Journey && window.Nave) {
+      try { window.Journey.init({ art: C.art || {} }); return; }
+      catch (e) { root.classList.remove("journey"); }
     }
-    return Math.min(1, Math.max(0, p));
-  }
-  function write(node, p) {
-    if (node._p !== p) { node._p = p; node.style.setProperty("--p", p.toFixed(4)); }
-  }
-  function measure(node) { write(node, progressOf(node, window.innerHeight)); }
-  var hero, heroVisible = true, lastY = -1, topMark, heroH = 0, maxScroll = 1;
-  function sizes() { heroH = hero ? hero.offsetHeight : 0; maxScroll = Math.max(1, root.scrollHeight - window.innerHeight); }
-  var batch = [];
-  function frame() {
-    ticking = false;
-    // 1. read
-    var sy = window.scrollY, vh = window.innerHeight;
-    batch.length = 0;
-    active.forEach(function (n) { batch.push(n, progressOf(n, vh)); });
-    // 2. write
-    for (var i = 0; i < batch.length; i += 2) write(batch[i], batch[i + 1]);
-    if (topMark) {
-      var past = sy > (heroH ? heroH * .8 : 400);
-      if (past !== topMark._past) { topMark._past = past; topMark.classList.toggle("is-away", past); }
-    }
-    // opening picture parallax
-    if (hero && heroVisible) {
-      var y = Math.round(Math.min(sy, vh * 1.2));
-      if (y !== lastY) { lastY = y; hero.style.setProperty("--y", y); }
-    }
-    if (progressBar) progressBar.style.setProperty("--progress", (sy / maxScroll).toFixed(4));
-  }
-  function requestFrame() { if (!ticking) { ticking = true; requestAnimationFrame(frame); } }
-
-  function initScroll() {
-    progressBar = doc.querySelector(".progress span");
-    topMark = doc.querySelector(".topbar__mark");
-    sizes();
-    window.addEventListener("resize", sizes, { passive: true });
-    if (window.ResizeObserver) new ResizeObserver(sizes).observe(doc.body);
-    hero = doc.querySelector(".hero");
-    scrubs = Array.prototype.slice.call(doc.querySelectorAll("[data-scrub]"));
-    if (reduceMotion.matches) return; // CSS supplies calm static states
-    new IntersectionObserver(function (entries) {
-      heroVisible = entries[0].isIntersecting;
-    }).observe(hero);
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting) active.add(e.target);
-        else { measure(e.target); active.delete(e.target); } // settle at 0 or 1 when leaving
-      });
-      requestFrame();
-    }, { rootMargin: "20% 0px 20% 0px" });
-    scrubs.forEach(function (s) { io.observe(s); });
-    window.addEventListener("scroll", requestFrame, { passive: true });
-    window.addEventListener("resize", requestFrame, { passive: true });
-  }
-
-  /* ----------------------- 3. Feature 2 · fade + float up on enter */
-  // Every <section> and <article> floats up 40px and fades in as it enters.
-  // Pinned scenes (data-nofade) animate with the scroll engine instead.
-  function initFades() {
-    var items = doc.querySelectorAll("main section:not([data-nofade]), main article");
-    if (reduceMotion.matches || !("IntersectionObserver" in window)) return;
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (!e.isIntersecting) return;
-        e.target.classList.add("is-in");
-        io.unobserve(e.target);
-        // drop the transform afterwards so the element stops being its own layer
-        e.target.addEventListener("transitionend", function done(ev) {
-          if (ev.target !== e.target || ev.propertyName !== "transform") return;
-          e.target.classList.remove("fade", "is-in");
-          e.target.removeEventListener("transitionend", done);
-        });
-      });
-    }, { rootMargin: "0px 0px -10% 0px", threshold: 0 });
-    items.forEach(function (n) { n.classList.add("fade"); io.observe(n); });
-  }
-
-  /* ------------------------------------------------------- the nave */
-  // The church interior is drawn by assets/js/nave.js (WebGL). It reads the
-  // scroll position itself and eases toward it, so the walk feels fluid.
-  function initNave() {
-    var el = doc.querySelector(".nave");
-    if (!el || !window.Nave) return;
-    window.Nave.init(el, {
-      hero: doc.querySelector(".hero"),
-      closing: doc.querySelector(".closing"),
-      reduce: reduceMotion.matches,
-      art: C.art || {},
-    });
+    root.classList.add("still");
+    if (!window.Nave || !nave || !window.Nave.init(nave, { art: C.art || {} })) return;
+    // one still view of the lit church, redrawn while its pictures load
+    var n = 0, t = setInterval(function () {
+      window.Nave.draw(performance.now(), { camZ: 9, yaw: 0, expo: 1, ignite: 1, win: 1, bloom: 0 });
+      if (++n > 20) clearInterval(t);
+    }, 300);
   }
 
   /* ------------------------------------------- Lottie animations */
@@ -403,15 +314,12 @@
   /* ------------------------------------------------------------- boot */
   function ready() {
     root.classList.add("is-ready");
-    requestFrame();
   }
 
   bindContent();
   renderLists();
-  initScroll();
-  initFades();
   initLottie();
-  initNave();
+  initExperience();
   initCountdown();
   initMusic();
   if (window.RSVP) window.RSVP.init(doc.querySelector(".rsvp__form"), C.rsvp || {});

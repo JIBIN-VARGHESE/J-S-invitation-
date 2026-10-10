@@ -1,8 +1,9 @@
 /* =============================================================================
    The nave — a small WebGL renderer for the church interior behind the page.
-   World units are metres. The camera stands at eye height in the aisle and
-   walks toward the altar as the page scrolls and stops before it as the
-   closing section begins (where a photograph of the couple fades in).
+   World units are metres. The camera stands at eye height in the aisle; its
+   position, turn (yaw), the light level and the candles are all set from
+   outside by journey.js, once per frame, from the same scroll value that
+   moves every card. Nave.project() places page elements in the same space.
 
    Everything is textured quads in true perspective (floor, walls, piers,
    arches, pews), drawn far to near, plus additive light (window
@@ -22,32 +23,34 @@
   var VS = [
     "attribute vec2 aQ;",
     "uniform vec3 uO, uU, uV, uCam;",
-    "uniform vec4 uUV, uProj;",
+    "uniform vec4 uUV, uProj; uniform vec2 uYaw;",
     "varying vec2 vUV; varying float vD;",
     "void main(){",
-    "  vec3 v = uO + aQ.x * uU + aQ.y * uV - uCam;",
+    "  vec3 w = uO + aQ.x * uU + aQ.y * uV - uCam;",
+    "  vec3 v = vec3(w.x * uYaw.x - w.z * uYaw.y, w.y, w.x * uYaw.y + w.z * uYaw.x);",
     "  vUV = vec2(mix(uUV.x, uUV.z, aQ.x), mix(uUV.w, uUV.y, aQ.y));",
     "  vD = length(v);",
     "  gl_Position = vec4(v.x * uProj.x + uProj.z * v.z, v.y * uProj.y + uProj.w * v.z, v.z - .2, v.z);",
     "}"].join("\n");
   var FS = [
     "precision mediump float;",
-    "uniform sampler2D uT; uniform vec4 uTint; uniform float uFog, uCut;",
+    "uniform sampler2D uT; uniform vec4 uTint; uniform float uFog, uCut, uExpo;",
     "varying vec2 vUV; varying float vD;",
     "void main(){",
     "  vec4 c = texture2D(uT, vUV) * uTint;",
     "  if (c.a < uCut) discard;",
-    "  gl_FragColor = vec4(c.rgb * exp(-vD * uFog), c.a);",
+    "  gl_FragColor = vec4(c.rgb * exp(-vD * uFog) * uExpo, c.a);",
     "}"].join("\n");
   var VS_P = [
     "attribute vec4 aP;",
-    "uniform vec3 uCam; uniform vec4 uProj; uniform float uPx;",
+    "uniform vec3 uCam; uniform vec4 uProj; uniform float uPx, uExpo; uniform vec2 uYaw;",
     "varying float vB;",
     "void main(){",
-    "  vec3 v = aP.xyz - uCam;",
+    "  vec3 w = aP.xyz - uCam;",
+    "  vec3 v = vec3(w.x * uYaw.x - w.z * uYaw.y, w.y, w.x * uYaw.y + w.z * uYaw.x);",
     "  gl_Position = vec4(v.x * uProj.x + uProj.z * v.z, v.y * uProj.y + uProj.w * v.z, v.z - .2, v.z);",
     "  gl_PointSize = clamp(uPx * .024 / max(v.z, .1), 1.5, 16.0);",
-    "  vB = aP.w * clamp(v.z - .4, 0., 1.) * exp(-v.z * .09);",
+    "  vB = aP.w * uExpo * clamp(v.z - .4, 0., 1.) * exp(-v.z * .09);",
     "}"].join("\n");
   var FS_P = [
     "precision mediump float;",
@@ -61,9 +64,9 @@
   var gl, canvas, prog, progP, U = {}, UP = {}, quadBuf, moteBuf, tex = {}, ready = false;
   var W = 0, H = 0, dpr = 1, k = 1, hz = 0;
   var solids = [], lights = [], motes, moteData, NM = 70;
-  var state = { sy: 0, t: 0, camZ: 0 };
-  var layout = { heroH: 0, closeTop: 0, closeH: 0, vh: 0 };
-  var opts = {}, reduce = false, dirty = true, rafId = 0, lastNow = 0, slowFrames = 0, host;
+  // P: what journey.js asks for each frame
+  var P = { camZ: 0, yaw: 0, expo: 1, ignite: 1, win: 1, bloom: 0 };
+  var opts = {}, dirty = true, slowFrames = 0, host, lastDraw = 0, lastKey = "", acc = 0, accN = 0;
 
   /* ------------------------------------------------------------- setup */
   function compile(vs, fs) {
@@ -178,9 +181,9 @@
         var sx = s * (M.pierX - .52), sz = z - .3;
         items.push(Q(tex.white, [sx - .015, 2.02, sz], [.03, 0, 0], [0, .16, 0], null, rgba(.85, .78, .62, 1), { cut: .5, x0: sx, x1: sx, top: 2.2 }));
         items.push(Q(tex.white, [sx - .06, 1.98, sz + .01], [.12, 0, 0], [0, .04, 0], null, grey(.06), { cut: .5, x0: sx, x1: sx, top: 2.1 }));
-        lights.push({ kind: "flame", p: [sx, 2.235, sz - .01], s: .07, c: [1, .9, .7], a: .95, ph: Math.random() * 9 });
-        lights.push({ kind: "glow", p: [sx, 2.24, sz - .02], s: 1.6, c: [1, .62, .3], a: .22, ph: Math.random() * 9 });
-        lights.push({ kind: "pool", p: [sx * .7, 0, sz - .4], s: 2.2, c: [1, .6, .3], a: .09, ph: Math.random() * 9 });
+        lights.push({ kind: "flame", p: [sx, 2.235, sz - .01], s: .07, c: [1, .9, .7], a: .95, ph: Math.random() * 9, candle: sz });
+        lights.push({ kind: "glow", p: [sx, 2.24, sz - .02], s: 1.6, c: [1, .62, .3], a: .22, ph: Math.random() * 9, candle: sz });
+        lights.push({ kind: "pool", p: [sx * .7, 0, sz - .4], s: 2.2, c: [1, .6, .3], a: .09, ph: Math.random() * 9, candle: sz });
       });
       items.push(Q(tex.arch, [-2.95, 4.95, z + .02], [5.9, 0, 0], [0, 4.5, 0], null, grey(1), { cut: .02, x0: -2.95, x1: 2.95, top: 9.45 }));
       // god-rays from the left clerestory, falling across the nave to the right
@@ -209,13 +212,13 @@
       items.push(Q(tex.white, [x - .13, 0, z], [.26, 0, 0], [0, .06, 0], null, grey(.05), { cut: .5, x0: x, x1: x, top: .1 }));
       items.push(Q(tex.white, [x - .1, 1.31, z], [.2, 0, 0], [0, .03, 0], null, grey(.07), { cut: .5, x0: x, x1: x, top: 1.35 }));
       items.push(Q(tex.white, [x - .025, 1.34, z - .01], [.05, 0, 0], [0, .2, 0], null, rgba(.9, .84, .7, 1), { cut: .5, x0: x, x1: x, top: 1.55 }));
-      lights.push({ kind: "flame", p: [x, 1.6, z - .02], s: .09, c: [1, .9, .7], a: 1, ph: Math.random() * 9 });
-      lights.push({ kind: "glow", p: [x, 1.6, z - .03], s: 2.6, c: [1, .62, .3], a: .3, ph: Math.random() * 9 });
-      lights.push({ kind: "pool", p: [x * .8, 0, z - .6], s: 3.4, c: [1, .6, .3], a: .12, ph: Math.random() * 9 });
+      lights.push({ kind: "flame", p: [x, 1.6, z - .02], s: .09, c: [1, .9, .7], a: 1, ph: Math.random() * 9, candle: z });
+      lights.push({ kind: "glow", p: [x, 1.6, z - .03], s: 2.6, c: [1, .62, .3], a: .3, ph: Math.random() * 9, candle: z });
+      lights.push({ kind: "pool", p: [x * .8, 0, z - .6], s: 3.4, c: [1, .6, .3], a: .12, ph: Math.random() * 9, candle: z });
     });
     // the sanctuary glows: a broad warm pool before the altar and a halo at the rose window
     lights.push({ kind: "pool", p: [0, 0, M.altarZ - 1.8], s: 7, c: [1, .7, .4], a: .16, ph: 0, still: true });
-    lights.push({ kind: "glow", p: [0, 4.3, M.altarZ - .1], s: 7.5, c: [1, .66, .36], a: .12, ph: 0, still: true, fog: .01 });
+    lights.push({ kind: "glow", p: [0, 4.3, M.altarZ - .1], s: 7.5, c: [1, .66, .36], a: .12, ph: 0, still: true, fog: .01, rose: true });
     items.sort(function (a, b) { return b.z - a.z; });
     M.items = items;
 
@@ -236,7 +239,7 @@
   function visible(o, cam) {
     var dz = o.z - cam;
     if (dz < .12) return false;
-    if (o.x0 == null) return true;
+    if (o.x0 == null || Math.abs(P.yaw) > .005) return true;
     var s = k / dz, halfW = W / 2 / dpr;
     var a = o.x0 * s, b = o.x1 * s;
     if (Math.min(a, b) > halfW + 40 || Math.max(a, b) < -halfW - 40) return false;
@@ -248,7 +251,8 @@
   }
 
   function render(time) {
-    var cam = state.camZ, cw = W / dpr, ch = H / dpr;
+    var cam = P.camZ, cw = W / dpr, ch = H / dpr, yc = Math.cos(P.yaw), ys = Math.sin(P.yaw);
+    var win = .3 + .7 * P.win;
     gl.viewport(0, 0, W, H);
     gl.clearColor(.022, .016, .013, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -259,13 +263,18 @@
     var proj = [2 * k / cw, 2 * k / ch, 0, 1 - 2 * hz / ch];
     gl.uniform3f(U.Cam, 0, M.eye, cam);
     gl.uniform4fv(U.Proj, proj);
+    gl.uniform2f(U.Yaw, yc, ys);
+    gl.uniform1f(U.Expo, P.expo);
     gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL); gl.depthMask(true);
     gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     boundTex = null;
 
     // planes: floor, carpet, walls, altar
     for (var i = 0; i < 2; i++) { bind(solids[i].t); setQuad(solids[i], solids[i].tint, solids[i].fog, solids[i].cut); }
-    for (i = 2; i < solids.length; i++) { bind(solids[i].t); setQuad(solids[i], solids[i].tint, solids[i].fog, solids[i].cut); }
+    for (i = 2; i < solids.length; i++) {
+      var sq = solids[i], tint = sq.t === tex.altar ? [win, win, win, 1] : sq.tint;   // the windows wake last
+      bind(sq.t); setQuad(sq, tint, sq.fog, sq.cut);
+    }
     // depth-sorted billboards, far to near
     var items = M.items;
     for (i = 0; i < items.length; i++) {
@@ -277,16 +286,24 @@
     // light: additive, depth-tested so piers and pews occlude it
     gl.depthMask(false);
     gl.blendFunc(gl.ONE, gl.ONE);
-    var tsec = time / 1000;
+    gl.uniform1f(U.Expo, 1);
+    var tsec = time / 1000, reach = P.ignite * (M.altarZ + 2);
     for (i = 0; i < lights.length; i++) {
-      var l = lights[i], f = flicker(l, tsec), a = l.a * f, col = [l.c[0] * a, l.c[1] * a, l.c[2] * a, 0];
+      var l = lights[i], f = flicker(l, tsec), lit;
+      // candles light one by one down the aisle; daylight comes with the windows
+      if (l.candle != null) lit = Math.min(1, Math.max(0, (reach - l.candle) / 1.6));
+      else lit = P.win * P.expo;
+      if (lit <= 0) continue;
+      var a = l.a * f * lit;
+      if (l.rose) a += P.bloom * 1.6;
+      var col = [l.c[0] * a, l.c[1] * a, l.c[2] * a, 0];
       if (l.kind === "beam") {
         if (l.O[2] - cam < -6) continue;
         bind(tex.beam);
         setQuad({ O: l.O, U: l.U, V: l.V, uv: [0, 0, 1, 1] }, col, .03, 0);
         continue;
       }
-      var p = l.p, s = l.s * (l.kind === "flame" ? (.92 + .1 * f) : 1);
+      var p = l.p, s = l.s * (l.kind === "flame" ? (.92 + .1 * f) : 1) * (l.rose ? 1 + P.bloom * 2.2 : 1);
       if (p[2] - cam < .15) continue;
       if (l.kind === "pool") {
         bind(tex.glow);
@@ -300,6 +317,7 @@
     // dust in the light
     gl.useProgram(progP);
     gl.uniform3f(UP.Cam, 0, M.eye, cam); gl.uniform4fv(UP.Proj, proj); gl.uniform1f(UP.Px, k * dpr);
+    gl.uniform2f(UP.Yaw, yc, ys); gl.uniform1f(UP.Expo, P.expo * (.4 + .6 * P.win));
     for (i = 0; i < NM; i++) {
       var m = motes[i];
       var zz;
@@ -320,79 +338,51 @@
     gl.depthMask(true);
   }
 
-  /* ------------------------------------------------- scroll → camera */
-  function measure() {
-    var vh = host.clientHeight || window.innerHeight;
-    layout.vh = window.innerHeight;
-    layout.heroH = opts.hero ? opts.hero.offsetHeight : 0;
-    if (opts.closing) {
-      var r = opts.closing.getBoundingClientRect();
-      layout.closeTop = r.top + window.scrollY; layout.closeH = r.height;
-    } else {
-      layout.closeTop = document.documentElement.scrollHeight - vh; layout.closeH = vh * 2;
-    }
-  }
+  /* --------------------------------------------------------- sizing */
   function resize() {
     var cw = host.clientWidth, ch = host.clientHeight;
     var want = Math.min(window.devicePixelRatio || 1, opts.maxDpr || 1.5);
-    if (slowFrames > 2) want = Math.min(want, 1.25); else if (slowFrames > 0) want = Math.min(want, 1.5);
+    if (slowFrames > 2) want = Math.min(want, 1.1); else if (slowFrames > 0) want = Math.min(want, 1.3);
     dpr = want;
     W = Math.round(cw * dpr); H = Math.round(ch * dpr);
     if (canvas.width !== W || canvas.height !== H) { canvas.width = W; canvas.height = H; }
     // focal length: a portrait phone sees the aisle as a tall, narrow view
     k = Math.min(cw * 1.25, ch * .6);
     hz = ch * (cw < ch ? .375 : .42);
-    measure();
     dirty = true;
   }
-  var smooth = function (x) { return x * x * (3 - 2 * x); };
-  function update(dt) {
-    var y = window.scrollY;
-    // inertia: the camera glides after the page, so the walk feels fluid
-    state.sy += (y - state.sy) * (1 - Math.exp(-dt / .12));
-    if (Math.abs(y - state.sy) < .05) state.sy = y;
-    var sy = reduce ? (opts.stillY != null ? opts.stillY : y) : state.sy;
-    var vh = layout.vh, start = layout.heroH * .5;
-    var end = layout.closeTop;                       // the camera arrives as the closing begins
-    var t = Math.min(1, Math.max(0, (sy - start) / Math.max(1, end - start)));
-    var endZ = M.coupleZ - M.endDist;
-    state.t = t;
-    state.camZ = reduce ? endZ * .62 : endZ * (.78 * t + .22 * smooth(t));
-    // fade the church in as the opening film scrolls away
-    var op = reduce ? 1 : Math.min(1, Math.max(0, y / (layout.heroH * .7)));
-    if (op !== state.op) { state.op = op; host.style.opacity = op.toFixed(3); }
-    return op;
+  function viewSize() { return { w: host.clientWidth, h: host.clientHeight }; }
+
+  // where a world point appears on screen (CSS px), for anchoring page elements
+  function project(x, y, z) {
+    var wx = x, wy = y - M.eye, wz = z - P.camZ, c = Math.cos(P.yaw), s = Math.sin(P.yaw);
+    var vx = wx * c - wz * s, vz = wx * s + wz * c;
+    if (vz < .05) return null;
+    var cw = host.clientWidth;
+    return { x: cw / 2 + vx * k / vz, y: hz - wy * k / vz, s: k / vz, dz: vz };
   }
-  function frame(now) {
-    rafId = requestAnimationFrame(frame);
-    var dt = lastNow ? Math.min(.05, (now - lastNow) / 1000) : .016;
-    // if the device struggles, render fewer pixels (checked over ~1 s windows)
-    if (lastNow && !reduce) {
-      frame.acc = (frame.acc || 0) + dt; frame.n = (frame.n || 0) + 1;
-      if (frame.acc > 1.2) {
-        if (frame.acc / frame.n > .024 && slowFrames < 3) { slowFrames++; resize(); }
-        frame.acc = 0; frame.n = 0;
-      }
+
+  // draw one frame with the given camera/light state (called by journey.js)
+  function draw(now, p) {
+    if (!ready) return;
+    for (var key in p) P[key] = p[key];
+    var sig = [P.camZ.toFixed(4), P.yaw.toFixed(4), P.expo.toFixed(3), P.ignite.toFixed(3), P.win.toFixed(3), P.bloom.toFixed(3)].join();
+    var moving = sig !== lastKey;
+    lastKey = sig;
+    // at rest only the candles and dust move: ~24 redraws a second is plenty
+    if (!moving && !dirty && now - lastDraw < 40) return;
+    // if the device struggles while moving, render fewer pixels
+    if (moving && lastDraw) {
+      acc += now - lastDraw; accN++;
+      if (accN > 45) { if (acc / accN > 24 && slowFrames < 3) { slowFrames++; resize(); } acc = 0; accN = 0; }
     }
-    lastNow = now;
-    var t0 = performance.now();
-    var op = update(dt);
-    if (op <= 0 || !ready) return;
-    if (reduce && !dirty) return;          // reduced motion: a still picture, redrawn only when needed
-    // at rest only the candles and dust move: redraw ~24 times a second to
-    // leave the phone's GPU free for the moment scrolling starts
-    var moving = Math.abs(window.scrollY - state.sy) > .5;
-    if (moving) state.still = 0; else state.still = (state.still || 0) + dt;
-    if (state.still > .3 && !dirty && now - (state.lastDraw || 0) < 40) return;
-    state.lastDraw = now;
+    lastDraw = now;
     dirty = false;
     render(now);
-    state.ms = state.ms ? state.ms * .95 + (performance.now() - t0) * .05 : performance.now() - t0;
   }
 
   function init(el, o) {
     host = el; opts = o || {};
-    reduce = !!opts.reduce;
     canvas = document.createElement("canvas");
     canvas.className = "nave__gl";
     var ctxOpts = { alpha: false, antialias: (window.devicePixelRatio || 1) < 1.5, depth: true, premultipliedAlpha: true, preserveDrawingBuffer: false, powerPreference: "high-performance" };
@@ -403,9 +393,9 @@
       prog = compile(VS, FS); progP = compile(VS_P, FS_P);
     } catch (e) { host.classList.add("nave--still"); canvas.remove(); return false; }
     ["aQ"].forEach(function (n) { U[n] = gl.getAttribLocation(prog, n); });
-    ["O", "U", "V", "Cam", "UV", "Proj", "Tint", "Fog", "Cut", "T"].forEach(function (n) { U[n] = gl.getUniformLocation(prog, "u" + n); });
+    ["O", "U", "V", "Cam", "UV", "Proj", "Tint", "Fog", "Cut", "T", "Yaw", "Expo"].forEach(function (n) { U[n] = gl.getUniformLocation(prog, "u" + n); });
     UP.aP = gl.getAttribLocation(progP, "aP");
-    ["Cam", "Proj", "Px"].forEach(function (n) { UP[n] = gl.getUniformLocation(progP, "u" + n); });
+    ["Cam", "Proj", "Px", "Yaw", "Expo"].forEach(function (n) { UP[n] = gl.getUniformLocation(progP, "u" + n); });
     aniso = gl.getExtension("EXT_texture_filter_anisotropic") || gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic");
     quadBuf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0, 0, 1, 0, 0, 1, 1, 1]), gl.STATIC_DRAW);
@@ -430,14 +420,13 @@
     window.addEventListener("resize", function () {
       // ignore the small height changes of mobile browser bars
       if (host.clientWidth !== lastW || Math.abs(host.clientHeight - lastH) > 140) { lastW = host.clientWidth; lastH = host.clientHeight; resize(); }
-      else measure();
     }, { passive: true });
-    if (window.ResizeObserver) new ResizeObserver(measure).observe(document.body);
     canvas.addEventListener("webglcontextlost", function (e) { e.preventDefault(); ready = false; host.classList.add("nave--still"); });
-    state.sy = window.scrollY;
-    rafId = requestAnimationFrame(frame);
     return true;
   }
 
-  window.Nave = { init: init, M: M, state: state };
+  // without WebGL, project() still works so cards can be placed
+  function initFallback(el) { host = el; k = Math.min(el.clientWidth * 1.25, el.clientHeight * .6); hz = el.clientHeight * .375; }
+
+  window.Nave = { init: init, draw: draw, project: project, M: M, P: P, initFallback: initFallback, isReady: function () { return ready; } };
 })();

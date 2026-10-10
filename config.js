@@ -27,6 +27,7 @@ window.WEDDING = {
   /* ---------------------------------------------------------------- INVITE */
   invitation: {
     eyebrow: "Together with our families",
+    welcome: "In the presence of God and our families…",   // first words as the church wakes
     // Each array item is rendered as its own line.
     lines: [
       "By the grace of God,",
