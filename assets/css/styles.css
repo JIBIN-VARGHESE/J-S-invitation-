@@ -448,30 +448,35 @@ html:not(.journey) .nave { opacity: 1; }
 }
 .still .topbar__mark { display: none; }
 
-/* The site has one look in every theme. Declaring it for both light and dark
-   preferences tells phone browsers (e.g. Samsung Internet's dark mode) that
-   this page handles dark mode itself, so they leave the candlelit gold alone. */
-@media (prefers-color-scheme: dark) {
-  :root { color-scheme: dark; }
-}
-@media (prefers-color-scheme: light) {
-  :root { color-scheme: dark; }
-}
 .journey .scroll-cue { display: none; }
 
-/* ============================================ Samsung Internet dark mode
-   Its forced dark mode can't be switched off by a website: it darkens light
-   backgrounds and lightens dark text, which turned the gold cards brown.
-   It leaves deep colours and light text alone, so on that browser in dark
-   mode the cards use a richer candlelit gold with cream lettering. */
-.safe-gold .card {
-  --fg: #FFF4DE; --fg-soft: #F2DEBC; --accent: #FFDFA0; --line: rgba(255, 223, 160, .38);
-  background: linear-gradient(180deg, #A97F42 0%, #946B33 55%, #7C5826 100%);
-  border-color: rgba(255, 214, 150, .75);
-  text-shadow: 0 1px 2px rgba(40, 22, 4, .55);
+
+/* =============================================== Cards in dark mode
+   Light mode: candlelit gold (above). Dark mode gets its own design,
+   midnight bronze with gold-leaf edges, gold headings and cream lettering.
+   Phone dark modes (e.g. Samsung Internet's, which a site can't switch off)
+   leave deep backgrounds and light text alone, so this looks the same in
+   every browser. */
+@media (prefers-color-scheme: dark) {
+  .card {
+    --fg: #F7ECD8; --fg-soft: #D8C4A2; --accent: #E4BB70; --line: rgba(228, 187, 112, .34);
+    color: var(--fg);
+    background:
+      radial-gradient(120% 55% at 50% 0%, rgba(236, 192, 118, .2), rgba(236, 192, 118, 0) 62%),
+      radial-gradient(90% 40% at 50% 100%, rgba(236, 192, 118, .1), rgba(236, 192, 118, 0) 70%),
+      linear-gradient(180deg, #2C1E11 0%, #1D130A 100%);
+    border: 1px solid rgba(232, 194, 124, .8);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, .5), 0 26px 60px rgba(0, 0, 0, .6), 0 0 60px rgba(240, 184, 102, .22), inset 0 1px 0 rgba(255, 226, 170, .25);
+  }
+  .card::before { border-color: rgba(228, 187, 112, .3); }
+  .card .orn, .card .eyebrow, .card__meta, .card__date b, .countdown__lbl, .card .field label, .card .field legend { color: var(--accent); }
+  .card__title em, .invite__names em { color: #E9C27A; }
+  .card__title, .invite__names, .card__venue, .card__bigdate, .countdown__num { color: #FFF3DE; text-shadow: 0 0 22px rgba(240, 184, 102, .25); }
+  .card__bigdate i { background: var(--accent); }
+  .card .btn { border-color: rgba(228, 187, 112, .75); color: #F3D9A4; }
+  .card .btn:hover { background: rgba(228, 187, 112, .15); color: #FFF3DE; border-color: #E4BB70; }
+  .card .btn--solid { background: #120B05; border-color: #E4BB70; color: #F3D9A4; }
+  .card .choice label { border-color: rgba(228, 187, 112, .45); color: var(--fg); }
+  .card .choice input:checked + label { background: rgba(228, 187, 112, .18); border-color: #E4BB70; color: #FFF3DE; }
+  .card .field input[type="text"], .card .field input[type="number"], .card .field textarea, .card .stepper button { color: #FFF3DE; }
 }
-.safe-gold .card::before { border-color: rgba(255, 223, 160, .3); }
-.safe-gold .card__title em, .safe-gold .invite__names em { color: #FFDFA0; }
-.safe-gold .card .btn { border-color: rgba(255, 223, 160, .7); color: #FFF4DE; }
-.safe-gold .card .btn--solid, .safe-gold .card .choice input:checked + label { background: #3A260C; border-color: #3A260C; color: #FFF4DE; }
-.safe-gold .card .field input, .safe-gold .card .field textarea { color: #FFF4DE; }

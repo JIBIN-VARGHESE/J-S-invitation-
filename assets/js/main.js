@@ -316,16 +316,6 @@
     root.classList.add("is-ready");
   }
 
-  // Samsung Internet's dark mode repaints pages and can't be opted out of;
-  // give it a palette it leaves alone (see .safe-gold in styles.css)
-  (function () {
-    if (!/SamsungBrowser/i.test(navigator.userAgent) || !window.matchMedia) return;
-    var dark = window.matchMedia("(prefers-color-scheme: dark)");
-    var set = function () { root.classList.toggle("safe-gold", dark.matches); };
-    set();
-    if (dark.addEventListener) dark.addEventListener("change", set);
-  })();
-
   bindContent();
   renderLists();
   initLottie();

@@ -28,8 +28,9 @@
   // how fast the timeline plays (units per second) in each stretch
   function rate(x) {
     if (x < 1.1) return .38;            // the statue fades
+    if (x > 2.85 && x < 3.35) return .1;   // Save the Date rests in the centre for a few seconds
     if (x < 3.9) return .42;            // the church wakes, Save the Date
-    if (x < 15.6) return .72;           // walking between the cards
+    if (x < 15.6) return .46;           // walking between the cards (an unhurried glide)
     if (x < 16.9) return .36;           // the light
     return .42;                         // the finale reveals
   }
@@ -50,7 +51,7 @@
   // camera position along the aisle (metres) at given scroll positions;
   // a smooth curve runs through these, so it eases into every stop
   var CAM = [
-    [0, -1.5], [1.0, -1.5], [2.4, .4], [3.9, 5.0],
+    [0, -1.5], [1.0, -1.5], [2.4, .4], [2.9, 1.45], [3.35, 1.65], [3.9, 5.0],
     [4.35, 5.65], [5.15, 5.9], [5.6, 8.0], [7.4, 9.8],
     [7.85, 10.05], [8.6, 10.3], [9.0, 12.2],
     [9.45, 12.65], [10.2, 12.9], [10.6, 14.6],
@@ -250,7 +251,8 @@
     setStyle(el.wake, "wk", "transform", "translate3d(0," + ((1 - ss(1.15, 1.6, s)) * 14 - ss(2.05, 2.35, s) * 14).toFixed(1) + "px,0)");
 
     /* 3 · Save the Date hangs in the aisle */
-    anchor(el.save, "sv", 0, 2.05, 4.2, 2.7, ss(2.35, 2.9, s), 1.8);
+    // it settles in the centre of the screen, rests, then you walk through it
+    anchor(el.save, "sv", 0, 2.05, 4.2, 2.6, ss(2.35, 2.9, s), 1.8, bump(2.45, 2.9, 3.35, 3.75, s));
 
     /* 4 · the cards */
     cards.forEach(function (c) { placeCard(c, s); });
@@ -298,12 +300,15 @@
 
   // a page element hanging in the church at (x, y, z): it is drawn at its
   // CSS size when it is `at` metres away and grows/shrinks with distance
-  function anchor(node, key, x, y, z, at, fadeIn, gone) {
+  function anchor(node, key, x, y, z, at, fadeIn, gone, centre) {
     var p = window.Nave && window.Nave.project(x, y, z);
     var o = p ? fadeIn * ss(gone * .55, gone, p.dz) : 0;
     setStyle(node, key, "opacity", o.toFixed(3));
     setStyle(node, key, "visibility", o > .002 ? "visible" : "hidden");
-    if (o > .002) setStyle(node, key, "transform", "translate3d(" + p.x.toFixed(1) + "px," + p.y.toFixed(1) + "px,0) translate(-50%,-50%) scale(" + (at / p.dz).toFixed(4) + ")");
+    if (o > .002) {
+      var c = centre || 0, px = lerp(p.x, root.clientWidth / 2, c), py = lerp(p.y, window.innerHeight * .44, c);
+      setStyle(node, key, "transform", "translate3d(" + px.toFixed(1) + "px," + py.toFixed(1) + "px,0) translate(-50%,-50%) scale(" + (at / p.dz).toFixed(4) + ")");
+    }
   }
 
   function placeCard(c, s) {
