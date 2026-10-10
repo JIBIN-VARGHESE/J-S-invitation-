@@ -316,18 +316,6 @@
     root.classList.add("is-ready");
   }
 
-  // Samsung Internet's dark mode repaints pages, can't be switched off by a
-  // site and often doesn't tell the page it is on. On that browser (unless the
-  // page knows it's dark, where the dark design applies) the cards use a
-  // deeper candlelit gold with cream lettering, which it leaves untouched.
-  (function () {
-    if (!/SamsungBrowser/i.test(navigator.userAgent)) return;
-    var dark = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : { matches: false };
-    var set = function () { root.classList.toggle("safe-gold", !dark.matches); };
-    set();
-    if (dark.addEventListener) dark.addEventListener("change", set);
-  })();
-
   bindContent();
   renderLists();
   initLottie();

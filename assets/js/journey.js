@@ -36,7 +36,10 @@
     if (x < 16.9) return .36;           // the light
     return .42;                         // the finale reveals
   }
-  var AUTO_START = 1600;     // ms on the statue before the journey begins by itself
+  var REVEAL = 3000;         // ms for the names, date and place to finish fading in (styles.css: .hero__content)
+  var AUTO_START = 3200;     // ms the opening then rests, fully shown, before the journey begins by itself
+  var HURRY = 2.8;           // a tap or swipe while the journey moves plays it this much faster, to the next stop
+  var REPEAT_INTRO = 2;      // a guest who has seen the opening before gets it this much faster
   var HOLD = 2.35;           // metres between camera and a card while you read it
   var CARD_Y = 1.5;          // card height above the floor (metres)
 
@@ -67,7 +70,7 @@
   ];
 
   var doc = document, root = doc.documentElement;
-  var settled = 0, intro = false, introGo = false, resting = false;
+  var settled = 0, intro = false, introGo = false, resting = false, boost = 1, introBoost = 1;
   var el = {}, cards = [], camAt, sm = 0, vel = 0, last = 0, dust = null, opts = {}, chapter = 0;
 
   /* ---------------------------------------------------------- helpers */
@@ -108,8 +111,20 @@
     if (Math.abs(i - settled) > 1) i = settled + (i > settled ? 1 : -1);
     chapter = i;
   }
-  function next() { if (resting && !intro) goTo(settled + 1); }
-  function back() { if (resting && !intro && settled > 1) goTo(settled - 1); }
+  // input while the journey moves is never lost: it hurries the move along
+  function hurry() {
+    if (intro && !introGo) { introGo = true; return; }       // a tap on the statue starts the opening
+    boost = HURRY;
+  }
+  function next() {
+    if (intro || (!resting && STOPS[chapter] > sm)) return hurry();
+    if (resting) goTo(settled + 1);
+  }
+  function back() {
+    if (intro) return;
+    if (!resting) { if (STOPS[chapter] < sm) hurry(); return; }
+    if (settled > 1) goTo(settled - 1);
+  }
 
   function init(o) {
     opts = o || {};
@@ -121,6 +136,12 @@
     if (el.back) el.back.addEventListener("click", back);
     // a single deliberate swipe (or wheel / arrow key) counts as one tap
     var ty = null, tx = null;
+    // a plain tap on the church (not on a link, button or field) while it moves hurries it along
+    doc.addEventListener("click", function (e) {
+      if (resting && !intro) return;
+      if (e.target.closest && e.target.closest("a, button, input, textarea, select, label")) return;
+      hurry();
+    });
     window.addEventListener("touchstart", function (e) { var t = e.touches[0]; ty = t.clientY; tx = t.clientX; }, { passive: true });
     window.addEventListener("touchend", function (e) {
       if (ty == null) return;
@@ -136,7 +157,10 @@
       e.deltaY > 0 ? next() : back();
     }, { passive: true });
     window.addEventListener("keydown", function (e) {
-      if (/INPUT|TEXTAREA/.test((e.target && e.target.tagName) || "")) return;
+      var t = e.target && e.target.closest ? e.target : doc.body;
+      if (t.closest("input, textarea, select, [contenteditable]")) return;
+      // Space on a button or link must press it (the guest stepper, "Send reply"), not move on
+      if (e.key === " " && t.closest("button, a")) return;
       if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") { e.preventDefault(); next(); }
       if (e.key === "ArrowUp" || e.key === "PageUp") { e.preventDefault(); back(); }
     });
@@ -181,14 +205,16 @@
     window.scrollTo(0, 0);
     chapter = 0; sm = 0; settled = 0;
     // the opening (statue → church → Save the Date → invitation) plays on its
-    // own; scrolling during it is ignored. A scroll on the statue starts it early.
+    // own once the names, date and place have fully appeared and rested. A tap,
+    // swipe or key on the statue starts it early; during it, the same hurries it.
     intro = chapter === 0;
-    var t0 = Date.now();
+    try { if (localStorage.getItem("journey-seen")) introBoost = REPEAT_INTRO; } catch (e) {}
+    var readyAt = 0;
     (function autostart() {
-      if (!intro) return;
-      var go = root.classList.contains("is-ready") && Date.now() - t0 >= AUTO_START;
-      if (!go) return setTimeout(autostart, 200);
-      introGo = true;
+      if (!intro || introGo) return;
+      if (!readyAt && root.classList.contains("is-ready")) readyAt = Date.now();
+      if (readyAt && Date.now() - readyAt >= (REVEAL + AUTO_START) / introBoost) { introGo = true; return; }
+      setTimeout(autostart, 100);
     })();
     requestAnimationFrame(frame);
   }
@@ -212,8 +238,8 @@
     if (intro) chapter = introGo ? 1 : 0;
     var target = STOPS[chapter];
     var gap = target - sm, dist = Math.abs(gap);
-    var hurry = gap < 0 ? 2.2 : 1;                                // going back is a little quicker
-    var speed = dist < 1e-4 ? 0 : rate(sm) * hurry * Math.min(1, .12 + dist / .45);
+    var backward = gap < 0 ? 2.2 : 1;                             // going back is a little quicker
+    var speed = dist < 1e-4 ? 0 : rate(sm) * backward * (intro ? introBoost : 1) * boost * Math.min(1, .12 + dist / .45);
     vel += (speed - vel) * (1 - Math.exp(-dt / .28));
     var step = Math.min(dist, vel * dt);
     sm += gap > 0 ? step : -step;
@@ -221,8 +247,11 @@
     var s = sm;
     resting = sm === target;
     if (resting) {
-      settled = chapter;
-      if (intro && chapter === 1) intro = false;              // the opening is over: hand over to the guest
+      settled = chapter; boost = 1;
+      if (intro && chapter === 1) {                           // the opening is over: hand over to the guest
+        intro = false;
+        try { localStorage.setItem("journey-seen", "1"); } catch (e) {}
+      }
     }
 
     /* arrival */

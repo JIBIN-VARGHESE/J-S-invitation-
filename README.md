@@ -43,9 +43,9 @@ The page is one continuous scene, run by `assets/js/journey.js`. Scrolling doesn
 5. **The light:** at the altar the rose window swells until light fills the screen ("Your presence would make our celebration complete").
 6. **Together:** out of the light, the couple photo. It drifts slowly closer, gold dust floats, the names write themselves, the verse and one candle appear.
 
-**Chapters.** The page doesn't scroll. Guests tap **Continue** (or swipe once) to move to the next chapter, and a small **Back** returns; the journey then plays on its own: the camera glides, turns to the next card, the card settles and its words reveal. The opening (statue → church → Save the Date → invitation) and the ending play by themselves. Save the Date and the verse hang in the aisle; each rests a moment and the camera walks through it.
+**Chapters.** The page doesn't scroll. Guests tap **Continue** (or swipe once) to move to the next chapter, and a small **Back** returns; the journey then plays on its own: the camera glides, turns to the next card, the card settles and its words reveal. The opening (statue → church → Save the Date → invitation) and the ending play by themselves; the opening waits until the names, date and place are fully shown. A tap or swipe while the journey moves hurries it to the next stop (on the statue, it starts the opening), and a guest who has seen the opening before gets it twice as fast. Save the Date and the verse hang in the aisle; each rests a moment and the camera walks through it.
 
-**Changing the pacing.** At the top of `journey.js`: `STOPS` (where each chapter rests), `rate()` (how fast each stretch plays), `AUTO_START` (time on the statue);
+**Changing the pacing.** At the top of `journey.js`: `STOPS` (where each chapter rests), `rate()` (how fast each stretch plays), `REVEAL` + `AUTO_START` (time on the statue: the names fading in, then resting), `HURRY` (how much faster a tap during a move plays), `REPEAT_INTRO` (opening speed for returning guests);
 - `TOTAL` is the length in screens of scrolling;
 - `STATIONS` says where each card stands (`z` along the aisle, `x` left/right) and when it arrives (`a`), holds until (`b`) and is passed (`s1`);
 - `CAM` lists the camera's position along the aisle at given scroll points.

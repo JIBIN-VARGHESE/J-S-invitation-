@@ -289,25 +289,33 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 .scene { position: relative; }
 
 /* ------------------------------------------------------- the cards
-   Colour "B · candlelit gold glass": lighter than the church, never white,
-   with dark ink for strong contrast. */
+   One design in every browser and colour scheme: midnight bronze with
+   gold-leaf edges, gold headings and cream lettering. Phone dark modes
+   (Samsung Internet's, which a site can't switch off, WebViews, Chrome's
+   auto-dark) leave deep backgrounds and light text alone, so it looks the
+   same everywhere. Opaque, so the church never shows through the words.
+   Contrast: text 13.8:1, soft text 9.5:1, gold labels 10:1. */
 .card {
-  --fg: #1F150A; --fg-soft: #4C3A22; --accent: #5A3A0E; --bg: #D2B487;
-  --line: rgba(74, 48, 12, .32); --glow: none;
+  --fg: #F7ECD8; --fg-soft: #D8C4A2; --accent: #E4BB70; --bg: #1D130A;
+  --line: rgba(228, 187, 112, .34); --glow: none; --error: #E58A73;   /* errors 6.3:1 */
   width: min(100vw - 2.4rem, 23.5rem);
   padding: 1.9rem 1.45rem 1.8rem;
   display: grid; justify-items: center; gap: .55rem; text-align: center;
   color: var(--fg);
-  background: linear-gradient(180deg, rgba(224, 198, 154, .95) 0%, rgba(200, 168, 120, .95) 55%, rgba(178, 142, 94, .95) 100%);
-  border: 1px solid rgba(244, 210, 150, .8);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, .3), 0 24px 60px rgba(0, 0, 0, .55), 0 0 80px rgba(240, 184, 102, .22), inset 0 1px 0 rgba(255, 242, 214, .7);
+  background:
+    radial-gradient(120% 55% at 50% 0%, rgba(236, 192, 118, .2), rgba(236, 192, 118, 0) 62%),
+    radial-gradient(90% 40% at 50% 100%, rgba(236, 192, 118, .1), rgba(236, 192, 118, 0) 70%),
+    linear-gradient(180deg, #2C1E11 0%, #1D130A 100%);
+  border: 1px solid rgba(232, 194, 124, .8);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .5), 0 26px 60px rgba(0, 0, 0, .6), 0 0 60px rgba(240, 184, 102, .22), inset 0 1px 0 rgba(255, 226, 170, .25);
 }
 .card, .card * { forced-color-adjust: none; }
-.card::before { content: ""; position: absolute; inset: 6px; border: 1px solid rgba(74, 48, 12, .26); pointer-events: none; }
+.card::before { content: ""; position: absolute; inset: 6px; border: 1px solid rgba(228, 187, 112, .3); pointer-events: none; }
 .card .orn { width: 24px; height: 37px; margin: 0 0 .1rem; color: var(--accent); filter: none; }
 .card .eyebrow { color: var(--accent); }
 .card__title { font-size: clamp(1.75rem, 7.8vw, 2.25rem); line-height: 1.1; letter-spacing: .08em; margin-right: -.08em; }
-.card__title em { color: #6B4413; font-size: 1.3em; margin-right: .1em; }
+.card__title em { color: #E9C27A; font-size: 1.3em; margin-right: .1em; }
+.card__title, .invite__names, .card__venue, .card__bigdate, .countdown__num { color: #FFF3DE; text-shadow: 0 0 22px rgba(240, 184, 102, .25); }
 .card__date { display: flex; align-items: center; gap: .85rem; margin-top: .2rem; }
 .card__date b { font-family: var(--display); font-weight: 400; font-size: 3.6rem; line-height: .9; color: var(--accent); }
 .card__date > span { padding-left: .85rem; border-left: 1px solid var(--line); text-align: left; width: 5.2em; font-family: var(--sans); font-weight: 500; font-size: .72rem; letter-spacing: var(--track); text-transform: uppercase; }
@@ -322,13 +330,13 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 .card__time { font-style: italic; font-size: 1.15rem; }
 .card__addr { color: var(--fg-soft); font-size: 1rem; }
 .card__addr:empty { display: none; }
-.card .btn { margin-top: .45rem; min-height: 44px; padding: .7rem 1.4rem; border-color: rgba(74, 48, 12, .6); color: var(--fg); }
-.card .btn:hover { background: #3A260C; border-color: #3A260C; color: #F3E3C4; box-shadow: none; }
+.card .btn { margin-top: .45rem; min-height: 44px; padding: .7rem 1.4rem; border-color: rgba(228, 187, 112, .75); color: #F3D9A4; }
+.card .btn:hover { background: rgba(228, 187, 112, .15); border-color: #E4BB70; color: #FFF3DE; box-shadow: none; }
 .card .tba { color: var(--fg-soft); }
 .invite__lines { margin: .3rem 0 .4rem; font-size: 1.12rem; line-height: 1.45; }
 .invite__names { display: flex; flex-direction: column; align-items: center; font-size: 1.42rem; line-height: 1.15; letter-spacing: .1em; }
 .invite__names span { white-space: nowrap; margin-right: -.1em; }
-.invite__names em { font-family: var(--script); font-style: normal; text-transform: none; letter-spacing: 0; font-size: 1.5em; line-height: .85; color: #6B4413; }
+.invite__names em { font-family: var(--script); font-style: normal; text-transform: none; letter-spacing: 0; font-size: 1.5em; line-height: .85; color: #E9C27A; }
 
 /* countdown and reply, inside cards */
 .countdown__grid { width: 100%; margin-top: .6rem; display: grid; grid-template-columns: repeat(4, 1fr); }
@@ -345,9 +353,10 @@ h1, h2, h3, p, .invite__lines p, .verse__text { text-wrap: balance; }
 .card--rsvp .stepper button { height: 40px; }
 .card--rsvp .field__error { min-height: 0; font-size: .95rem; }
 .card--rsvp .field__error:empty { display: none; }
-.card .btn--solid { width: 100%; background: #2A1B0B; border-color: #2A1B0B; color: #F3E3C4; }
-.card .btn--solid:hover { background: #4A300F; }
-.card .choice input:checked + label { background: #2A1B0B; border-color: #2A1B0B; color: #F3E3C4; }
+.card .btn--solid { width: 100%; background: #120B05; border-color: #E4BB70; color: #F3D9A4; }
+.card .btn--solid:hover { background: rgba(228, 187, 112, .18); color: #FFF3DE; }
+.card .choice label { border-color: rgba(228, 187, 112, .45); }
+.card .choice input:checked + label { background: rgba(228, 187, 112, .18); border-color: #E4BB70; color: #FFF3DE; }
 
 /* ------------------------------------------------------ words in the church */
 .wake__line { max-width: 20rem; font-weight: 300; font-style: italic; font-size: clamp(1.7rem, 7vw, 2.4rem); line-height: 1.3; color: #FFF4E0; text-shadow: 0 0 30px rgba(240, 184, 102, .5), 0 2px 16px rgba(0, 0, 0, .8); }
@@ -453,51 +462,3 @@ html:not(.journey) .nave { opacity: 1; }
 .still .topbar__mark { display: none; }
 
 .journey .scroll-cue { display: none; }
-
-
-/* ============================================ Samsung Internet
-   Its dark mode darkens light backgrounds and lightens dark text, can't be
-   switched off by a site, and often doesn't report itself. On that browser
-   the cards use a deeper candlelit gold with cream lettering, which it
-   leaves alone, so they look the same with its dark mode on or off. */
-.safe-gold .card {
-  --fg: #FFF4DE; --fg-soft: #F2DEBC; --accent: #FFDFA0; --line: rgba(255, 223, 160, .38);
-  background: linear-gradient(180deg, #A97F42 0%, #946B33 55%, #7C5826 100%);
-  border-color: rgba(255, 214, 150, .75);
-  text-shadow: 0 1px 2px rgba(40, 22, 4, .55);
-}
-.safe-gold .card::before { border-color: rgba(255, 223, 160, .3); }
-.safe-gold .card__title em, .safe-gold .invite__names em { color: #FFDFA0; }
-.safe-gold .card .btn { border-color: rgba(255, 223, 160, .7); color: #FFF4DE; }
-.safe-gold .card .btn--solid, .safe-gold .card .choice input:checked + label { background: #3A260C; border-color: #3A260C; color: #FFF4DE; }
-.safe-gold .card .field input, .safe-gold .card .field textarea, .safe-gold .card .stepper button { color: #FFF4DE; }
-
-/* =============================================== Cards in dark mode
-   Light mode: candlelit gold (above). Dark mode gets its own design,
-   midnight bronze with gold-leaf edges, gold headings and cream lettering.
-   Phone dark modes (e.g. Samsung Internet's, which a site can't switch off)
-   leave deep backgrounds and light text alone, so this looks the same in
-   every browser. */
-@media (prefers-color-scheme: dark) {
-  .card {
-    --fg: #F7ECD8; --fg-soft: #D8C4A2; --accent: #E4BB70; --line: rgba(228, 187, 112, .34);
-    color: var(--fg);
-    background:
-      radial-gradient(120% 55% at 50% 0%, rgba(236, 192, 118, .2), rgba(236, 192, 118, 0) 62%),
-      radial-gradient(90% 40% at 50% 100%, rgba(236, 192, 118, .1), rgba(236, 192, 118, 0) 70%),
-      linear-gradient(180deg, #2C1E11 0%, #1D130A 100%);
-    border: 1px solid rgba(232, 194, 124, .8);
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, .5), 0 26px 60px rgba(0, 0, 0, .6), 0 0 60px rgba(240, 184, 102, .22), inset 0 1px 0 rgba(255, 226, 170, .25);
-  }
-  .card::before { border-color: rgba(228, 187, 112, .3); }
-  .card .orn, .card .eyebrow, .card__meta, .card__date b, .countdown__lbl, .card .field label, .card .field legend { color: var(--accent); }
-  .card__title em, .invite__names em { color: #E9C27A; }
-  .card__title, .invite__names, .card__venue, .card__bigdate, .countdown__num { color: #FFF3DE; text-shadow: 0 0 22px rgba(240, 184, 102, .25); }
-  .card__bigdate i { background: var(--accent); }
-  .card .btn { border-color: rgba(228, 187, 112, .75); color: #F3D9A4; }
-  .card .btn:hover { background: rgba(228, 187, 112, .15); color: #FFF3DE; border-color: #E4BB70; }
-  .card .btn--solid { background: #120B05; border-color: #E4BB70; color: #F3D9A4; }
-  .card .choice label { border-color: rgba(228, 187, 112, .45); color: var(--fg); }
-  .card .choice input:checked + label { background: rgba(228, 187, 112, .18); border-color: #E4BB70; color: #FFF3DE; }
-  .card .field input[type="text"], .card .field input[type="number"], .card .field textarea, .card .stepper button { color: #FFF3DE; }
-}
