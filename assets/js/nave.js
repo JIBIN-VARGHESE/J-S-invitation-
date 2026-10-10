@@ -1,11 +1,11 @@
 /* =============================================================================
    The nave — a small WebGL renderer for the church interior behind the page.
    World units are metres. The camera stands at eye height in the aisle and
-   walks toward the altar as the page scrolls; at the end the couple appear
-   before the altar in an embrace.
+   walks toward the altar as the page scrolls and stops before it as the
+   closing section begins (where a photograph of the couple fades in).
 
    Everything is textured quads in true perspective (floor, walls, piers,
-   arches, pews, the couple), drawn far to near, plus additive light (window
+   arches, pews), drawn far to near, plus additive light (window
    beams, candle glows, dust). One draw loop, GPU only — no layout work.
    Falls back to a still image when WebGL is unavailable.
    ========================================================================== */
@@ -19,14 +19,6 @@
     pewFrom: 1.8, pewTo: 19.8, pewIn: .82, pewOut: 1.86,
     coupleZ: 23.6, altarZ: 26.2, endDist: 4.3,
   };
-  // the couple (assets/images/nave/couple.webp): the embrace from the Freepik
-  // pack, gown ivory, boutonniere white, the rest dark. Frame units: 153 = 1 m.
-  var FIG = { unit: 153, cx: 236, floor: 478 };
-  var PIECES = {
-    eVeil: { uv: [.00586, .00781, .25879, .95313], bb: [158, 194, 312.17, 482.1] },
-    eBody: { uv: [.26855, .00781, .52148, .95313], bb: [158, 194, 312.17, 482.1] },
-  };
-
   var VS = [
     "attribute vec2 aQ;",
     "uniform vec3 uO, uU, uV, uCam;",
@@ -69,7 +61,7 @@
   var gl, canvas, prog, progP, U = {}, UP = {}, quadBuf, moteBuf, tex = {}, ready = false;
   var W = 0, H = 0, dpr = 1, k = 1, hz = 0;
   var solids = [], lights = [], motes, moteData, NM = 70;
-  var state = { sy: 0, t: 0, camZ: 0, hug: 0 };
+  var state = { sy: 0, t: 0, camZ: 0 };
   var layout = { heroH: 0, closeTop: 0, closeH: 0, vh: 0 };
   var opts = {}, reduce = false, dirty = true, rafId = 0, lastNow = 0, slowFrames = 0, host;
 
@@ -210,7 +202,7 @@
         items.push(Q(tex.pewend, [s * M.pewIn, 0, r + .6], [0, 0, -.6], [0, 1.12, 0], null, grey(1), { cut: .5, z: r + .3, x0: s * M.pewIn, x1: s * M.pewIn, top: 1.12 }));
       });
     }
-    // two tall candle stands beside the couple
+    // two tall candle stands before the altar
     [-1, 1].forEach(function (s) {
       var x = s * 1.32, z = M.coupleZ + .9;
       items.push(Q(tex.white, [x - .02, 0, z], [.04, 0, 0], [0, 1.32, 0], null, grey(.045), { cut: .5, x0: x, x1: x, top: 1.4 }));
@@ -225,26 +217,12 @@
     lights.push({ kind: "pool", p: [0, 0, M.altarZ - 1.8], s: 7, c: [1, .7, .4], a: .16, ph: 0, still: true });
     lights.push({ kind: "glow", p: [0, 4.3, M.altarZ - .1], s: 7.5, c: [1, .66, .36], a: .12, ph: 0, still: true, fog: .01 });
     items.sort(function (a, b) { return b.z - a.z; });
-    // insert the couple at its depth
-    var at = 0; while (at < items.length && items[at].z > M.coupleZ) at++;
-    items.splice(at, 0, { couple: true, z: M.coupleZ });
     M.items = items;
 
     // dust: random points in a box ahead of the camera, wrapped as we walk
     moteData = new Float32Array(NM * 4);
     motes = [];
     for (var m = 0; m < NM; m++) motes.push({ x: (Math.random() * 2 - 1) * 2.4, y: .3 + Math.random() * 6, z: Math.random() * 14, ph: Math.random() * 6.28, sp: .4 + Math.random() * .6 });
-  }
-
-  /* --------------------------------------------------------- the couple */
-  // a still picture standing before the altar; it only fades in
-  function piece(name, a) {
-    var p = PIECES[name], b = p.bb, x0 = (b[0] - FIG.cx) / FIG.unit, x1 = (b[2] - FIG.cx) / FIG.unit;
-    var y0 = (FIG.floor - b[3]) / FIG.unit, y1 = (FIG.floor - b[1]) / FIG.unit;
-    return { O: [x0, y0, M.coupleZ], U: [x1 - x0, 0, 0], V: [0, y1 - y0, 0], uv: p.uv, a: a };
-  }
-  function coupleQuads() {
-    return state.hug > .001 ? [piece("eVeil", state.hug), piece("eBody", state.hug)] : [];
   }
 
   /* ------------------------------------------------------------- render */
@@ -285,29 +263,13 @@
     gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     boundTex = null;
 
-    var couple = coupleQuads();
     // planes: floor, carpet, walls, altar
     for (var i = 0; i < 2; i++) { bind(solids[i].t); setQuad(solids[i], solids[i].tint, solids[i].fog, solids[i].cut); }
-    // the couple's reflection in the polished floor
-    if (tex.couple.ok) {
-      gl.disable(gl.DEPTH_TEST);
-      bind(tex.couple);
-      couple.forEach(function (c) {
-        var ra = .16 * c.a; setQuad({ O: [c.O[0], -c.O[1], c.O[2]], U: [c.U[0], -c.U[1], 0], V: [c.V[0], -c.V[1], 0], uv: c.uv }, [.13 * c.a, .1 * c.a, .08 * c.a, ra], .02, 0);
-      });
-      gl.enable(gl.DEPTH_TEST);
-    }
     for (i = 2; i < solids.length; i++) { bind(solids[i].t); setQuad(solids[i], solids[i].tint, solids[i].fog, solids[i].cut); }
     // depth-sorted billboards, far to near
     var items = M.items;
     for (i = 0; i < items.length; i++) {
       var o = items[i];
-      if (o.couple) {
-        if (!tex.couple.ok) continue;
-        bind(tex.couple);
-        for (var c = 0; c < couple.length; c++) { var ca = couple[c].a; setQuad(couple[c], [ca, ca, ca, ca], .02, .01); }
-        continue;
-      }
       if (!visible(o, cam)) continue;
       bind(o.t); setQuad(o, o.tint, o.fog, o.cut);
     }
@@ -334,12 +296,6 @@
         var sw = l.kind === "flame" ? s * .55 : s;
         setQuad({ O: [p[0] - sw / 2, p[1] - s / 2, p[2]], U: [sw, 0, 0], V: [0, s, 0], uv: [0, 0, 1, 1] }, col, l.fog || .04, 0);
       }
-    }
-    // a warm bloom behind the couple while one pose dissolves into the other
-    var bloom = Math.sin(Math.PI * state.hug) * .3;
-    if (bloom > .005) {
-      bind(tex.glow);
-      setQuad({ O: [-1.9, -.4, M.coupleZ + .15], U: [3.8, 0, 0], V: [0, 3.8, 0], uv: [0, 0, 1, 1] }, [bloom, bloom * .66, bloom * .36, 0], .02, 0);
     }
     // dust in the light
     gl.useProgram(progP);
@@ -402,9 +358,6 @@
     var endZ = M.coupleZ - M.endDist;
     state.t = t;
     state.camZ = reduce ? endZ * .62 : endZ * (.78 * t + .22 * smooth(t));
-    // the couple appear once, as a transition, early in the closing section
-    var hugFrom = layout.closeTop + (layout.closeH - vh) * .06, hugLen = (layout.closeH - vh) * .16;
-    state.hug = reduce ? 1 : smooth(Math.min(1, Math.max(0, (sy - hugFrom) / Math.max(1, hugLen))));
     // fade the church in as the opening film scrolls away
     var op = reduce ? 1 : Math.min(1, Math.max(0, y / (layout.heroH * .7)));
     if (op !== state.op) { state.op = op; host.style.opacity = op.toFixed(3); }
@@ -428,7 +381,7 @@
     if (reduce && !dirty) return;          // reduced motion: a still picture, redrawn only when needed
     // at rest only the candles and dust move: redraw ~24 times a second to
     // leave the phone's GPU free for the moment scrolling starts
-    var moving = Math.abs(window.scrollY - state.sy) > .5 || state.hug > 0 && state.hug < 1;
+    var moving = Math.abs(window.scrollY - state.sy) > .5;
     if (moving) state.still = 0; else state.still = (state.still || 0) + dt;
     if (state.still > .3 && !dirty && now - (state.lastDraw || 0) < 40) return;
     state.lastDraw = now;
@@ -469,7 +422,6 @@
     tex.pew = texture(A.pew || base + "pew.webp", true);
     tex.pewend = texture(A.pewend || base + "pewend.webp");
     tex.altar = texture(A.altar || base + "altar.webp");
-    tex.couple = texture(A.couple || base + "couple.webp");
     makeSprites();
     build();
     resize();

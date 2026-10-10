@@ -34,7 +34,7 @@ Open **`config.js`**. It holds the names, dates, times, venues, addresses, map l
 
 ## 2. The walk down the aisle
 
-After the opening film, a church interior sits **fixed behind the whole page**, drawn in real 3D with WebGL by `assets/js/nave.js`. As guests scroll, the camera walks down the aisle between pews and clustered stone pillars, under pointed arches, with light falling from the high windows and candles flickering on the pillars. The camera eases toward the scroll position, so it keeps gliding for a moment after the finger stops. The camera stops before the altar as the closing section begins; then the bride (ivory gown) and groom (white boutonnière) appear in an embrace, faded in with a warm glow, and the names follow. The couple don't move. Every section floats over the church on a parchment card, with a screen of church between cards.
+After the opening film, a church interior sits **fixed behind the whole page**, drawn in real 3D with WebGL by `assets/js/nave.js`. As guests scroll, the camera walks down the aisle between pews and clustered stone pillars, under pointed arches, with light falling from the high windows and candles flickering on the pillars. The camera eases toward the scroll position, so it keeps gliding for a moment after the finger stops. The camera stops before the altar as the closing section begins; then a photograph of a couple embracing beneath arches fades in over the church, and the names follow. Every section floats over the church on a parchment card, with a screen of church between cards.
 
 | Layer | File | Notes |
 |---|---|---|
@@ -42,7 +42,7 @@ After the opening film, a church interior sits **fixed behind the whole page**, 
 | Floor, carpet, walls, side-aisle windows | `floor.webp`, `carpet.webp`, `wall.webp`, `aisle.webp` | rendered for this site; they repeat |
 | Pillars, arches, pews | `pier.webp`, `arch.webp`, `pew.webp`, `pewend.webp` | rendered for this site |
 | Altar wall (rose window, altar, candles) | `altar.webp` | rendered for this site |
-| The couple | `couple.webp` | the embrace (bottom-left pose) from the Freepik pack you supplied, recoloured: gown ivory, boutonnière white, everything else dark. Source shapes in `assets/images/nave/source/` |
+| The couple (ending) | `assets/images/closing/couple-arches.webp` | photo you supplied; fades in over the church as the closing begins. Use only a photo you own or have permission to publish |
 
 All in `assets/images/nave/`; paths are listed in `config.js → art`. Texture sizes are powers of two (512, 1024, 2048); keep them that way if you replace one.
 
@@ -53,9 +53,9 @@ All in `assets/images/nave/`; paths are listed in `config.js → art`. Texture s
 
 
 
-**Phones without WebGL** (very rare) see a still picture of the altar instead. Guests with "reduce motion" turned on see a still view of the church with the couple already in the embrace.
+**Phones without WebGL** (very rare) see a still picture of the altar instead. Guests with "reduce motion" turned on see the church and the closing photo without animation.
 
-**Credits.** The footer credit line was removed at your request. The free Vecteezy (opening picture) and Freepik (couple) licences require visible attribution, so either hold premium licences for both or add a credit line back at the end of `index.html`.
+**Credits.** The footer credit line was removed at your request. The free Vecteezy licence (opening picture) requires visible attribution, so either hold a premium licence or add a credit line back at the end of `index.html`.
 
 `assets/images/glass/` holds the stained-glass renders used to build the windows and altar wall. The page doesn't load them.
 
